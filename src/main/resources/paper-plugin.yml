@@ -1,0 +1,6 @@
+name: KnockBackffA
+version: '${version}'
+main: dev.marten_mrfcyt.knockbackffa.KnockBackffA
+api-version: '1.20'
+authors: [Marten_mrfcyt]
+description: The #1 Knockbackffa plugin
