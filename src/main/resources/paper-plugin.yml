@@ -2,3 +2,5 @@ name: KnockBackFFA
 version: '${version}'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 api-version: '1.20'
+authors: [Marten_Mrfcyt]
+description: The best KnockBackFFA plugin!
