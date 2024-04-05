@@ -5,6 +5,7 @@ import org.bukkit.plugin.java.JavaPlugin
 class KnockBackFFA : JavaPlugin() {
     override fun onEnable() {
         logger.info("KnockBackFFA has been enabled!")
+        kbffaCommand()
     }
 
     override fun onDisable() {
