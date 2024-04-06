@@ -73,7 +73,7 @@ task<ShadowJar>("buildAndMove") {
     // Move the jar from the build/libs folder to the server/plugins folder
     doLast {
         val jar = file("build/libs/%s-%s-all.jar".format(project.name, version))
-        val server = file("server/plugins/%s.jar".format(project.name.capitalizeAsciiOnly()))
+        val server = file("server/plugins/%s-%s.jar".format(project.name.capitalizeAsciiOnly(), version))
 
         // Delete the old file if it exists
         if (server.exists()) {
