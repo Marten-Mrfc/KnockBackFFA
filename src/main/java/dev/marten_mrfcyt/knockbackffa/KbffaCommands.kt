@@ -5,10 +5,10 @@ import dev.marten_mrfcyt.knockbackffa.utils.sendMini
 import org.bukkit.plugin.Plugin
 import lirand.api.dsl.command.builders.LiteralDSLBuilder
 import lirand.api.dsl.command.builders.command
-import dev.marten_mrfcyt.knockbackffa.arena.createArena
-import dev.marten_mrfcyt.knockbackffa.utils.message
 import com.mojang.brigadier.arguments.StringArgumentType.string
+import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
+import dev.marten_mrfcyt.knockbackffa.arena.listArena
 
 fun Plugin.kbffaCommand() = command("kbffa") {
     setup()
@@ -28,7 +28,7 @@ private fun LiteralDSLBuilder.setup() {
         }
         literal("list") {
             executes {
-                source.message("Arena list command")
+                plugin.listArena(source)
             }
         }
         literal("delete") {
@@ -41,16 +41,16 @@ private fun LiteralDSLBuilder.setup() {
                 source.error("Please insert a name for the arena!")
             }
         }
-    }
-    executes {
-        // List all commands in help command format
-        source.sendMini(
-            """
+        executes {
+            // List all commands in help command format
+            source.sendMini(
+                """
                 <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Command
                 <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Create an arena
                 <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>List all arenas
                 <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Delete an arena
             """.trimIndent()
-        )
+            )
+        }
     }
 }
