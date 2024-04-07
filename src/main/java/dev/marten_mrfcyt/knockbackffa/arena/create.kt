@@ -1,15 +1,12 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
-import dev.marten_mrfcyt.knockbackffa.utils.sendMini
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
-
 fun Plugin.createArena(source: CommandSender, name: String) {
     if (source is Player) {
     // Setting location and modifying name.
@@ -29,9 +26,26 @@ fun Plugin.createArena(source: CommandSender, name: String) {
             source.message("arena.yml file created!")
         }
         val arenaConfig = YamlConfiguration.loadConfiguration(config)
-        arenaConfig.set("arenas.$arenaName.location", location)
-        arenaConfig.save(config)
-        source.message("Arena $arenaName <green>created<white> successfully!")
+        if (!arenaConfig.contains("arenas.$arenaName")) {
+            if (location.world?.pvp == true) {
+                with(arenaConfig) {
+                    set("arenas.$arenaName.location.world", location.world?.name)
+                    set("arenas.$arenaName.location.x", location.x)
+                    set("arenas.$arenaName.location.y", location.y)
+                    set("arenas.$arenaName.location.z", location.z)
+                    set("arenas.$arenaName.location.yaw", location.yaw)
+                    set("arenas.$arenaName.location.pitch", location.pitch)
+                }
+                arenaConfig.save(config)
+                source.message("Arena $arenaName <green>created<white> successfully!")
+            }
+            else {
+                source.error("This world needs pvp to be enabled!")
+            }
+        }
+        else {
+            source.error("Arena $arenaName <green>already exists<white>!")
+        }
     }
     else {
         source.error("You must be a player to create an arena!")
