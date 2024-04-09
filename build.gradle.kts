@@ -14,15 +14,11 @@ version = "0.1-dev"
 repositories {
     mavenCentral()
     maven("https://jitpack.io")
-    maven {
-        name = "papermc-repo"
-        url = uri("https://repo.papermc.io/repository/maven-public/")
-    }
-    maven {
-        name = "sonatype"
-        url = uri("https://oss.sonatype.org/content/groups/public/")
-    }
+    maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
+    maven("https://repo.opencollab.dev/maven-snapshots/")
+    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://libraries.minecraft.net")
 }
 val centralDependencies = listOf(
@@ -32,13 +28,17 @@ val centralDependencies = listOf(
     "com.corundumstudio.socketio:netty-socketio:1.7.19", // Keep this on a lower version as the newer version breaks the ping
 )
 dependencies {
-    compileOnly ("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
-    implementation ("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compileOnly("io.papermc.paper:paper-api:1.20.4-R0.1-SNAPSHOT")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     implementation("net.kyori:adventure-text-minimessage:4.16.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.6.0")
     implementation("com.github.dyam0:LirandAPI:96cc59d4fb")
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("net.kyori:adventure-text-minimessage:4.13.1")
+    compileOnly("me.clip:placeholderapi:2.11.3")
+    implementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    implementation("org.mockito:mockito-core:5.11.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 }
 
 val targetJavaVersion = 17
