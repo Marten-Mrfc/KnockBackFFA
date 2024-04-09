@@ -22,7 +22,6 @@ class PlayerData(plugin: KnockBackFFA) {
     // Save player data
     fun savePlayerData(playerId: UUID, playerData: YamlConfiguration, plugin: KnockBackFFA) {
         val playerDataFile = File(playerDataDirectory, "$playerId.yml")
-        plugin.logger.info("Saving player data for $playerId...")
         playerData.save(playerDataFile)
     }
 }

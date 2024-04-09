@@ -1,12 +1,14 @@
 package dev.marten_mrfcyt.knockbackffa
 
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
+import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
 import dev.marten_mrfcyt.knockbackffa.player.ScoreHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import lirand.api.architecture.KotlinPlugin
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
+import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 
 class KnockBackFFA : KotlinPlugin() {
 
@@ -14,7 +16,6 @@ class KnockBackFFA : KotlinPlugin() {
         lateinit var instance: KnockBackFFA
             private set
     }
-
     override fun onEnable() {
         instance = this
 
@@ -28,10 +29,11 @@ class KnockBackFFA : KotlinPlugin() {
         } catch (ex: IllegalArgumentException) {
             logger.severe("Failed to save default config: ${ex.message}")
         }
+        val scoreboardHandler = ScoreboardHandler(this)
         kbffaCommand()
         logger.info("Commands registered -> Registering events...")
         var amount = 1
-        listOf(registerEvents(PlayerJoinListener(), ScoreHandler(this))).forEach { _ -> amount++ }
+        listOf(registerEvents(PlayerJoinListener(scoreboardHandler), PlayerQuitListener(scoreboardHandler), ScoreHandler(this))).forEach { _ -> amount++ }
         logger.info("$amount events registered -> Registering placeholders...")
         val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
         if (placeholderAPI != null) {
