@@ -1,0 +1,14 @@
+scoreboard:
+  title: "<gold><bold>KnockBackFFA<reset>"
+  lines:
+    - "<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>"
+    - "<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>"
+    - "<gray><b>└</b></gray><white>Current map:</white> <green>%knockbackffa_map%</green>"
+    - ""
+    - "<gray><b>┌─</b></gray><gold><b>STATS</b></gold>"
+    - "<gray><b>├</b></gray><white>Your ping: </white><green>%player_ping%</green>"
+    - "<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_kills%</green>"
+    - "<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_killstreak%</green>"
+    - "<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>"
+    - "<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>"
+    - "<gray><b>└</b></gray><white>Elo: </white> <green>%knockbackffa_elo%</green>"
