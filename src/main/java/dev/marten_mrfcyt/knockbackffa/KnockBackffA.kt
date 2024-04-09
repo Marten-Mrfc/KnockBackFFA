@@ -9,18 +9,30 @@ import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 
 class KnockBackFFA : KotlinPlugin() {
-    override suspend fun onEnableAsync() {
-        logger.info("KnockBackFFA enabled!")
+
+    companion object {
+        lateinit var instance: KnockBackFFA
+            private set
+    }
+
+    override fun onEnable() {
+        instance = this
+
+        logger.info("Registering commands...")
         if (!dataFolder.exists() && !dataFolder.mkdir()) {
             logger.severe("Failed to create data folder!")
             return
         }
-        try { saveDefaultConfig() }
-        catch (ex: IllegalArgumentException) { logger.severe("Failed to save default config: ${ex.message}") }
+        try {
+            saveDefaultConfig()
+        } catch (ex: IllegalArgumentException) {
+            logger.severe("Failed to save default config: ${ex.message}")
+        }
         kbffaCommand()
-
-        // Register all event listeners
-        registerEvents(PlayerJoinListener())
+        logger.info("Commands registered -> Registering events...")
+        var amount = 1
+        listOf(registerEvents(PlayerJoinListener(), ScoreHandler(this))).forEach { _ -> amount++ }
+        logger.info("$amount events registered -> Registering placeholders...")
         val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
         if (placeholderAPI != null) {
             PlaceHolderAPI(this).register()
@@ -30,8 +42,6 @@ class KnockBackFFA : KotlinPlugin() {
             Bukkit.getPluginManager().disablePlugin(this)
         }
     }
-
-    override suspend fun onDisableAsync() {
     override fun onDisable() {
         logger.info("KnockBackFFA has been disabled!")
     }
