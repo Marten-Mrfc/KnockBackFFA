@@ -14,12 +14,11 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
         source.message("<dark_red>Deleting<white> arena $name!")
         val config = File("$dataFolder/arena.yml")
         val arenaConfig = YamlConfiguration.loadConfiguration(config)
-        if (!config.readLines().contains("arenas.$name")) {
+        if (!arenaConfig.contains("arenas.$name")) {
             source.error("Arena $name <dark_red>not found. Is it misspelled<white>!")
             return
         }
         arenaConfig.set("arenas.$name", null)
-        arenaConfig.set("arenas.$name.location", null)
         arenaConfig.save(config)
         source.message("Arena $name <dark_red>deleted<white> successfully!")
     }
