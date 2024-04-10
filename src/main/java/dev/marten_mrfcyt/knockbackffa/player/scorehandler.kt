@@ -31,9 +31,9 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             if (killer != null) {
                 val killerData = PlayerData(plugin).getPlayerData(killer.uniqueId)
                 killerData.set("kills", killerData.getInt("kills", 0) + 1)
-                PlayerData(plugin).savePlayerData(killer.uniqueId, killerData, plugin)
+                PlayerData(plugin).savePlayerData(killer.uniqueId, killerData)
             }
-            PlayerData(plugin).savePlayerData(source.uniqueId, playerData, plugin)
+            PlayerData(plugin).savePlayerData(source.uniqueId, playerData)
         } catch (e: Exception) {
             plugin.logger.severe("Failed to load or save player data: ${e.message}")
             e.printStackTrace()

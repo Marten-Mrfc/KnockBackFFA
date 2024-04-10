@@ -41,8 +41,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             }
         }.runTaskAsynchronously(plugin)
     }
-    var currentArena: Arena? = null
-        private set
+    private var currentArena: Arena? = null
     fun switchArena() {
         if (arenas.isNotEmpty()) {
             val arena = arenas[Random.nextInt(arenas.size)]
@@ -59,13 +58,5 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
     }
     fun getArenaNames(): CompletableFuture<List<String>> {
         return arenasLoaded.thenApply { arenas.map { it.name } }
-    }
-    fun getArenaLocation(name: String): Location? {
-        for (arena in arenas) {
-            if (arena.name == name) {
-                return arena.location
-            }
-        }
-        return null
     }
 }

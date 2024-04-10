@@ -12,8 +12,6 @@ import java.util.*
 
 class ScoreboardHandler(private val plugin: KnockBackFFA) {
     // Create a map to store custom display names
-    private val displayNames: MutableMap<String, String> = mutableMapOf()
-
     fun createScoreboard(source: Player) {
         val scoreboard = Bukkit.getScoreboardManager().newScoreboard
 

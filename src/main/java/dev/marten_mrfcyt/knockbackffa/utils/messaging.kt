@@ -38,10 +38,6 @@ fun message(message: String, player: Player? = null): Component {
     val formattedMessage = PlaceholderAPI.setPlaceholders(player, "<gold><bold>KnockBackFFA</bold><gray> | <white> $message")
     return formattedMessage.asMini()
 }
-fun formatMessage(player: Player, message: String): Component {
-    val formattedMessage = PlaceholderAPI.setPlaceholders(player, message)
-    return formattedMessage.asMini()
-}
 
 fun cmessage(messageKey: String, player: Player? = null, vararg args: String) = "<gold><bold>KnockBackFFA</bold><gray> | <white> ${getMessage(messageKey, player, *args)}".asMini()
 

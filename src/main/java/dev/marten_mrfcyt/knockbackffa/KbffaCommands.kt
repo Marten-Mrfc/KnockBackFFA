@@ -13,8 +13,6 @@ import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import dev.marten_mrfcyt.knockbackffa.kits.KitCreate
-import lirand.api.dsl.command.builders.BrigadierCommandContext
-import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
