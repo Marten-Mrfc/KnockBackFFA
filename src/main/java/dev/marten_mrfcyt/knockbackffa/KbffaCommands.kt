@@ -12,6 +12,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
+import dev.marten_mrfcyt.knockbackffa.kits.KitCreate
 import lirand.api.dsl.command.builders.BrigadierCommandContext
 import org.bukkit.command.CommandSender
 import java.util.concurrent.CompletableFuture
@@ -62,6 +63,19 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
             )
         }
     }
+    literal("kit") {
+        literal("create") {
+            argument("name", string()) {
+                executes {
+                    KitCreate(KnockBackFFA()).openKitCreationGUI(source, getArgument("name"))
+                }
+            }
+            executes {
+                source.error("Please insert a name for the kit!")
+            }
+        }
+    }
+}
 fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
     return arenaHandler.getArenaNames().thenApply { names ->
         names.forEach {
