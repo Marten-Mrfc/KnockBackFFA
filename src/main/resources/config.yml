@@ -1,3 +1,8 @@
+################################
+#                              #
+#          Scoreboard          #
+#                              #
+################################
 scoreboard:
   title: "<gold><bold>KnockBackFFA<reset>"
   lines:
@@ -12,3 +17,10 @@ scoreboard:
     - "<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>"
     - "<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>"
     - "<gray><b>└</b></gray><white>Elo: </white> <green>%knockbackffa_elo%</green>"
+
+################################
+#                              #
+#      DO NOT EDIT THESE!      #
+#                              #
+################################
+currentArena:
