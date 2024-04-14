@@ -35,6 +35,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                         event.isCancelled = true
                         val itemInHand = event.cursor
                         val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_display_item") as String
+                        val name = kitConfig.getConfigurationSection("kit.$kitName")?.getString("DisplayName")
                         val kitLore = kitConfig.getConfigurationSection("kit.$kitName")?.getString("Lore")
                         if (itemInHand.type != Material.AIR) {
                             val itemType = itemInHand.type.name
@@ -52,8 +53,8 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             } ?: source.error("Kit section could not be found.")
                         }
                         kitConfig.save(config)
-                        if (kitLore != null) {
-                            KitModifier(plugin).openNewKitGUI(source,kitName.asMini(),kitLore.asMini(), false)
+                        if (kitLore != null && name != null) {
+                            KitModifier(plugin).openNewKitGUI(source, name.asMini(), kitLore.asMini(), false)
                         }
 
                     }
