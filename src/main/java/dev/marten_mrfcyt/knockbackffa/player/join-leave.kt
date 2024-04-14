@@ -20,6 +20,7 @@ class PlayerJoinListener(private val scoreboardHandler: ScoreboardHandler) : Lis
         }
     }
 }
+
 class PlayerQuitListener(private val scoreboardHandler: ScoreboardHandler) : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {

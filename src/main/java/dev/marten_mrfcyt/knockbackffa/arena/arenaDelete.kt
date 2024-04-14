@@ -21,8 +21,7 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
         arenaConfig.set("arenas.$name", null)
         arenaConfig.save(config)
         source.message("Arena $name <dark_red>deleted<white> successfully!")
-    }
-    else {
+    } else {
         source.error("You must be a player to create an arena!")
     }
 }

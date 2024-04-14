@@ -1,15 +1,14 @@
 package dev.marten_mrfcyt.knockbackffa.utils
 
+
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import me.clip.placeholderapi.PlaceholderAPI
+import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
-import java.io.File
-import me.clip.placeholderapi.PlaceholderAPI
-import net.kyori.adventure.text.Component
-
-
 import org.bukkit.entity.Player
+import java.io.File
 import kotlin.random.Random
 
 private val mm = MiniMessage.builder().build()
@@ -19,6 +18,7 @@ fun String.asMini(player: Player? = null): Component {
     val formattedMessage = if (player != null) PlaceholderAPI.setPlaceholders(player, this) else this
     return mm.deserialize(formattedMessage)
 }
+
 fun CommandSender.sendMini(message: String, player: Player? = null) {
     val formattedMessage = PlaceholderAPI.setPlaceholders(player, message)
     sendMessage(formattedMessage.asMini())
@@ -30,16 +30,19 @@ fun CommandSender.error(message: String, player: Player? = null) {
 }
 
 fun CommandSender.message(message: String, player: Player? = null) {
-    val formattedMessage = PlaceholderAPI.setPlaceholders(player, "<gold><bold>KnockBackFFA</bold><gray> | <white> $message")
+    val formattedMessage =
+        PlaceholderAPI.setPlaceholders(player, "<gold><bold>KnockBackFFA</bold><gray> | <white> $message")
     sendMessage(formattedMessage.asMini())
 }
 
 fun message(message: String, player: Player? = null): Component {
-    val formattedMessage = PlaceholderAPI.setPlaceholders(player, "<gold><bold>KnockBackFFA</bold><gray> | <white> $message")
+    val formattedMessage =
+        PlaceholderAPI.setPlaceholders(player, "<gold><bold>KnockBackFFA</bold><gray> | <white> $message")
     return formattedMessage.asMini()
 }
 
-fun cmessage(messageKey: String, player: Player? = null, vararg args: String) = "<gold><bold>KnockBackFFA</bold><gray> | <white> ${getMessage(messageKey, player, *args)}".asMini()
+fun cmessage(messageKey: String, player: Player? = null, vararg args: String) =
+    "<gold><bold>KnockBackFFA</bold><gray> | <white> ${getMessage(messageKey, player, *args)}".asMini()
 
 fun getMessage(messageKey: String, player: Player? = null, vararg args: String): String {
     return when (val message = messagesConfig.get(messageKey)) {
@@ -50,6 +53,7 @@ fun getMessage(messageKey: String, player: Player? = null, vararg args: String):
             println(formattedMessage)
             formattedMessage
         }
+
         is List<*> -> {
             if (message.isNotEmpty()) {
                 val randomIndex = Random.nextInt(message.size)
@@ -60,6 +64,7 @@ fun getMessage(messageKey: String, player: Player? = null, vararg args: String):
                 "Empty list for message key '$messageKey'"
             }
         }
+
         else -> {
             "Message key '$messageKey' not found"
         }

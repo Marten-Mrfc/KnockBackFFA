@@ -1,18 +1,20 @@
 package dev.marten_mrfcyt.knockbackffa
 
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.sendMini
-import org.bukkit.plugin.Plugin
-import lirand.api.dsl.command.builders.LiteralDSLBuilder
-import lirand.api.dsl.command.builders.command
 import com.mojang.brigadier.arguments.StringArgumentType.string
 import com.mojang.brigadier.suggestion.Suggestions
+import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import dev.marten_mrfcyt.knockbackffa.kits.KitCreate
+import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
+import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.utils.asMini
+import dev.marten_mrfcyt.knockbackffa.utils.error
+import dev.marten_mrfcyt.knockbackffa.utils.sendMini
+import lirand.api.dsl.command.builders.LiteralDSLBuilder
+import lirand.api.dsl.command.builders.command
+import org.bukkit.plugin.Plugin
 import java.util.concurrent.CompletableFuture
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
@@ -63,17 +65,32 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
     }
     literal("kit") {
         literal("create") {
-            argument("name", string()) {
+            argument("name", string()) { // Fixed line
+                argument("lore", string()) {
+                    executes {
+                        val name = getArgument<String>("name")
+                        val lore = getArgument<String>("lore")
+                        KitModifier(KnockBackFFA()).openNewKitGUI(
+                            source,
+                            name.asMini(),
+                            lore.asMini()
+                        )
+                    }
+                }
                 executes {
-                    KitCreate(KnockBackFFA()).openKitCreationGUI(source, getArgument("name"))
+                    source.error("Please insert a lore for the kit!")
                 }
             }
             executes {
                 source.error("Please insert a name for the kit!")
             }
         }
+        executes {
+            KitEditor(KnockBackFFA()).openKitCreationGui(source)
+        }
     }
 }
+
 fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
     return arenaHandler.getArenaNames().thenApply { names ->
         names.forEach {

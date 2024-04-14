@@ -7,14 +7,15 @@ import org.bukkit.Location
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
-import kotlin.random.Random
 import java.util.concurrent.CompletableFuture
+import kotlin.random.Random
 
 data class Arena(val name: String, val location: Location)
 
 class ArenaHandler(private val plugin: KnockBackFFA) {
     private val arenas: MutableList<Arena> = mutableListOf()
     private val arenasLoaded = CompletableFuture<Void>()
+
     init {
         // Load arenas from arena.yml asynchronously
         object : BukkitRunnable() {
@@ -41,6 +42,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             }
         }.runTaskAsynchronously(plugin)
     }
+
     private var currentArena: Arena? = null
     fun switchArena() {
         if (arenas.isNotEmpty()) {
@@ -56,6 +58,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             plugin.saveConfig()
         }
     }
+
     fun getArenaNames(): CompletableFuture<List<String>> {
         return arenasLoaded.thenApply { arenas.map { it.name } }
     }

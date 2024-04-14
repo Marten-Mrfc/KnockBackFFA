@@ -21,6 +21,7 @@ class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
     override fun getVersion(): String {
         return plugin.pluginMeta.version
     }
+
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         if (player == null) return null
         val playerData = PlayerData(KnockBackFFA()).getPlayerData(player.uniqueId)
@@ -28,21 +29,27 @@ class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
             "deaths" -> {
                 playerData.getInt("deaths", 0).toString()
             }
+
             "kills" -> {
                 playerData.getInt("kills", 0).toString()
             }
+
             "killstreak" -> {
                 playerData.getInt("killstreak", 0).toString()
             }
+
             "coins" -> {
                 playerData.getInt("coins", 0).toString()
             }
+
             "elo" -> {
                 playerData.getInt("elo", 0).toString()
             }
+
             "map" -> {
                 plugin.config.getString("currentArena", "No current arena")
             }
+
             "next_map" -> {
                 val now = Instant.now()
                 if (now.isBefore(KnockBackFFA.nextSwitchTime)) {
@@ -54,6 +61,7 @@ class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
                     "00:00"
                 }
             }
+
             else -> null
         }
     }

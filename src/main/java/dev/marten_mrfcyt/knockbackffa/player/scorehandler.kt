@@ -2,11 +2,12 @@ package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
-import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.cmessage
+import dev.marten_mrfcyt.knockbackffa.utils.error
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
+
 class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
     // Player data directory
     // Event handler for player death
@@ -16,10 +17,9 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         val source = event.player
         val killer = source.killer
         // Set death message
-        if (killer != null){
+        if (killer != null) {
             event.deathMessage(cmessage("killed_by_message", source, killer.name))
-        }
-        else{
+        } else {
             event.deathMessage(cmessage("death_message", source))
         }
         try {

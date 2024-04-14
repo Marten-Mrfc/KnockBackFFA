@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa
 
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
 import dev.marten_mrfcyt.knockbackffa.player.ScoreHandler
@@ -43,14 +44,16 @@ class KnockBackFFA : KotlinPlugin() {
             registerEvents(
                 PlayerJoinListener(scoreboardHandler),
                 PlayerQuitListener(scoreboardHandler),
-                ScoreHandler(this)
+                ScoreHandler(this),
+                GuiListener(this)
             )
         ).forEach { _ -> amount++ }
         logger.info("$amount events registered -> Starting arena handler...")
         val task = object : BukkitRunnable() {
             override fun run() {
                 lastSwitchTime = Instant.now()
-                nextSwitchTime = lastSwitchTime.plusSeconds(mapDuration.toLong()) // Use the map duration from the config file
+                nextSwitchTime =
+                    lastSwitchTime.plusSeconds(mapDuration.toLong()) // Use the map duration from the config file
                 arenaHandler.switchArena()
             }
         }
