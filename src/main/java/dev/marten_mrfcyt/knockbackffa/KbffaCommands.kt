@@ -73,7 +73,8 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                         KitModifier(KnockBackFFA()).openNewKitGUI(
                             source,
                             name.asMini(),
-                            lore.asMini()
+                            lore.asMini(),
+                            name.replace(" ", "_")
                         )
                     }
                 }

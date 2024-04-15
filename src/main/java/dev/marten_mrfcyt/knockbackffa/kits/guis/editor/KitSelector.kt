@@ -1,8 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
-import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
+import dev.marten_mrfcyt.knockbackffa.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -50,6 +49,7 @@ class KitSelector(private val plugin: KnockBackFFA) {
                 meta.displayName(displayName)
                 meta.lore(listOf(lore))
                 setCustomValue(meta, plugin, "6F70656E5F6B69745F656469746F72", "open_kit_editor")
+                setCustomValue(meta, plugin, "kit_name", kit)
                 // Apply enchantments
                 enchantments?.getKeys(false)?.forEach { enchantmentKey ->
                     val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))

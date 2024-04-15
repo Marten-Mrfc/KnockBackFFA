@@ -19,6 +19,14 @@ fun String.asMini(player: Player? = null): Component {
     return mm.deserialize(formattedMessage)
 }
 
+fun Component.notMiniText(): String {
+    return mm.serialize(this).replace("\\<", "<")
+}
+
+fun Component.notMini(): String {
+    return mm.serialize(this)
+}
+
 fun CommandSender.sendMini(message: String, player: Player? = null) {
     val formattedMessage = PlaceholderAPI.setPlaceholders(player, message)
     sendMessage(formattedMessage.asMini())

@@ -1,13 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
+import dev.marten_mrfcyt.knockbackffa.utils.*
 import lirand.api.extensions.inventory.set
 import net.kyori.adventure.text.Component
-import net.kyori.adventure.text.TextComponent
-import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.NamespacedKey
@@ -21,21 +17,20 @@ import java.io.File
 import java.util.*
 
 class KitModifier(private val plugin: KnockBackFFA) {
-    fun openNewKitGUI(source: CommandSender, name: Component, lore: Component, new: Boolean = true) {
+    fun openNewKitGUI(source: CommandSender, name: Component, lore: Component, kitName: String, new: Boolean = true) {
         if (source is Player) {
             val config = File("${plugin.dataFolder}/kits.yml")
             val kitConfig = YamlConfiguration.loadConfiguration(config)
-            val nameContent = (name as? TextComponent)?.content()?.replace(" ", "_")
             if (new) {
-                if (kitConfig.contains("kit.$nameContent")) {
+                if (kitConfig.contains("kit.$kitName")) {
                     source.error("Kit with this name already exists!")
                     return
                 } else {
                     with(kitConfig) {
-                        set("kit.${nameContent}.DisplayName", MiniMessage.miniMessage().serialize(name))
-                        set("kit.${nameContent}.Lore", MiniMessage.miniMessage().serialize(lore))
-                        set("kit.${nameContent}.DisplayItem.item", Material.STICK.name)
-                        set("kit.${nameContent}.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
+                        set("kit.$kitName.DisplayName", name.notMini())
+                        set("kit.$kitName.Lore", lore.notMini())
+                        set("kit.$kitName.DisplayItem.item", Material.STICK.name)
+                        set("kit.$kitName.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
                     }
                 }
             }
@@ -53,7 +48,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             }
 
             // Create a ItemStack to represent the kit
-            val kitSection = kitConfig.getConfigurationSection("kit.$nameContent")
+            val kitSection = kitConfig.getConfigurationSection("kit.$kitName")
             if (kitSection != null) {
                 // Load the display name and lore
                 val displayName = kitSection.getString("DisplayName")?.asMini()
@@ -83,19 +78,26 @@ class KitModifier(private val plugin: KnockBackFFA) {
                             modifiedKitMeta.addEnchant(enchantment, level, true)
                         }
                     }
-
                     // Set the custom values
                     setCustomValue(modifiedKitMeta, plugin, "6B69745F646973706C61795F6974656D", "kit_display_item_check")
-                    setCustomValue(modifiedKitMeta, plugin, "kit_display_item", nameContent.toString())
+                    setCustomValue(modifiedKitMeta, plugin, "kit_name", kitName)
 
                     // Set the ItemMeta back to the ItemStack
                     modifiedKit.itemMeta = modifiedKitMeta
-
+                    source.message("Setting item: $modifiedKit")
                     // Add the ItemStack to the inventory
                     inventory[13] = modifiedKit
                 }
             }
-
+            // editor items
+            // Edit DisplayName
+            val editDisplayName = ItemStack(Material.NAME_TAG)
+            val editDisplayNameMeta: ItemMeta = editDisplayName.itemMeta
+            editDisplayNameMeta.displayName("<gray>Edit Display Name".asMini())
+            setCustomValue(editDisplayNameMeta, plugin, "6B69745F646973706C61795F6E616D655F65646974", "kit_display_name_edit")
+            setCustomValue(editDisplayNameMeta, plugin, "kit_name", kitName)
+            editDisplayName.itemMeta = editDisplayNameMeta
+            inventory[0] = editDisplayName
             // save all the data
             kitConfig.save(config)
             source.openInventory(inventory)
