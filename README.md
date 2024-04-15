@@ -24,13 +24,50 @@ Probably in 1-3 months
 **Why so long?**
 I just started coding the plugin so yeah that will take some time.
 
-## What will it include?
+## Progress
+✅ = Done
+🏗️ = In progress
+❌ = Not done 
+
 Many things like:
-* Arena's
-* Kit creator
-* PlaceholderAPI intergration
-* Scoreboard with stats
-* Custom messages for: Join, leave, deaths and kills
-* (later) cosmetics
+* Arena's ✅
+  * Arena creation✅
+  * Arena deletion✅
+  * Arena list✅
+
+
+* Kits 🏗️
+  * Kit creator🏗️
+  * Kit list gui ✅
+  * Kit editor gui ️🏗️
+  * kit items list gui❌
+  * item editor gui❌
+  * kit selector gui❌
+
+
+* PlaceholderAPI integration✅
+
+
+* Scoreboard with stats🏗️
+  * Kills✅
+  * Deaths✅
+  * K/D ratio🏗️
+  * Coins❌
+  * KillStreak❌
+  
+
+* Custom messages
+  * deaths✅
+  * kills✅
+  * Join🏗️
+  * leave❌
+
+
+* Cosmetics❌
+
+
+* Player 🏗️
+  * Join in arena✅
+  * Give kit ❌
 
 And probably even more!

@@ -1,9 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
-import dev.marten_mrfcyt.knockbackffa.utils.cmessage
-import dev.marten_mrfcyt.knockbackffa.utils.error
+import dev.marten_mrfcyt.knockbackffa.utils.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
