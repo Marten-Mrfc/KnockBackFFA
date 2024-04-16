@@ -8,6 +8,7 @@ import org.bukkit.persistence.PersistentDataType
 // Enter value into `https://www.rapidtables.com/convert/number/ascii-to-hex.html` and use result as id.
 // or use id:
 // - is_draggable: true/false
+// - kit_name: String
 fun setCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any) {
     val key = NamespacedKey(plugin, id)
     when (value) {
@@ -27,8 +28,8 @@ fun checkCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: An
 fun getCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String): Any? {
     val key = NamespacedKey(plugin, id)
     return when {
-        meta.persistentDataContainer.has(key, PersistentDataType.STRING) -> meta.persistentDataContainer.get(key, PersistentDataType.STRING)
-        meta.persistentDataContainer.has(key, PersistentDataType.BOOLEAN) -> meta.persistentDataContainer.get(key, PersistentDataType.BOOLEAN)
+        meta.persistentDataContainer.has(key, PersistentDataType.STRING) -> meta.persistentDataContainer.get(key, PersistentDataType.STRING) ?: ""
+        meta.persistentDataContainer.has(key, PersistentDataType.BOOLEAN) -> meta.persistentDataContainer.get(key, PersistentDataType.BOOLEAN) ?: false
         else -> null
     }
 }
