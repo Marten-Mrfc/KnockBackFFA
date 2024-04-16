@@ -25,7 +25,7 @@ class ScoreboardHandler(private val plugin: KnockBackFFA) {
         objective.displaySlot = DisplaySlot.SIDEBAR
 
         // Set scores
-        for ((index, line) in lines.withIndex()) {
+        for ((index) in lines.withIndex()) {
             val score = objective.getScore("KnockBackFFA_$index")
             score.score = lines.size - index
         }
@@ -54,7 +54,7 @@ class ScoreboardHandler(private val plugin: KnockBackFFA) {
         createScoreboard(source)
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
             updateScoreboard(source)
-        }, 0L, 20L)
+        }, 0L, 10L)
     }
 
     fun stopUpdatingScoreboard(source: Player) {

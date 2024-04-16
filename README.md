@@ -5,7 +5,7 @@
 # About me
 Hey, I am Marten. I'm just a teenager trying to learn coding, so don't expect much of me, but what I can offer are some amazing skills because, in all these languages, I have coded:
 <div>
-  <img src="https://github.com/devicons/devicon/blob/master/icons/css3/css3-plain-wordmark.svg"  title="CSS3" alt="CSS" width="40" height="40"/>&nbsp;
+  <img src="https://github.com/devicons/devicon/blob/master/icons/css3/css3-original.svg"  title="CSS3" alt="CSS" width="40" height="40"/>&nbsp;
   <img src="https://github.com/devicons/devicon/blob/master/icons/html5/html5-original.svg" title="HTML5" alt="HTML" width="40" height="40"/>&nbsp;
   <img src="https://github.com/devicons/devicon/blob/master/icons/javascript/javascript-original.svg" title="JavaScript" alt="JavaScript" width="40" height="40"/>&nbsp;
   <img src="https://github.com/devicons/devicon/blob/master/icons/nodejs/nodejs-original.svg" title="NodeJS" alt="NodeJS" width="40" height="40"/>&nbsp;
@@ -29,7 +29,6 @@ I just started coding the plugin so yeah that will take some time.
 🏗️ = In progress
 ❌ = Not done 
 
-Many things like:
 * Arena's ✅
   * Arena creation✅
   * Arena deletion✅
@@ -37,23 +36,23 @@ Many things like:
 
 
 * Kits 🏗️
-  * Kit creator🏗️
+  * Kit creation✅
   * Kit list gui ✅
   * Kit editor gui ️🏗️
-  * kit items list gui❌
-  * item editor gui❌
-  * kit selector gui❌
+  * kit items list gui❌(1.20.5)
+  * item editor gui❌(1.20.5)
+  * kit selector gui❌(1.20.5)
 
 
 * PlaceholderAPI integration✅
 
 
-* Scoreboard with stats🏗️
+* Scoreboard with stats✅
   * Kills✅
   * Deaths✅
-  * K/D ratio🏗️
-  * Coins❌
-  * KillStreak❌
+  * K/D ratio✅
+  * Coins✅
+  * KillStreak✅
   
 
 * Custom messages
@@ -68,6 +67,6 @@ Many things like:
 
 * Player 🏗️
   * Join in arena✅
-  * Give kit ❌
+  * Give kit ❌(1.20.5)
 
 And probably even more!

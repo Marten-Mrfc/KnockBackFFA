@@ -5,33 +5,55 @@ import dev.marten_mrfcyt.knockbackffa.utils.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
+import java.math.RoundingMode
+import java.text.DecimalFormat
 
 class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
     // Player data directory
     // Event handler for player death
     @EventHandler
     fun onPlayerKill(event: PlayerDeathEvent) {
-        // Get killer and killed player
         val source = event.player
         val killer = source.killer
-        // Set death message
+
         if (killer != null) {
             event.deathMessage(cmessage("killed_by_message", source, killer.name))
         } else {
             event.deathMessage(cmessage("death_message", source))
         }
-        try {
-            // Increment deaths for the killed player
-            val playerData = PlayerData(plugin).getPlayerData(source.uniqueId)
-            playerData.set("deaths", playerData.getInt("deaths", 0) + 1)
 
-            // Increment kills for the killer player
-            if (killer != null) {
-                val killerData = PlayerData(plugin).getPlayerData(killer.uniqueId)
-                killerData.set("kills", killerData.getInt("kills", 0) + 1)
-                PlayerData(plugin).savePlayerData(killer.uniqueId, killerData)
+        try {
+            val playerDataHandler = PlayerData(plugin)
+
+            // Handle the killed player
+            val playerData = playerDataHandler.getPlayerData(source.uniqueId)
+            playerData.apply {
+                set("deaths", getInt("deaths", 0) + 1)
+                set("killstreak", 0)
+                val deaths = getInt("deaths", 0)
+                val kills = getInt("kills", 0)
+                val kdRatio = if (deaths != 0) kills.toFloat() / deaths else kills.toFloat()
+                set("kd-ratio", kdRatio)
             }
-            PlayerData(plugin).savePlayerData(source.uniqueId, playerData)
+            playerDataHandler.savePlayerData(source.uniqueId, playerData)
+
+            // Handle the killer player
+            killer?.let {
+                val killerData = playerDataHandler.getPlayerData(it.uniqueId)
+                killerData.apply {
+                    set("kills", getInt("kills", 0) + 1)
+                    set("killstreak", getInt("killstreak", 0) + 1)
+                    set("coins", getInt("coins", 0) + 1)
+                    val killerDeaths = getInt("deaths", 0)
+                    val killerKills = getInt("kills", 0)
+                    val killerKdRatio = if (killerDeaths != 0) killerKills.toDouble() / killerDeaths else killerKills.toDouble()
+                    val df = DecimalFormat("#.##")
+                    df.roundingMode = RoundingMode.CEILING
+                    val killerKdRatioRounded = df.format(killerKdRatio).replace(',', '.').toDouble()
+                    set("kd-ratio", killerKdRatioRounded)
+                }
+                playerDataHandler.savePlayerData(it.uniqueId, killerData)
+            }
         } catch (e: Exception) {
             plugin.logger.severe("Failed to load or save player data: ${e.message}")
             e.printStackTrace()

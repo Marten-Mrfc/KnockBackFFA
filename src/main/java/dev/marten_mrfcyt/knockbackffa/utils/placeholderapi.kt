@@ -39,11 +39,11 @@ class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
             }
 
             "coins" -> {
-                playerData.getInt("coins", 0).toString()
+                playerData.getDouble("coins", 0.0).toString()
             }
 
-            "elo" -> {
-                playerData.getInt("elo", 0).toString()
+            "kd-ratio" -> {
+                playerData.getDouble("kd-ratio", 0.0).toString()
             }
 
             "map" -> {
