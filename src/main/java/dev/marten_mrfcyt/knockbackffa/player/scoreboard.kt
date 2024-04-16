@@ -4,15 +4,16 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.scoreboard.Criteria
 import org.bukkit.scoreboard.DisplaySlot
 import org.bukkit.scoreboard.Objective
+import org.bukkit.scoreboard.Scoreboard
 import java.util.*
 
 class ScoreboardHandler(private val plugin: KnockBackFFA) {
-    // Create a map to store custom display names
-    fun createScoreboard(source: Player) {
+    private val playerScoreboards: MutableMap<UUID, Scoreboard> = mutableMapOf()
+
+    private fun createScoreboard(source: Player) {
         val scoreboard = Bukkit.getScoreboardManager().newScoreboard
 
         // Get configuration values
@@ -22,44 +23,42 @@ class ScoreboardHandler(private val plugin: KnockBackFFA) {
         // Create objective
         val objective: Objective = scoreboard.registerNewObjective("test", Criteria.DUMMY, title)
         objective.displaySlot = DisplaySlot.SIDEBAR
-        objective.setAutoUpdateDisplay(true)
+
         // Set scores
         for ((index, line) in lines.withIndex()) {
-            // Convert the line to a mini component
             val score = objective.getScore("KnockBackFFA_$index")
-            score.customName(line.asMini(source))
             score.score = lines.size - index
-            score.objective.willAutoUpdateDisplay()
         }
+
+        // Store the scoreboard for this player
+        playerScoreboards[source.uniqueId] = scoreboard
 
         // Display the scoreboard to the player
         source.scoreboard = scoreboard
     }
 
-    private val taskIds: MutableMap<UUID, Int> = mutableMapOf()
+    private fun updateScoreboard(source: Player) {
+        val scoreboard = playerScoreboards[source.uniqueId]
+        val objective = scoreboard?.getObjective(DisplaySlot.SIDEBAR)
+        val lines = plugin.config.getStringList("scoreboard.lines")
+
+        // Update scores
+        for ((index, line) in lines.withIndex()) {
+            val score = objective?.getScore("KnockBackFFA_$index")
+            score?.customName(line.asMini(source))
+        }
+    }
 
     fun startUpdatingScoreboard(source: Player) {
-        val taskId = object : BukkitRunnable() {
-            override fun run() {
-                Bukkit.getScheduler().runTask(plugin, Runnable {
-                    createScoreboard(source)
-                })
-            }
-        }.runTaskTimerAsynchronously(plugin, 0L, 20L).taskId // get the task ID
-
-        // Store the task ID for this player
-        taskIds[source.uniqueId] = taskId
+        // Create the scoreboard
+        createScoreboard(source)
+        Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
+            updateScoreboard(source)
+        }, 0L, 20L)
     }
 
     fun stopUpdatingScoreboard(source: Player) {
-        // Get the task ID for this player
-        val taskId = taskIds[source.uniqueId]
-
-        // If a task exists, cancel it
-        if (taskId != null) {
-            Bukkit.getScheduler().cancelTask(taskId)
-            // Remove the task ID from the map
-            taskIds.remove(source.uniqueId)
-        }
+        // Remove the scoreboard from the map
+        playerScoreboards.remove(source.uniqueId)
     }
 }
