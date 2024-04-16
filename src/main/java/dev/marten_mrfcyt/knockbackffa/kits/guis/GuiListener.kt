@@ -4,6 +4,8 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import io.papermc.paper.event.player.AsyncChatEvent
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -14,7 +16,7 @@ import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.*
 class GuiListener(private val plugin: KnockBackFFA) : Listener {
-    private val playerEditDisplayMap = HashMap<UUID, Pair<Boolean, ItemMeta?>>()
+    private val editKitMap = HashMap<UUID, Pair<Boolean, ItemMeta?>>()
     val config = File("${plugin.dataFolder}/kits.yml")
     private val kitConfig = YamlConfiguration.loadConfiguration(config)
     @EventHandler
@@ -73,24 +75,49 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                         event.isCancelled = true
                         source.closeInventory()
                         source.message("Please enter the new display name in the chat.")
-                        playerEditDisplayMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
+                        editKitMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
+                    }
+                    checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6C6F72655F65646974", "kit_display_lore_edit") -> {
+                        event.isCancelled = true
+                        source.closeInventory()
+                        source.message("Please enter the new lore in the chat.")
+                        editKitMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
                     }
                 }
             }
         }
+    }
+    private fun handleKitEdit(source: Player, kitName: String?, key: String, message: Component) {
+        if (kitName != null) {
+            kitConfig.set("kit.$kitName.$key", message.notMiniText())
+            kitConfig.save(config)
+            editKitMap[source.uniqueId] = Pair(false, null)
+            val name = kitConfig.get("kit.$kitName.DisplayName").toString().asMini()
+            val lore = kitConfig.get("kit.$kitName.Lore").toString().asMini()
+            Bukkit.getScheduler().runTask(plugin, Runnable {
+                KitModifier(plugin).openNewKitGUI(source, name, lore, kitName, false)
+            })        }
     }
     @EventHandler
     fun onPlayerChat(event: AsyncChatEvent) {
         val source = event.player
         val message = event.message()
 
-        val (isEditingDisplay, itemMeta) = playerEditDisplayMap[source.uniqueId] ?: Pair(false, null)
+        val (isEditingDisplay, itemMeta) = editKitMap[source.uniqueId] ?: Pair(false, null)
         if (isEditingDisplay) {
-            val kitName = itemMeta?.let { getCustomValue(it, plugin, "kit_name") } as String
-            kitConfig.set("kit.$kitName.DisplayName", message.notMiniText())
-            kitConfig.save(config)
-            playerEditDisplayMap[source.uniqueId] = Pair(false, null)
-            event.isCancelled = true
+            if (itemMeta?.let { checkCustomValue(it, plugin, "6B69745F646973706C61795F6E616D655F65646974", "kit_display_name_edit") } == true) {
+            val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String?
+                if (kitName != null) {
+                    handleKitEdit(source, kitName, "DisplayName", message)
+                    event.isCancelled = true
+                }
+            } else if (itemMeta?.let { checkCustomValue(it, plugin, "6B69745F646973706C61795F6C6F72655F65646974", "kit_display_lore_edit") } == true) {
+                val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String?
+                if (kitName != null) {
+                    handleKitEdit(source, kitName, "Lore", message)
+                    event.isCancelled = true
+                }
+            }
         }
     }
 }

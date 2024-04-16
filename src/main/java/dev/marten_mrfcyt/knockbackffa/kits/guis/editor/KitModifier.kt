@@ -98,6 +98,14 @@ class KitModifier(private val plugin: KnockBackFFA) {
             setCustomValue(editDisplayNameMeta, plugin, "kit_name", kitName)
             editDisplayName.itemMeta = editDisplayNameMeta
             inventory[0] = editDisplayName
+            // edit Lore
+            val editLore = ItemStack(Material.BOOK)
+            val editLoreMeta: ItemMeta = editLore.itemMeta
+            editLoreMeta.displayName("<gray>Edit Lore".asMini())
+            setCustomValue(editLoreMeta, plugin, "6B69745F646973706C61795F6C6F72655F65646974", "kit_display_lore_edit")
+            setCustomValue(editLoreMeta, plugin, "kit_name", kitName)
+            editLore.itemMeta = editLoreMeta
+            inventory[1] = editLore
             // save all the data
             kitConfig.save(config)
             source.openInventory(inventory)
