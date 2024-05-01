@@ -1,3 +1,13 @@
+join_message:
+  - "<white>%player_name%<gray> jumped into the arena!"
+  - "<white>%player_name%<gray> has joined the arena!"
+  - "<white>%player_name%<gray> has entered the arena!"
+
+leave_message:
+    - "<white>%player_name%<gray> has left the arena!"
+    - "<white>%player_name%<gray> has exited the arena!"
+    - "<white>%player_name%<gray> has abandoned the arena!"
+
 death_message:
   - "<white>%player_name%<gray> has been knocked into the void!"
   - "<white>%player_name%<gray> couldn't handle the knockback and fell to their demise!"

@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.utils.cmessage
 import dev.marten_mrfcyt.knockbackffa.utils.message
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -12,7 +13,7 @@ class PlayerJoinListener(private val scoreboardHandler: ScoreboardHandler) : Lis
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val source = event.player
-        event.joinMessage(message("<white>${source.name}<gray> has joined the arena!"))
+        event.joinMessage(cmessage("join_message", source))
         scoreboardHandler.startUpdatingScoreboard(source)
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
         if (currentArena != null) {
@@ -25,6 +26,7 @@ class PlayerQuitListener(private val scoreboardHandler: ScoreboardHandler) : Lis
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val source = event.player
+        event.quitMessage(cmessage("leave_message", source))
         scoreboardHandler.stopUpdatingScoreboard(source)
     }
 }
