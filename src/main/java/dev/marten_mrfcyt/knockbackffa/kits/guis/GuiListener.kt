@@ -5,6 +5,7 @@ import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import io.papermc.paper.event.player.AsyncChatEvent
+import lirand.api.extensions.inventory.customModel
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -13,6 +14,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.*
@@ -160,6 +162,30 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                         ) -> {
                             event.isCancelled = true
                             source.message("Editing slot ${event.slot}")
+                            val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                            // if it has item in hand set that item to the slot
+                            val itemInHand = event.cursor
+                            if (itemInHand.type != Material.AIR) {
+                                val itemMeta = event.cursor.itemMeta
+                                kitConfig.apply {
+                                    set("kit.$kitName.items.${event.slot}", null)
+                                    set("kit.$kitName.items.${event.slot}.name", itemMeta.displayName()?.notMini())
+                                    set("kit.$kitName.items.${event.slot}.lore", itemMeta.lore()?.map { it.notMini() })
+                                    set("kit.$kitName.items.${event.slot}.item", event.cursor.type.name)
+                                    set("kit.$kitName.items.${event.slot}.amount", event.cursor.amount)
+                                    set("kit.$kitName.items.${event.slot}.enchants", event.cursor.enchantments)
+                                    set("kit.$kitName.items.${event.slot}.meta.model", itemMeta.customModel)
+                                    if (itemMeta is Damageable) {
+                                        set("kit.$kitName.items.${event.slot}.meta.durability", itemMeta.damage)
+                                    }
+                                    set("kit.$kitName.items.${event.slot}.meta.unbreakable", itemMeta.isUnbreakable)
+                                    set("kit.$kitName.items.${event.slot}.meta.itemFlags", itemMeta.itemFlags.map { it.name }.toList())
+                                    save(config)
+                                }
+                                source.message("Item set to slot ${event.slot} successfully.")
+                            } else {
+                                source.message("Please hold an item in your hand to set it to the slot.")
+                            }
                         }
                     }
                 }
