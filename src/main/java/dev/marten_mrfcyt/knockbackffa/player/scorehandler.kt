@@ -32,8 +32,11 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                 set("killstreak", 0)
                 val deaths = getInt("deaths", 0)
                 val kills = getInt("kills", 0)
+                val df = DecimalFormat("#.##")
+                df.roundingMode = RoundingMode.CEILING
                 val kdRatio = if (deaths != 0) kills.toFloat() / deaths else kills.toFloat()
-                set("kd-ratio", kdRatio)
+                val kdRatioRounded = df.format(kdRatio).replace(',', '.').toFloat()
+                set("kd-ratio", kdRatioRounded)
             }
             playerDataHandler.savePlayerData(source.uniqueId, playerData)
 
