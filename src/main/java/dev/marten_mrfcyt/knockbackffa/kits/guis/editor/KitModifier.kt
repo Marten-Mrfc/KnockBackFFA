@@ -9,6 +9,7 @@ import org.bukkit.Material
 import org.bukkit.NamespacedKey
 import org.bukkit.Registry
 import org.bukkit.command.CommandSender
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
@@ -22,20 +23,22 @@ class KitModifier(private val plugin: KnockBackFFA) {
     val config = File("${plugin.dataFolder}/kits.yml")
     private val kitConfig = YamlConfiguration.loadConfiguration(config)
     fun kitEditor(source: CommandSender, name: Component, lore: Component, kitName: String, new: Boolean = true) {
-        if (source is Player) {
-            if (new) {
-                if (kitConfig.contains("kit.$kitName")) {
-                    source.error("Kit with this name already exists!")
-                    return
-                } else {
-                    with(kitConfig) {
-                        set("kit.$kitName.show.DisplayName", name.notMini())
-                        set("kit.$kitName.show.Lore", lore.notMini())
-                        set("kit.$kitName.show.DisplayItem.item", Material.STICK.name)
-                        set("kit.$kitName.show.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
-                    }
+        if (source !is Player) {
+            source.error("You must be a player to use this command!")
+            return
+        } else {
+            if (new && kitConfig.contains("kit.$kitName")) {
+                source.error("Kit with this name already exists!")
+                return
+            } else {
+                with(kitConfig) {
+                    set("kit.$kitName.show.DisplayName", name.notMini())
+                    set("kit.$kitName.show.Lore", lore.notMini())
+                    set("kit.$kitName.show.DisplayItem.item", Material.STICK.name)
+                    set("kit.$kitName.show.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
                 }
             }
+
             // Create the inventory
             val inventorySize = 18
             val edittext = "<gray>Editing:</gray><white> ".asMini()
@@ -51,52 +54,66 @@ class KitModifier(private val plugin: KnockBackFFA) {
 
             // Create a ItemStack to represent the kit
             val kitSection = kitConfig.getConfigurationSection("kit.$kitName.show")
-            if (kitSection != null) {
-                // Load the display name and lore
-                val displayName = kitSection.getString("DisplayName")?.asMini()
-                val kitLore = kitSection.getString("Lore")?.asMini()
+            if (kitSection == null) {
+                source.error("Kit $kitName is missing from kits.yml")
+                return
+            }                // Load the display name and lore
+            val displayName = kitSection.getString("DisplayName")?.asMini()
+            val kitLore = kitSection.getString("Lore")?.asMini()
 
-                // Load the display item and enchantments
-                val displayItemMaterial = kitSection.getConfigurationSection("DisplayItem")?.getString("item")?.let { Material.getMaterial(it) }
-                val enchantments = kitSection.getConfigurationSection("DisplayItem")?.getConfigurationSection("enchants")
+            // Load the display item and enchantments
+            val displayItemMaterial = kitSection.getConfigurationSection("DisplayItem")?.getString("item")
+                ?.let { Material.getMaterial(it) }
+            if (displayName == null || kitLore == null || displayItemMaterial == null) {
+                source.error("Kit $kitName is missing required fields in kits.yml")
+                return
+            }
+            val enchantments =
+                kitSection.getConfigurationSection("DisplayItem")?.getConfigurationSection("enchants")
 
-                // Create the ItemStack and ItemMeta
-                if (displayName != null && kitLore != null && displayItemMaterial != null) {
-                    val modifiedKit = ItemStack(displayItemMaterial)
-                    val modifiedKitMeta: ItemMeta = modifiedKit.itemMeta
+            // Create the ItemStack and ItemMeta
+            val modifiedKit = ItemStack(displayItemMaterial)
+            val modifiedKitMeta: ItemMeta = modifiedKit.itemMeta
 
-                    // Set the display name and lore
-                    modifiedKitMeta.displayName(displayName)
-                    val line = "<gray>------------------<reset>".asMini()
-                    val toplore = "<dark_purple>Drag an item onto me".asMini()
-                    val bottomlore = "<dark_purple>To change my DisplayIcon!".asMini()
-                    modifiedKitMeta.lore(listOf(kitLore, line, toplore, bottomlore))
-                    // Apply the enchantments
-                    enchantments?.getKeys(false)?.forEach { enchantmentKey ->
-                        val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
-                        val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
-                        val level = enchantments.getInt(enchantmentKey)
-                        if (enchantment != null) {
-                            modifiedKitMeta.addEnchant(enchantment, level, true)
-                        }
-                    }
-                    // Set the custom values
-                    setCustomValue(modifiedKitMeta, plugin, "6B69745F646973706C61795F6974656D", "kit_display_item_check")
-                    setCustomValue(modifiedKitMeta, plugin, "kit_name", kitName)
-
-                    // Set the ItemMeta back to the ItemStack
-                    modifiedKit.itemMeta = modifiedKitMeta
-                    source.message("Setting item: $modifiedKit")
-                    // Add the ItemStack to the inventory
-                    inventory[13] = modifiedKit
+            // Set the display name and lore
+            modifiedKitMeta.displayName(displayName)
+            val line = "<gray>------------------<reset>".asMini()
+            val toplore = "<dark_purple>Drag an item onto me".asMini()
+            val bottomlore = "<dark_purple>To change my DisplayIcon!".asMini()
+            modifiedKitMeta.lore(listOf(kitLore, line, toplore, bottomlore))
+            // Apply the enchantments
+            enchantments?.getKeys(false)?.forEach { enchantmentKey ->
+                val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
+                val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
+                val level = enchantments.getInt(enchantmentKey)
+                if (enchantment != null) {
+                    modifiedKitMeta.addEnchant(enchantment, level, true)
                 }
             }
+            // Set the custom values
+            setCustomValue(
+                modifiedKitMeta,
+                plugin,
+                "6B69745F646973706C61795F6974656D",
+                "kit_display_item_check"
+            )
+            setCustomValue(modifiedKitMeta, plugin, "kit_name", kitName)
+
+            // Set the ItemMeta back to the ItemStack
+            modifiedKit.itemMeta = modifiedKitMeta
+            // Add the ItemStack to the inventory
+            inventory[13] = modifiedKit
             // editor items
             // Edit DisplayName
             val editDisplayName = ItemStack(Material.NAME_TAG)
             val editDisplayNameMeta: ItemMeta = editDisplayName.itemMeta
             editDisplayNameMeta.displayName("<gray>Edit Display Name".asMini())
-            setCustomValue(editDisplayNameMeta, plugin, "6B69745F646973706C61795F6E616D655F65646974", "kit_display_name_edit")
+            setCustomValue(
+                editDisplayNameMeta,
+                plugin,
+                "6B69745F646973706C61795F6E616D655F65646974",
+                "kit_display_name_edit"
+            )
             setCustomValue(editDisplayNameMeta, plugin, "kit_name", kitName)
             editDisplayName.itemMeta = editDisplayNameMeta
             inventory[0] = editDisplayName
@@ -127,14 +144,14 @@ class KitModifier(private val plugin: KnockBackFFA) {
             // save all the data
             kitConfig.save(config)
             source.openInventory(inventory)
-        } else {
-            source.sendMessage("You must be a player to use this command!")
         }
     }
+
     fun editKitGUI(source: CommandSender, kitName: String) {
         if (source is Player) {
-            source.message("Editing: $kitName")
+            source.message("kitName: $kitName")
             val name = kitConfig.get("kit.$kitName.show.DisplayName")
+            source.message("Name: $name")
             val inventorySize = 18
             val edittext = "<gray>Editing:</gray><white> $name".asMini()
             val inventory = Bukkit.createInventory(null, inventorySize, edittext)
@@ -143,7 +160,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
                     val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
                     val glassMeta: ItemMeta = glassPane.itemMeta
                     val toplore = "<dark_purple>Drag an item onto me".asMini()
-                    val bottomlore = "<dark_purple>To change my DisplayIcon!".asMini()
+                    val bottomlore = "<dark_purple>to change me completely!".asMini()
                     glassMeta.lore(listOf(toplore, bottomlore))
                     glassMeta.displayName("<gray>Click to edit slot</gray>".asMini().asComponent())
                     setCustomValue(glassMeta, plugin, "edit_kit_item", true)
@@ -157,38 +174,13 @@ class KitModifier(private val plugin: KnockBackFFA) {
             kitItemsSection?.getKeys(false)?.forEach { slot ->
                 val itemSection = kitItemsSection.getConfigurationSection(slot)
                 if (itemSection != null) {
-                    val itemName = itemSection.getString("name")?.asMini()
-                    val itemLore = itemSection.getStringList("lore").map { it.asMini() }
-                    val itemType = itemSection.getString("item")?.let { Material.getMaterial(it) }
-                    val itemAmount = itemSection.getInt("amount")
-                    val itemMetaModel = itemSection.getInt("meta.model")
-                    val itemMetaDurability = itemSection.getInt("meta.durability")
-                    val itemMetaUnbreakable = itemSection.getBoolean("meta.unbreakable")
-                    val itemMetaItemFlags = itemSection.getStringList("meta.itemFlags").map { ItemFlag.valueOf(it) }
-                    val enchantments = itemSection.getConfigurationSection("enchants")
-
-                    val itemStack = itemType?.let { ItemStack(it, itemAmount) }
-                    val itemMeta: ItemMeta = itemStack?.itemMeta ?: return@forEach
-                    itemMeta.displayName(itemName)
-                    itemMeta.lore(itemLore)
-                    itemMeta.setCustomModelData(itemMetaModel)
-                    if (itemMeta is Damageable) {
-                        itemMeta.damage = itemMetaDurability
+                    val item = loadItemData(itemSection, kitName)
+                    val itemMeta = item?.itemMeta
+                    if (itemMeta != null) {
+                        setCustomValue(itemMeta, plugin, "edit_kit_item", true)
+                        item.itemMeta = itemMeta
+                        inventory.setItem(slot.toInt(), item)
                     }
-                    itemMeta.isUnbreakable = itemMetaUnbreakable
-                    itemMetaItemFlags.forEach { itemMeta.addItemFlags(it) }
-                    enchantments?.getKeys(false)?.forEach { enchantmentKey ->
-                        val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
-                        val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
-                        val level = enchantments.getInt(enchantmentKey)
-                        if (enchantment != null) {
-                            itemMeta.addEnchant(enchantment, level, true)
-                        }
-                    }
-                    setCustomValue(itemMeta, plugin, "edit_kit_item", true)
-                    setCustomValue(itemMeta, plugin, "kit_name", kitName)
-                    itemStack.itemMeta = itemMeta
-                    inventory.setItem(slot.toInt(), itemStack)
                 }
             }
             // go back button
@@ -206,6 +198,89 @@ class KitModifier(private val plugin: KnockBackFFA) {
             source.sendMessage("You must be a player to use this command!")
         }
     }
+
+    fun editKitItem(source: CommandSender, kitName: String, slot: Int) {
+        source.message(slot.toString())
+        if (source is Player) {
+            val inventorySize = 18
+            val edittext = "<gray>Editing slot:</gray><white> $slot".asMini()
+            val inventory = Bukkit.createInventory(null, inventorySize, edittext)
+            for (i in 0..17) {
+                if (i < 8 || i > 8) {
+                    val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
+                    val glassMeta: ItemMeta = glassPane.itemMeta
+                    glassMeta.displayName("".asMini())
+                    glassPane.itemMeta = glassMeta
+                    inventory[i] = glassPane
+                }
+            }
+            // show item
+            val kitItem = kitConfig.getConfigurationSection("kit.$kitName.items.$slot")
+
+            if (kitItem != null) {
+                val item = loadItemData(kitItem, kitName)
+                val itemMeta = item?.itemMeta
+                if (itemMeta != null) {
+                    setCustomValue(itemMeta, plugin, "slot", slot)
+                    setCustomValue(itemMeta, plugin, "edit_kit_item", true)
+                    item.itemMeta = itemMeta
+                }
+                source.message(item.toString())
+                inventory[13] = item
+            }
+
+
+            // go back button
+            val goBack = ItemStack(Material.BARRIER)
+            val goBackMeta: ItemMeta = goBack.itemMeta
+            goBackMeta.displayName("<gray>Go Back".asMini())
+            setCustomValue(goBackMeta, plugin, "kit_name", kitName)
+            setCustomValue(goBackMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button")
+            setCustomValue(goBackMeta, plugin, "menu", "edit_kit_gui")
+            goBack.itemMeta = goBackMeta
+            inventory[8] = goBack
+            kitConfig.save(config)
+            source.openInventory(inventory)
+        } else {
+            source.sendMessage("You must be a player to use this command!")
+        }
+    }
+    private fun loadItemData(itemSelector: ConfigurationSection?, kitName: String): ItemStack? {
+        val itemName = itemSelector?.getString("name")?.asMini()
+        val line = "<gray>------------------<reset>".asMini()
+        val toplore = "<dark_purple>Drag an item onto me".asMini()
+        val bottomlore = "<dark_purple>to change me completely!".asMini()
+        val lore = itemSelector?.getStringList("lore")?.map { it.asMini() }
+        val itemLore = lore?.plus(line)?.plus(toplore)?.plus(bottomlore)
+        val itemType = itemSelector?.getString("item")?.let { Material.getMaterial(it) }
+        val itemAmount = itemSelector?.getInt("amount")
+        val itemMetaModel = itemSelector?.getInt("meta.model")
+        val itemMetaDurability = itemSelector?.getInt("meta.durability")
+        val itemMetaUnbreakable = itemSelector?.getBoolean("meta.unbreakable")
+        val itemMetaItemFlags = itemSelector?.getStringList("meta.itemFlags")?.map { ItemFlag.valueOf(it) }
+        val enchantments = itemSelector?.getConfigurationSection("enchants")
+
+        val itemStack = itemType?.let { ItemStack(it, itemAmount ?: 0) }
+        val itemMeta: ItemMeta = itemStack?.itemMeta ?: return null
+        itemMeta.displayName(itemName)
+        itemMeta.lore(itemLore)
+        itemMeta.setCustomModelData(itemMetaModel)
+        if (itemMeta is Damageable) {
+            if (itemMetaDurability != null) {
+                itemMeta.damage = itemMetaDurability
+            }
+        }
+        if (itemMetaUnbreakable != null) {
+            itemMeta.isUnbreakable = itemMetaUnbreakable
+        }
+        itemMetaItemFlags?.forEach { itemMeta.addItemFlags(it) }
+        enchantments?.let { getEnchantments(it, itemMeta) }
+        setCustomValue(itemMeta, plugin, "kit_name", kitName)
+        itemStack.itemMeta = itemMeta
+
+        return itemStack
+    }
+}
 fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
     enchantments?.getKeys(false)?.forEach { enchantmentKey ->
         val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))

@@ -144,9 +144,18 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                 "kit_editor" -> {
                                     getCustomValue(clickedItem.itemMeta, plugin, "kit_name")?.let { kitName ->
                                         if (kitName is String) {
-                                            val displayName = getKitAttribute(kitName, "DisplayName")
-                                            val lore = getKitAttribute(kitName, "Lore")
+                                            val displayName = getKitAttribute(kitName, "show.DisplayName")
+                                            val lore = getKitAttribute(kitName, "show.Lore")
                                             KitModifier(plugin).kitEditor(source, displayName, lore, kitName, false)
+                                        } else {
+                                            source.error("Kit name could not be found or isn't a String")
+                                        }
+                                    }
+                                }
+                                "edit_kit_gui" -> {
+                                    getCustomValue(clickedItem.itemMeta, plugin, "kit_name")?.let { kitName ->
+                                        if (kitName is String) {
+                                            KitModifier(plugin).editKitGUI(source, kitName)
                                         } else {
                                             source.error("Kit name could not be found or isn't a String")
                                         }
@@ -161,31 +170,51 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             true
                         ) -> {
                             event.isCancelled = true
-                            source.message("Editing slot ${event.slot}")
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                            source.message("0 $kitName")
+                            val name = kitConfig.get("kit.$kitName.show.DisplayName")
+                            source.message("Name1: ${kitConfig.get("kit.$kitName.show.DisplayName")}")
                             // if it has item in hand set that item to the slot
                             val itemInHand = event.cursor
                             if (itemInHand.type != Material.AIR) {
                                 val itemMeta = event.cursor.itemMeta
-                                kitConfig.apply {
-                                    set("kit.$kitName.items.${event.slot}", null)
-                                    set("kit.$kitName.items.${event.slot}.name", itemMeta.displayName()?.notMini())
-                                    set("kit.$kitName.items.${event.slot}.lore", itemMeta.lore()?.map { it.notMini() })
-                                    set("kit.$kitName.items.${event.slot}.item", event.cursor.type.name)
-                                    set("kit.$kitName.items.${event.slot}.amount", event.cursor.amount)
-                                    val itemEnchants = itemMeta.enchants.mapKeys { it.key.key.key.uppercase(Locale.getDefault()) }
-                                    set("kit.$kitName.items.${event.slot}.enchants", itemEnchants)
-                                    set("kit.$kitName.items.${event.slot}.meta.model", itemMeta.customModel)
-                                    if (itemMeta is Damageable) {
-                                        set("kit.$kitName.items.${event.slot}.meta.durability", itemMeta.damage)
-                                    }
-                                    set("kit.$kitName.items.${event.slot}.meta.unbreakable", itemMeta.isUnbreakable)
-                                    set("kit.$kitName.items.${event.slot}.meta.itemFlags", itemMeta.itemFlags.map { it.name }.toList())
-                                    save(config)
+                                source.message("3 ${getCustomValue(clickedItem.itemMeta, plugin, "slot")}")
+                                val editItem: Boolean
+                                val slot = if (getCustomValue(clickedItem.itemMeta, plugin, "slot") != null) {
+                                    editItem = true
+                                    getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
+                                } else {
+                                    editItem = false
+                                    event.slot
                                 }
-                                source.message("Item set to slot ${event.slot} successfully.")
+                                with(kitConfig) {
+                                    set("kit.$kitName.items.$slot.name", itemMeta.displayName()?.notMini())
+                                    set("kit.$kitName.items.$slot.lore", itemMeta.lore()?.map { it.notMini() })
+                                    set("kit.$kitName.items.$slot.item", event.cursor.type.name)
+                                    set("kit.$kitName.items.$slot.amount", event.cursor.amount)
+                                    val itemEnchants = itemMeta.enchants.mapKeys { it.key.key.key.uppercase(Locale.getDefault()) }
+                                    set("kit.$kitName.items.$slot.enchants", itemEnchants)
+                                    set("kit.$kitName.items.$slot.meta.model", itemMeta.customModel)
+                                    if (itemMeta is Damageable) {
+                                        set("kit.$kitName.items.$slot.meta.durability", itemMeta.damage)
+                                    }
+                                    source.message("Name2: ${kitConfig.get("kit.$kitName.show.DisplayName")}")
+                                    set("kit.$kitName.items.$slot.meta.unbreakable", itemMeta.isUnbreakable)
+                                    set("kit.$kitName.items.$slot.meta.itemFlags", itemMeta.itemFlags.map { it.name }.toList())
+                                    save(config)
+                                    if (editItem) {
+                                        KitModifier(plugin).editKitItem(source, kitName, slot)
+                                        source.message("1 $kitName")
+                                    } else {
+                                        KitModifier(plugin).editKitGUI(source, kitName)
+                                        source.message("Name3: ${kitConfig.get("kit.$kitName.show.DisplayName")}")
+                                        source.message("2 $kitName")
+                                    }
+                                }
+                                source.message("Item set to slot $slot successfully.")
                             } else {
-                                source.message("Please hold an item in your hand to set it to the slot.")
+                                source.message(kitName)
+                                KitModifier(plugin).editKitItem(source, kitName, event.slot)
                             }
                         }
                     }
@@ -197,8 +226,8 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                 kitConfig.set("kit.$kitName.$key", message.notMiniText())
                 kitConfig.save(config)
                 editKitMap[source.uniqueId] = Pair(false, null)
-                val name = getKitAttribute(kitName, "DisplayName")
-                val lore = getKitAttribute(kitName, "Lore")
+                val name = getKitAttribute(kitName, "show.DisplayName")
+                val lore = getKitAttribute(kitName, "show.Lore")
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     KitModifier(plugin).kitEditor(source, name, lore, kitName, false)
                 })
