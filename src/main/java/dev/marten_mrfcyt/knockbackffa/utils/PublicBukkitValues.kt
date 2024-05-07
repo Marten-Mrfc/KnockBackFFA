@@ -14,6 +14,7 @@ fun setCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any)
     when (value) {
         is String -> meta.persistentDataContainer.set(key, PersistentDataType.STRING, value)
         is Boolean -> meta.persistentDataContainer.set(key, PersistentDataType.BOOLEAN, value)
+        is Int -> meta.persistentDataContainer.set(key, PersistentDataType.INTEGER, value)
     }
 }
 
@@ -22,6 +23,7 @@ fun checkCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: An
     return when (value) {
         is String -> meta.persistentDataContainer.getOrDefault(key, PersistentDataType.STRING, "") == value
         is Boolean -> meta.persistentDataContainer.getOrDefault(key, PersistentDataType.BOOLEAN, true) == value
+        is Int -> meta.persistentDataContainer.getOrDefault(key, PersistentDataType.INTEGER, 0) == value
         else -> false
     }
 }
@@ -30,6 +32,7 @@ fun getCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String): Any? {
     return when {
         meta.persistentDataContainer.has(key, PersistentDataType.STRING) -> meta.persistentDataContainer.get(key, PersistentDataType.STRING) ?: ""
         meta.persistentDataContainer.has(key, PersistentDataType.BOOLEAN) -> meta.persistentDataContainer.get(key, PersistentDataType.BOOLEAN) ?: false
+        meta.persistentDataContainer.has(key, PersistentDataType.INTEGER) -> meta.persistentDataContainer.get(key, PersistentDataType.INTEGER) ?: 0
         else -> null
     }
 }
