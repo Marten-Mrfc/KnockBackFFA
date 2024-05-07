@@ -11,7 +11,9 @@ import org.bukkit.Registry
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
+import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
+import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.*
@@ -140,11 +142,53 @@ class KitModifier(private val plugin: KnockBackFFA) {
                 if (i < 8 || i > 8) {
                     val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
                     val glassMeta: ItemMeta = glassPane.itemMeta
+                    val toplore = "<dark_purple>Drag an item onto me".asMini()
+                    val bottomlore = "<dark_purple>To change my DisplayIcon!".asMini()
+                    glassMeta.lore(listOf(toplore, bottomlore))
                     glassMeta.displayName("<gray>Click to edit slot</gray>".asMini().asComponent())
                     setCustomValue(glassMeta, plugin, "edit_kit_item", true)
                     setCustomValue(glassMeta, plugin, "kit_name", kitName)
                     glassPane.itemMeta = glassMeta
                     inventory[i] = glassPane
+                }
+            }
+            // item loader
+            val kitItemsSection = kitConfig.getConfigurationSection("kit.$kitName.items")
+            kitItemsSection?.getKeys(false)?.forEach { slot ->
+                val itemSection = kitItemsSection.getConfigurationSection(slot)
+                if (itemSection != null) {
+                    val itemName = itemSection.getString("name")?.asMini()
+                    val itemLore = itemSection.getStringList("lore").map { it.asMini() }
+                    val itemType = itemSection.getString("item")?.let { Material.getMaterial(it) }
+                    val itemAmount = itemSection.getInt("amount")
+                    val itemMetaModel = itemSection.getInt("meta.model")
+                    val itemMetaDurability = itemSection.getInt("meta.durability")
+                    val itemMetaUnbreakable = itemSection.getBoolean("meta.unbreakable")
+                    val itemMetaItemFlags = itemSection.getStringList("meta.itemFlags").map { ItemFlag.valueOf(it) }
+                    val enchantments = itemSection.getConfigurationSection("enchants")
+
+                    val itemStack = itemType?.let { ItemStack(it, itemAmount) }
+                    val itemMeta: ItemMeta = itemStack?.itemMeta ?: return@forEach
+                    itemMeta.displayName(itemName)
+                    itemMeta.lore(itemLore)
+                    itemMeta.setCustomModelData(itemMetaModel)
+                    if (itemMeta is Damageable) {
+                        itemMeta.damage = itemMetaDurability
+                    }
+                    itemMeta.isUnbreakable = itemMetaUnbreakable
+                    itemMetaItemFlags.forEach { itemMeta.addItemFlags(it) }
+                    enchantments?.getKeys(false)?.forEach { enchantmentKey ->
+                        val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
+                        val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
+                        val level = enchantments.getInt(enchantmentKey)
+                        if (enchantment != null) {
+                            itemMeta.addEnchant(enchantment, level, true)
+                        }
+                    }
+                    setCustomValue(itemMeta, plugin, "edit_kit_item", true)
+                    setCustomValue(itemMeta, plugin, "kit_name", kitName)
+                    itemStack.itemMeta = itemMeta
+                    inventory.setItem(slot.toInt(), itemStack)
                 }
             }
             // go back button
