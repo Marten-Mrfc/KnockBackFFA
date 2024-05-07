@@ -2,6 +2,7 @@ package dev.marten_mrfcyt.knockbackffa.kits.guis
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import io.papermc.paper.event.player.AsyncChatEvent
 import net.kyori.adventure.text.Component
@@ -125,6 +126,31 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             event.isCancelled = true
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                             KitModifier(plugin).editKitGUI(source, kitName)
+                        }
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "676F5F6261636B5F627574746F6E",
+                            "go_back_button"
+                        ) -> {
+                            event.isCancelled = true
+                            val menu = getCustomValue(clickedItem.itemMeta, plugin, "menu") as String
+                            when (menu) {
+                                "kit_selector" -> {
+                                    KitSelector(plugin).kitSelector(source)
+                                }
+                                "kit_editor" -> {
+                                    getCustomValue(clickedItem.itemMeta, plugin, "kit_name")?.let { kitName ->
+                                        if (kitName is String) {
+                                            val displayName = getKitAttribute(kitName, "DisplayName")
+                                            val lore = getKitAttribute(kitName, "Lore")
+                                            KitModifier(plugin).kitEditor(source, displayName, lore, kitName, false)
+                                        } else {
+                                            source.error("Kit name could not be found or isn't a String")
+                                        }
+                                    }
+                                }
+                            }
                         }
                     }
                 }

@@ -114,6 +114,14 @@ class KitModifier(private val plugin: KnockBackFFA) {
             setCustomValue(editItemsMeta, plugin, "kit_name", kitName)
             editItems.itemMeta = editItemsMeta
             inventory[2] = editItems
+            // go back button
+            val goBack = ItemStack(Material.BARRIER)
+            val goBackMeta: ItemMeta = goBack.itemMeta
+            goBackMeta.displayName("<gray>Go Back".asMini())
+            setCustomValue(goBackMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button")
+            setCustomValue(goBackMeta, plugin, "menu", "kit_selector")
+            goBack.itemMeta = goBackMeta
+            inventory[8] = goBack
             // save all the data
             kitConfig.save(config)
             source.openInventory(inventory)
@@ -136,6 +144,15 @@ class KitModifier(private val plugin: KnockBackFFA) {
             for (i in 9..17) {
                 inventory[i] = glassPane
             }
+            // go back button
+            val goBack = ItemStack(Material.BARRIER)
+            val goBackMeta: ItemMeta = goBack.itemMeta
+            goBackMeta.displayName("<gray>Go Back".asMini())
+            setCustomValue(goBackMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button")
+            setCustomValue(goBackMeta, plugin, "kit_name", kitName)
+            setCustomValue(goBackMeta, plugin, "menu", "kit_editor")
+            goBack.itemMeta = goBackMeta
+            inventory[8] = goBack
             kitConfig.save(config)
             source.openInventory(inventory)
         } else {
