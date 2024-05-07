@@ -139,7 +139,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             val menu = getCustomValue(clickedItem.itemMeta, plugin, "menu") as String
                             when (menu) {
                                 "kit_selector" -> {
-                                    KitSelector(plugin).kitSelector(source)
+                                    KitSelector(plugin).editKitSelector(source)
                                 }
                                 "kit_editor" -> {
                                     getCustomValue(clickedItem.itemMeta, plugin, "kit_name")?.let { kitName ->
