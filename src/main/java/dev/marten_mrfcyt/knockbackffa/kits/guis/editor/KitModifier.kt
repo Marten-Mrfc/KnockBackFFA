@@ -27,10 +27,10 @@ class KitModifier(private val plugin: KnockBackFFA) {
                     return
                 } else {
                     with(kitConfig) {
-                        set("kit.$kitName.DisplayName", name.notMini())
-                        set("kit.$kitName.Lore", lore.notMini())
-                        set("kit.$kitName.DisplayItem.item", Material.STICK.name)
-                        set("kit.$kitName.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
+                        set("kit.$kitName.show.DisplayName", name.notMini())
+                        set("kit.$kitName.show.Lore", lore.notMini())
+                        set("kit.$kitName.show.DisplayItem.item", Material.STICK.name)
+                        set("kit.$kitName.show.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
                     }
                 }
             }
@@ -48,7 +48,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             }
 
             // Create a ItemStack to represent the kit
-            val kitSection = kitConfig.getConfigurationSection("kit.$kitName")
+            val kitSection = kitConfig.getConfigurationSection("kit.$kitName.show")
             if (kitSection != null) {
                 // Load the display name and lore
                 val displayName = kitSection.getString("DisplayName")?.asMini()
@@ -132,7 +132,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
     fun editKitGUI(source: CommandSender, kitName: String) {
         if (source is Player) {
             source.message("Editing: $kitName")
-            val name = kitConfig.get("kit.$kitName.DisplayName")
+            val name = kitConfig.get("kit.$kitName.show.DisplayName")
             val inventorySize = 18
             val edittext = "<gray>Editing:</gray><white> $name".asMini()
             val inventory = Bukkit.createInventory(null, inventorySize, edittext)

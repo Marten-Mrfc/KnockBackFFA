@@ -28,7 +28,7 @@ class KitSelector(private val plugin: KnockBackFFA) {
 
             // Load all kits from kits.yml
             kits?.forEach { kit ->
-                val kitSection = kitConfig.getConfigurationSection("kit.$kit")
+                val kitSection = kitConfig.getConfigurationSection("kit.$kit.show")
                 if (kitSection == null) {
                     source.sendMessage("Kit $kit is missing from kits.yml")
                     return

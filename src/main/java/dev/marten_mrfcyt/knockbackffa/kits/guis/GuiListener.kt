@@ -45,13 +45,13 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             event.isCancelled = true
                             val itemInHand = event.cursor
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
-                            val name = kitConfig.getConfigurationSection("kit.$kitName")?.getString("DisplayName")
-                            val kitLore = kitConfig.getConfigurationSection("kit.$kitName")?.getString("Lore")
+                            val name = kitConfig.getConfigurationSection("kit.$kitName.show")?.getString("DisplayName")
+                            val kitLore = kitConfig.getConfigurationSection("kit.$kitName.show")?.getString("Lore")
                             if (itemInHand.type != Material.AIR) {
                                 val itemType = itemInHand.type.name
                                 val itemEnchants = itemInHand.enchantments.map { it.key.key to it.value }.toMap()
 
-                                kitConfig.getConfigurationSection("kit.$kitName")?.apply {
+                                kitConfig.getConfigurationSection("kit.$kitName.show")?.apply {
                                     getConfigurationSection("DisplayItem")?.set("item", itemType)
                                     getConfigurationSection("DisplayItem")?.getConfigurationSection("enchants")
                                         ?.let { enchantsSection ->
@@ -173,7 +173,8 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                     set("kit.$kitName.items.${event.slot}.lore", itemMeta.lore()?.map { it.notMini() })
                                     set("kit.$kitName.items.${event.slot}.item", event.cursor.type.name)
                                     set("kit.$kitName.items.${event.slot}.amount", event.cursor.amount)
-                                    set("kit.$kitName.items.${event.slot}.enchants", event.cursor.enchantments)
+                                    val itemEnchants = itemMeta.enchants.mapKeys { it.key.key.key.uppercase(Locale.getDefault()) }
+                                    set("kit.$kitName.items.${event.slot}.enchants", itemEnchants)
                                     set("kit.$kitName.items.${event.slot}.meta.model", itemMeta.customModel)
                                     if (itemMeta is Damageable) {
                                         set("kit.$kitName.items.${event.slot}.meta.durability", itemMeta.damage)
