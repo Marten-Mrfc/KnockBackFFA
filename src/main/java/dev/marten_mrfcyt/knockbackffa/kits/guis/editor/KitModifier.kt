@@ -17,10 +17,10 @@ import java.io.File
 import java.util.*
 
 class KitModifier(private val plugin: KnockBackFFA) {
+    val config = File("${plugin.dataFolder}/kits.yml")
+    val kitConfig = YamlConfiguration.loadConfiguration(config)
     fun openNewKitGUI(source: CommandSender, name: Component, lore: Component, kitName: String, new: Boolean = true) {
         if (source is Player) {
-            val config = File("${plugin.dataFolder}/kits.yml")
-            val kitConfig = YamlConfiguration.loadConfiguration(config)
             if (new) {
                 if (kitConfig.contains("kit.$kitName")) {
                     source.error("Kit with this name already exists!")
@@ -106,7 +106,36 @@ class KitModifier(private val plugin: KnockBackFFA) {
             setCustomValue(editLoreMeta, plugin, "kit_name", kitName)
             editLore.itemMeta = editLoreMeta
             inventory[1] = editLore
+            // Edit Items
+            val editItems = ItemStack(Material.CHEST)
+            val editItemsMeta: ItemMeta = editItems.itemMeta
+            editItemsMeta.displayName("<gray>Edit Items".asMini())
+            setCustomValue(editItemsMeta, plugin, "6B69745F646973706C61795F6974656D5F65646974", "kit_display_item_edit")
+            setCustomValue(editItemsMeta, plugin, "kit_name", kitName)
+            editItems.itemMeta = editItemsMeta
+            inventory[2] = editItems
             // save all the data
+            kitConfig.save(config)
+            source.openInventory(inventory)
+        } else {
+            source.sendMessage("You must be a player to use this command!")
+        }
+    }
+    fun editKitGUI(source: CommandSender, kitName: String) {
+        if (source is Player) {
+            source.message("Editing: $kitName")
+            val name = kitConfig.get("kit.$kitName.DisplayName")
+            val inventorySize = 18
+            val edittext = "<gray>Editing:</gray><white> $name".asMini()
+            val inventory = Bukkit.createInventory(null, inventorySize, edittext)
+            val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
+            val glassMeta: ItemMeta = glassPane.itemMeta
+            glassMeta.displayName("".asMini().asComponent())
+            setCustomValue(glassMeta, plugin, "is_draggable", false)
+            glassPane.itemMeta = glassMeta
+            for (i in 9..17) {
+                inventory[i] = glassPane
+            }
             kitConfig.save(config)
             source.openInventory(inventory)
         } else {
