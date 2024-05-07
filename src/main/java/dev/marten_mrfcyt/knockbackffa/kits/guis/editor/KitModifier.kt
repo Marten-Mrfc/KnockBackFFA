@@ -136,13 +136,16 @@ class KitModifier(private val plugin: KnockBackFFA) {
             val inventorySize = 18
             val edittext = "<gray>Editing:</gray><white> $name".asMini()
             val inventory = Bukkit.createInventory(null, inventorySize, edittext)
-            val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
-            val glassMeta: ItemMeta = glassPane.itemMeta
-            glassMeta.displayName("".asMini().asComponent())
-            setCustomValue(glassMeta, plugin, "is_draggable", false)
-            glassPane.itemMeta = glassMeta
-            for (i in 9..17) {
-                inventory[i] = glassPane
+            for (i in 0..17) {
+                if (i < 8 || i > 8) {
+                    val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
+                    val glassMeta: ItemMeta = glassPane.itemMeta
+                    glassMeta.displayName("<gray>Click to edit slot</gray>".asMini().asComponent())
+                    setCustomValue(glassMeta, plugin, "edit_kit_item", true)
+                    setCustomValue(glassMeta, plugin, "kit_name", kitName)
+                    glassPane.itemMeta = glassMeta
+                    inventory[i] = glassPane
+                }
             }
             // go back button
             val goBack = ItemStack(Material.BARRIER)
