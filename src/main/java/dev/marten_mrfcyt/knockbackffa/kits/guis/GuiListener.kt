@@ -63,7 +63,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             }
                             kitConfig.save(config)
                             if (kitLore != null && name != null) {
-                                KitModifier(plugin).openNewKitGUI(
+                                KitModifier(plugin).kitEditor(
                                     source,
                                     name.asMini(),
                                     kitLore.asMini(),
@@ -86,7 +86,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                 val lore = itemMeta.lore()?.get(0)
                                 val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String
                                 if (name != null && lore != null) {
-                                    KitModifier(plugin).openNewKitGUI(source, name, lore, kitName, false)
+                                    KitModifier(plugin).kitEditor(source, name, lore, kitName, false)
                                 } else {
                                     source.error("Name or lore could not be found.")
                                 }
@@ -138,7 +138,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                 val name = kitConfig.get("kit.$kitName.DisplayName").toString().asMini()
                 val lore = kitConfig.get("kit.$kitName.Lore").toString().asMini()
                 Bukkit.getScheduler().runTask(plugin, Runnable {
-                    KitModifier(plugin).openNewKitGUI(source, name, lore, kitName, false)
+                    KitModifier(plugin).kitEditor(source, name, lore, kitName, false)
                 })
             }
         }

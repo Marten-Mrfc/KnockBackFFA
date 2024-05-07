@@ -16,7 +16,7 @@ import java.util.*
 import kotlin.math.ceil
 
 class KitSelector(private val plugin: KnockBackFFA) {
-    fun openKitCreationGUI(source: CommandSender) {
+    fun kitSelector(source: CommandSender) {
         if (source is Player) {
             val config = File("${plugin.dataFolder}/kits.yml")
             val kitConfig = YamlConfiguration.loadConfiguration(config)

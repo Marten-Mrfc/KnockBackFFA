@@ -70,7 +70,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                     executes {
                         val name = getArgument<String>("name")
                         val lore = getArgument<String>("lore")
-                        KitModifier(KnockBackFFA()).openNewKitGUI(
+                        KitModifier(KnockBackFFA()).kitEditor(
                             source,
                             name.asMini(),
                             lore.asMini(),

@@ -18,8 +18,8 @@ import java.util.*
 
 class KitModifier(private val plugin: KnockBackFFA) {
     val config = File("${plugin.dataFolder}/kits.yml")
-    val kitConfig = YamlConfiguration.loadConfiguration(config)
-    fun openNewKitGUI(source: CommandSender, name: Component, lore: Component, kitName: String, new: Boolean = true) {
+    private val kitConfig = YamlConfiguration.loadConfiguration(config)
+    fun kitEditor(source: CommandSender, name: Component, lore: Component, kitName: String, new: Boolean = true) {
         if (source is Player) {
             if (new) {
                 if (kitConfig.contains("kit.$kitName")) {
