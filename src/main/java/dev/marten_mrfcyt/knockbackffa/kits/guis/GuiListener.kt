@@ -135,7 +135,6 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
 
         @EventHandler
         fun onPlayerChat(event: AsyncChatEvent) {
-            val source = event.player
             val message = event.message()
 
             val (isEditingDisplay, itemMeta) = editKitMap[source.uniqueId] ?: Pair(false, null)
