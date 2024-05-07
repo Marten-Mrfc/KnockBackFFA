@@ -206,4 +206,13 @@ class KitModifier(private val plugin: KnockBackFFA) {
             source.sendMessage("You must be a player to use this command!")
         }
     }
+fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
+    enchantments?.getKeys(false)?.forEach { enchantmentKey ->
+        val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
+        val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
+        val level = enchantments.getInt(enchantmentKey)
+        if (enchantment != null) {
+            itemMeta.addEnchant(enchantment, level, true)
+        }
+    }
 }

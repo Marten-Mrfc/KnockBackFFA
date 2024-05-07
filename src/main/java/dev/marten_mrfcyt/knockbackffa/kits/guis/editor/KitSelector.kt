@@ -51,15 +51,7 @@ class KitSelector(private val plugin: KnockBackFFA) {
                 setCustomValue(meta, plugin, "6F70656E5F6B69745F656469746F72", "open_kit_editor")
                 setCustomValue(meta, plugin, "kit_name", kit)
                 // Apply enchantments
-                enchantments?.getKeys(false)?.forEach { enchantmentKey ->
-                    val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
-                    val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
-                    val level = enchantments.getInt(enchantmentKey)
-                    if (enchantment != null) {
-                        meta.addEnchant(enchantment, level, true)
-                    }
-                }
-
+                enchantments?.let { getEnchantments(it, meta) }
                 item.itemMeta = meta
                 inventory.addItem(item)
             }
