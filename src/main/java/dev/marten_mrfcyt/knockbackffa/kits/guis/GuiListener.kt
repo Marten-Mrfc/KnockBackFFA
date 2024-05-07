@@ -152,6 +152,15 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                 }
                             }
                         }
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "edit_kit_item",
+                            true
+                        ) -> {
+                            event.isCancelled = true
+                            source.message("Editing slot ${event.slot}")
+                        }
                     }
                 }
             }
