@@ -135,8 +135,8 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                 kitConfig.set("kit.$kitName.$key", message.notMiniText())
                 kitConfig.save(config)
                 editKitMap[source.uniqueId] = Pair(false, null)
-                val name = kitConfig.get("kit.$kitName.DisplayName").toString().asMini()
-                val lore = kitConfig.get("kit.$kitName.Lore").toString().asMini()
+                val name = getKitAttribute(kitName, "DisplayName")
+                val lore = getKitAttribute(kitName, "Lore")
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     KitModifier(plugin).kitEditor(source, name, lore, kitName, false)
                 })
@@ -178,5 +178,8 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                 }
             }
         }
+    }
+    private fun getKitAttribute(kitName: String, attribute: String): Component {
+        return kitConfig.get("kit.$kitName.$attribute").toString().asMini()
     }
 }
