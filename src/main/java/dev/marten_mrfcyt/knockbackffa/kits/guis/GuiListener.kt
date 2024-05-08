@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.guis
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.ItemModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.utils.*
@@ -28,7 +29,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         val source = event.whoClicked as? Player ?: return
         val clickedInventory = event.clickedInventory
         if (clickedItem.itemMeta != null) {
-
+        println(clickedItem.toString())
             when {
                 checkCustomValue(clickedItem.itemMeta, plugin, "is_draggable", false) -> {
                     event.isCancelled = true
@@ -47,18 +48,14 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             val itemInHand = event.cursor
                             kitConfig.save(config)
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
-                            source.message("Kit name: $kitName")
-                            source.message("kits.yml: ${kitConfig.getKeys(true)}")
                             if (itemInHand.type != Material.AIR) {
                                 val itemType = event.cursor.type.name
                                 val itemEnchants = event.cursor.enchantments.map { it.key.key to it.value }.toMap()
                                 val name = kitConfig.getString("kit.$kitName.show.DisplayName")
                                 val kitLore = kitConfig.getString("kit.$kitName.show.Lore")
                                 kitConfig.getConfigurationSection("kit.$kitName.show")?.apply {
-                                    source.message("saving item: $itemType")
                                     set("DisplayItem.item", itemType)
                                     kitConfig.save(config)
-                                    source.message("${kitConfig.get("kit.$kitName.show.DisplayItem.item")}")
                                     kitConfig.save(config)
                                     getConfigurationSection("DisplayItem")?.getConfigurationSection("enchants")
                                         ?.let { enchantsSection ->
@@ -71,7 +68,6 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                         }
                                     kitConfig.save(config)
                                     if (kitLore != null && name != null) {
-                                        source.message("Opening kit editor")
                                         KitModifier(plugin).kitEditor(
                                             source,
                                             name.asMini(),
@@ -184,8 +180,6 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             val kitConfig = YamlConfiguration.loadConfiguration(config)
                             event.isCancelled = true
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
-                            val name = kitConfig.get("kit.${kitName}.show.DisplayName")
-                            source.message("$name - Edit item in slot ${event.slot}")
                             val itemInHand = event.cursor
                             val editItem: Boolean
                             val slot = if (getCustomValue(clickedItem.itemMeta, plugin, "slot") != null) {
@@ -216,14 +210,36 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                     )
                                     save(config)
                                     if (editItem) {
-                                        KitModifier(plugin).editKitItem(source, kitName, slot)
+                                        ItemModifier(plugin).editKitItem(source, kitName, slot)
                                     } else {
                                         KitModifier(plugin).editKitGUI(source, kitName)
                                     }
                                 }
-                                source.message("Item set to slot $slot successfully.")
                             } else {
-                                KitModifier(plugin).editKitItem(source, kitName, slot)
+                                ItemModifier(plugin).editKitItem(source, kitName, slot)
+                            }
+                        }
+
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "6D6F646966696572",
+                            "modifier"
+                        ) -> {
+                            event.isCancelled = true
+                            source.message("Modifier clicked")
+                            val modify = getCustomValue(clickedItem.itemMeta, plugin, "modify") as String
+                            when(modify) {
+                                "placeBlock" -> {
+                                    source.message("Place block modifier clicked")
+                                    val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                                    val slot = getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
+                                    val kitConfig = YamlConfiguration.loadConfiguration(config)
+                                    val isPlaceBlock = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.placeBlock", false)
+                                    kitConfig.set("kit.$kitName.items.$slot.modifiers.placeBlock", !isPlaceBlock)
+                                    kitConfig.save(config)
+                                    ItemModifier(plugin).editKitItem(source, kitName, slot)
+                                }
                             }
                         }
                     }

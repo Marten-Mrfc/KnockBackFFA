@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa
 
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.kits.custom.BuildBlocks
 import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
@@ -45,7 +46,8 @@ class KnockBackFFA : KotlinPlugin() {
                 PlayerJoinListener(scoreboardHandler),
                 PlayerQuitListener(scoreboardHandler),
                 ScoreHandler(this),
-                GuiListener(this)
+                GuiListener(this),
+                BuildBlocks(this)
             )
         ).forEach { _ -> amount++ }
         logger.info("$amount events registered -> Starting arena handler...")
