@@ -27,15 +27,18 @@ class KitModifier(private val plugin: KnockBackFFA) {
             source.error("You must be a player to use this command!")
             return
         } else {
-            if (new && kitConfig.contains("kit.$kitName")) {
-                source.error("Kit with this name already exists!")
-                return
-            } else {
-                with(kitConfig) {
-                    set("kit.$kitName.show.DisplayName", name.notMini())
-                    set("kit.$kitName.show.Lore", lore.notMini())
-                    set("kit.$kitName.show.DisplayItem.item", Material.STICK.name)
-                    set("kit.$kitName.show.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
+            if (new) {
+                if (kitConfig.contains("kit.$kitName")) {
+                    source.error("Kit with this name already exists!")
+                    return
+                } else {
+                    with(kitConfig) {
+                        set("kit.$kitName.show.DisplayName", name.notMini())
+                        set("kit.$kitName.show.Lore", lore.notMini())
+                        set("kit.$kitName.show.DisplayItem.item", Material.STICK.name)
+                        set("kit.$kitName.show.DisplayItem.enchants", mapOf("KNOCKBACK" to 2))
+                        save(config)
+                    }
                 }
             }
 
