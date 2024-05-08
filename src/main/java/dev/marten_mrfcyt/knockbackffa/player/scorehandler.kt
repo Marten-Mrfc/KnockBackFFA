@@ -44,9 +44,19 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             killer?.let {
                 val killerData = playerDataHandler.getPlayerData(it.uniqueId)
                 killerData.apply {
-                    set("kills", getInt("kills", 0) + 1)
-                    set("killstreak", getInt("killstreak", 0) + 1)
+                    val currentKills = getInt("kills", 0) + 1
+                    val currentKillstreak = getInt("killstreak", 0) + 1
+                    val currentMaxKillstreak = getInt("max-killstreak", 0)
+
+                    set("kills", currentKills)
+                    set("killstreak", currentKillstreak)
                     set("coins", getInt("coins", 0) + 1)
+
+                    // Update max-killstreak if the current killstreak is higher
+                    if (currentKillstreak > currentMaxKillstreak) {
+                        set("max-killstreak", currentKillstreak)
+                    }
+
                     val killerDeaths = getInt("deaths", 0)
                     val killerKills = getInt("kills", 0)
                     val killerKdRatio = if (killerDeaths != 0) killerKills.toDouble() / killerDeaths else killerKills.toDouble()
