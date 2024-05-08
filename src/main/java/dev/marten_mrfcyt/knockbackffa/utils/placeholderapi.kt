@@ -38,6 +38,10 @@ class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
                 playerData.getInt("killstreak", 0).toString()
             }
 
+            "max-killstreak" -> {
+                playerData.getInt("max-killstreak", 0).toString()
+            }
+
             "coins" -> {
                 playerData.getDouble("coins", 0.0).toString()
             }
