@@ -21,9 +21,9 @@ fun setCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any)
 fun checkCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any): Boolean {
     val key = NamespacedKey(plugin, id)
     return when (value) {
-        is String -> meta.persistentDataContainer.getOrDefault(key, PersistentDataType.STRING, "") == value
-        is Boolean -> meta.persistentDataContainer.getOrDefault(key, PersistentDataType.BOOLEAN, true) == value
-        is Int -> meta.persistentDataContainer.getOrDefault(key, PersistentDataType.INTEGER, 0) == value
+        is String -> meta.persistentDataContainer.get(key, PersistentDataType.STRING) == value
+        is Boolean -> meta.persistentDataContainer.get(key, PersistentDataType.BOOLEAN) == value
+        is Int -> meta.persistentDataContainer.get(key, PersistentDataType.INTEGER) == value
         else -> false
     }
 }
