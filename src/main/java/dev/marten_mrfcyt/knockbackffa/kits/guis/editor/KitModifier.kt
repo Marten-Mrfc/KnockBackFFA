@@ -200,56 +200,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             source.sendMessage("You must be a player to use this command!")
         }
     }
-
-    fun editKitItem(source: CommandSender, kitName: String, slot: Int) {
-        val kitConfig = YamlConfiguration.loadConfiguration(config)
-        source.message(slot.toString())
-        if (source is Player) {
-            val inventorySize = 18
-            val edittext = "<gray>Editing slot:</gray><white> $slot".asMini()
-            val inventory = Bukkit.createInventory(null, inventorySize, edittext)
-            for (i in 0..17) {
-                if (i < 8 || i > 8) {
-                    val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
-                    val glassMeta: ItemMeta = glassPane.itemMeta
-                    glassMeta.displayName("".asMini())
-                    setCustomValue(glassMeta, plugin, "is_draggable", false)
-                    glassPane.itemMeta = glassMeta
-                    inventory[i] = glassPane
-                }
-            }
-            // show item
-            val kitItem = kitConfig.getConfigurationSection("kit.$kitName.items.$slot")
-
-            if (kitItem != null) {
-                val item = loadItemData(kitItem, kitName)
-                val itemMeta = item?.itemMeta
-                if (itemMeta != null) {
-                    setCustomValue(itemMeta, plugin, "slot", slot)
-                    setCustomValue(itemMeta, plugin, "edit_kit_item", true)
-                    item.itemMeta = itemMeta
-                }
-                source.message(item.toString())
-                inventory[13] = item
-            }
-
-
-            // go back button
-            val goBack = ItemStack(Material.BARRIER)
-            val goBackMeta: ItemMeta = goBack.itemMeta
-            goBackMeta.displayName("<gray>Go Back".asMini())
-            setCustomValue(goBackMeta, plugin, "kit_name", kitName)
-            setCustomValue(goBackMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button")
-            setCustomValue(goBackMeta, plugin, "menu", "edit_kit_gui")
-            goBack.itemMeta = goBackMeta
-            inventory[8] = goBack
-            kitConfig.save(config)
-            source.openInventory(inventory)
-        } else {
-            source.sendMessage("You must be a player to use this command!")
-        }
-    }
-    private fun loadItemData(itemSelector: ConfigurationSection?, kitName: String): ItemStack? {
+    fun loadItemData(itemSelector: ConfigurationSection?, kitName: String): ItemStack? {
         val itemName = itemSelector?.getString("name")?.asMini()
         val line = "<gray>------------------<reset>".asMini()
         val toplore = "<dark_purple>Drag an item onto me".asMini()
@@ -285,6 +236,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
         return itemStack
     }
 }
+
 fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
     enchantments?.getKeys(false)?.forEach { enchantmentKey ->
         val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
