@@ -149,9 +149,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
 
     fun editKitGUI(source: CommandSender, kitName: String) {
         if (source is Player) {
-            source.message("kitName: $kitName")
             val name = kitConfig.get("kit.$kitName.show.DisplayName")
-            source.message("Name: $name")
             val inventorySize = 18
             val edittext = "<gray>Editing:</gray><white> $name".asMini()
             val inventory = Bukkit.createInventory(null, inventorySize, edittext)
