@@ -21,8 +21,8 @@ import java.util.*
 
 class KitModifier(private val plugin: KnockBackFFA) {
     val config = File("${plugin.dataFolder}/kits.yml")
-    private val kitConfig = YamlConfiguration.loadConfiguration(config)
     fun kitEditor(source: CommandSender, name: Component, lore: Component, kitName: String, new: Boolean = true) {
+        val kitConfig = YamlConfiguration.loadConfiguration(config)
         if (source !is Player) {
             source.error("You must be a player to use this command!")
             return
@@ -151,6 +151,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
     }
 
     fun editKitGUI(source: CommandSender, kitName: String) {
+        val kitConfig = YamlConfiguration.loadConfiguration(config)
         if (source is Player) {
             val name = kitConfig.get("kit.$kitName.show.DisplayName")
             val inventorySize = 18
@@ -201,6 +202,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
     }
 
     fun editKitItem(source: CommandSender, kitName: String, slot: Int) {
+        val kitConfig = YamlConfiguration.loadConfiguration(config)
         source.message(slot.toString())
         if (source is Player) {
             val inventorySize = 18

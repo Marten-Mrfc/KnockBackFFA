@@ -18,10 +18,10 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.*
+
 class GuiListener(private val plugin: KnockBackFFA) : Listener {
     private val editKitMap = HashMap<UUID, Pair<Boolean, ItemMeta?>>()
     val config = File("${plugin.dataFolder}/kits.yml")
-    private val kitConfig = YamlConfiguration.loadConfiguration(config)
     @EventHandler
     fun onInventoryClick(event: InventoryClickEvent) {
         val clickedItem = event.currentItem ?: return
@@ -42,6 +42,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             "6B69745F646973706C61795F6974656D",
                             "kit_display_item_check"
                         ) -> {
+                            val kitConfig = YamlConfiguration.loadConfiguration(config)
                             event.isCancelled = true
                             val itemInHand = event.cursor
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
@@ -74,7 +75,6 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                     false
                                 )
                             }
-
                         }
 
                         checkCustomValue(
@@ -119,6 +119,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             source.message("Please enter the new lore in the chat.")
                             editKitMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
                         }
+
                         checkCustomValue(
                             clickedItem.itemMeta,
                             plugin,
@@ -129,6 +130,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                             KitModifier(plugin).editKitGUI(source, kitName)
                         }
+
                         checkCustomValue(
                             clickedItem.itemMeta,
                             plugin,
@@ -141,6 +143,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                 "kit_selector" -> {
                                     KitSelector(plugin).editKitSelector(source)
                                 }
+
                                 "kit_editor" -> {
                                     getCustomValue(clickedItem.itemMeta, plugin, "kit_name")?.let { kitName ->
                                         if (kitName is String) {
@@ -152,6 +155,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                         }
                                     }
                                 }
+
                                 "edit_kit_gui" -> {
                                     getCustomValue(clickedItem.itemMeta, plugin, "kit_name")?.let { kitName ->
                                         if (kitName is String) {
@@ -163,12 +167,14 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                 }
                             }
                         }
+
                         checkCustomValue(
                             clickedItem.itemMeta,
                             plugin,
                             "edit_kit_item",
                             true
                         ) -> {
+                            val kitConfig = YamlConfiguration.loadConfiguration(config)
                             event.isCancelled = true
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                             val name = kitConfig.get("kit.${kitName}.show.DisplayName")
@@ -260,8 +266,10 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                 }
             }
         }
+            val kitConfig = YamlConfiguration.loadConfiguration(config)
     }
     private fun getKitAttribute(kitName: String, attribute: String): Component {
+        val kitConfig = YamlConfiguration.loadConfiguration(config)
         return kitConfig.get("kit.$kitName.$attribute").toString().asMini()
     }
 }
