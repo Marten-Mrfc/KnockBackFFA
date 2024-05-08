@@ -67,7 +67,15 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             setCustomValue(isPlaceBlockMeta, plugin, "slot", slot)
             isPlaceBlock.itemMeta = isPlaceBlockMeta
             inventory[0] = isPlaceBlock
-
+            // delete button
+            val deleteButton = ItemStack(Material.RED_CONCRETE)
+            val deleteButtonMeta: ItemMeta = deleteButton.itemMeta
+            deleteButtonMeta.displayName("<red>Delete Item".asMini())
+            setCustomValue(deleteButtonMeta, plugin, "64656C6574655F6974656D", "delete_item")
+            setCustomValue(deleteButtonMeta, plugin, "kit_name", kitName)
+            setCustomValue(deleteButtonMeta, plugin, "slot", slot)
+            deleteButton.itemMeta = deleteButtonMeta
+            inventory[7] = deleteButton
             // go back button
             val goBack = ItemStack(Material.BARRIER)
             val goBackMeta: ItemMeta = goBack.itemMeta
