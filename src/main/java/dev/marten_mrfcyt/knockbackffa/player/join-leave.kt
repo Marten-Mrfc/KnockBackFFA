@@ -1,8 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.cmessage
-import dev.marten_mrfcyt.knockbackffa.utils.message
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -17,6 +17,7 @@ class PlayerJoinListener(private val scoreboardHandler: ScoreboardHandler) : Lis
         scoreboardHandler.startUpdatingScoreboard(source)
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
         if (currentArena != null) {
+            loadKit(KnockBackFFA.instance, source)
             source.teleport(currentArena)
         }
     }
