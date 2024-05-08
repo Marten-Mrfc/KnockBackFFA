@@ -45,15 +45,21 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             val kitConfig = YamlConfiguration.loadConfiguration(config)
                             event.isCancelled = true
                             val itemInHand = event.cursor
+                            kitConfig.save(config)
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
-                            val name = kitConfig.getConfigurationSection("kit.$kitName.show")?.getString("DisplayName")
-                            val kitLore = kitConfig.getConfigurationSection("kit.$kitName.show")?.getString("Lore")
+                            source.message("Kit name: $kitName")
+                            source.message("kits.yml: ${kitConfig.getKeys(true)}")
                             if (itemInHand.type != Material.AIR) {
-                                val itemType = itemInHand.type.name
-                                val itemEnchants = itemInHand.enchantments.map { it.key.key to it.value }.toMap()
-
+                                val itemType = event.cursor.type.name
+                                val itemEnchants = event.cursor.enchantments.map { it.key.key to it.value }.toMap()
+                                val name = kitConfig.getString("kit.$kitName.show.DisplayName")
+                                val kitLore = kitConfig.getString("kit.$kitName.show.Lore")
                                 kitConfig.getConfigurationSection("kit.$kitName.show")?.apply {
-                                    getConfigurationSection("DisplayItem")?.set("item", itemType)
+                                    source.message("saving item: $itemType")
+                                    set("DisplayItem.item", itemType)
+                                    kitConfig.save(config)
+                                    source.message("${kitConfig.get("kit.$kitName.show.DisplayItem.item")}")
+                                    kitConfig.save(config)
                                     getConfigurationSection("DisplayItem")?.getConfigurationSection("enchants")
                                         ?.let { enchantsSection ->
                                             enchantsSection.getKeys(false).forEach { enchantsSection.set(it, null) }
@@ -63,17 +69,18 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                                 enchantsSection.set(enchantKey, level)
                                             }
                                         }
-                                } ?: source.error("Kit section could not be found.")
-                            }
-                            kitConfig.save(config)
-                            if (kitLore != null && name != null) {
-                                KitModifier(plugin).kitEditor(
-                                    source,
-                                    name.asMini(),
-                                    kitLore.asMini(),
-                                    kitName,
-                                    false
-                                )
+                                    kitConfig.save(config)
+                                    if (kitLore != null && name != null) {
+                                        source.message("Opening kit editor")
+                                        KitModifier(plugin).kitEditor(
+                                            source,
+                                            name.asMini(),
+                                            kitLore.asMini(),
+                                            kitName,
+                                            false
+                                        )
+                                    }
+                                } ?: source.error("Kit section could not be found: ")
                             }
                         }
 
@@ -178,30 +185,35 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             event.isCancelled = true
                             val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                             val name = kitConfig.get("kit.${kitName}.show.DisplayName")
+                            source.message("$name - Edit item in slot ${event.slot}")
                             val itemInHand = event.cursor
+                            val editItem: Boolean
+                            val slot = if (getCustomValue(clickedItem.itemMeta, plugin, "slot") != null) {
+                                editItem = true
+                                getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
+                            } else {
+                                editItem = false
+                                event.slot
+                            }
                             if (itemInHand.type != Material.AIR) {
                                 val itemMeta = event.cursor.itemMeta
-                                val editItem: Boolean
-                                val slot = if (getCustomValue(clickedItem.itemMeta, plugin, "slot") != null) {
-                                    editItem = true
-                                    getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
-                                } else {
-                                    editItem = false
-                                    event.slot
-                                }
                                 with(kitConfig) {
                                     set("kit.$kitName.items.$slot.name", itemMeta.displayName()?.notMini())
                                     set("kit.$kitName.items.$slot.lore", itemMeta.lore()?.map { it.notMini() })
                                     set("kit.$kitName.items.$slot.item", event.cursor.type.name)
                                     set("kit.$kitName.items.$slot.amount", event.cursor.amount)
-                                    val itemEnchants = itemMeta.enchants.mapKeys { it.key.key.key.uppercase(Locale.getDefault()) }
+                                    val itemEnchants =
+                                        itemMeta.enchants.mapKeys { it.key.key.key.uppercase(Locale.getDefault()) }
                                     set("kit.$kitName.items.$slot.enchants", itemEnchants)
                                     set("kit.$kitName.items.$slot.meta.model", itemMeta.customModel)
                                     if (itemMeta is Damageable) {
                                         set("kit.$kitName.items.$slot.meta.durability", itemMeta.damage)
                                     }
                                     set("kit.$kitName.items.$slot.meta.unbreakable", itemMeta.isUnbreakable)
-                                    set("kit.$kitName.items.$slot.meta.itemFlags", itemMeta.itemFlags.map { it.name }.toList())
+                                    set(
+                                        "kit.$kitName.items.$slot.meta.itemFlags",
+                                        itemMeta.itemFlags.map { it.name }.toList()
+                                    )
                                     save(config)
                                     if (editItem) {
                                         KitModifier(plugin).editKitItem(source, kitName, slot)
@@ -211,30 +223,18 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                 }
                                 source.message("Item set to slot $slot successfully.")
                             } else {
-                                KitModifier(plugin).editKitItem(source, kitName, event.slot)
+                                KitModifier(plugin).editKitItem(source, kitName, slot)
                             }
                         }
                     }
                 }
             }
         }
-        fun handleKitEdit(source: Player, kitName: String?, key: String, message: Component) {
-            if (kitName != null) {
-                kitConfig.set("kit.$kitName.$key", message.notMiniText())
-                kitConfig.save(config)
-                editKitMap[source.uniqueId] = Pair(false, null)
-                val name = getKitAttribute(kitName, "show.DisplayName")
-                val lore = getKitAttribute(kitName, "show.Lore")
-                Bukkit.getScheduler().runTask(plugin, Runnable {
-                    KitModifier(plugin).kitEditor(source, name, lore, kitName, false)
-                })
-            }
-        }
-
+    }
         @EventHandler
         fun onPlayerChat(event: AsyncChatEvent) {
             val message = event.message()
-
+            val source = event.player
             val (isEditingDisplay, itemMeta) = editKitMap[source.uniqueId] ?: Pair(false, null)
             if (isEditingDisplay) {
                 if (itemMeta?.let {
@@ -247,7 +247,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                     } == true) {
                     val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String?
                     if (kitName != null) {
-                        handleKitEdit(source, kitName, "DisplayName", message)
+                        handleKitEdit(source, kitName, "show.DisplayName", message)
                         event.isCancelled = true
                     }
                 } else if (itemMeta?.let {
@@ -260,13 +260,24 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                     } == true) {
                     val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String?
                     if (kitName != null) {
-                        handleKitEdit(source, kitName, "Lore", message)
+                        handleKitEdit(source, kitName, "show.Lore", message)
                         event.isCancelled = true
                     }
                 }
             }
         }
+    private fun handleKitEdit(source: Player, kitName: String?, key: String, message: Component) {
+        if (kitName != null) {
             val kitConfig = YamlConfiguration.loadConfiguration(config)
+            kitConfig.set("kit.$kitName.$key", message.notMiniText())
+            kitConfig.save(config)
+            editKitMap[source.uniqueId] = Pair(false, null)
+            val name = getKitAttribute(kitName, "show.DisplayName")
+            val lore = getKitAttribute(kitName, "show.Lore")
+            Bukkit.getScheduler().runTask(plugin, Runnable {
+                KitModifier(plugin).kitEditor(source, name, lore, kitName, false)
+            })
+        }
     }
     private fun getKitAttribute(kitName: String, attribute: String): Component {
         val kitConfig = YamlConfiguration.loadConfiguration(config)

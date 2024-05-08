@@ -213,6 +213,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
                     val glassPane = ItemStack(Material.GRAY_STAINED_GLASS_PANE)
                     val glassMeta: ItemMeta = glassPane.itemMeta
                     glassMeta.displayName("".asMini())
+                    setCustomValue(glassMeta, plugin, "is_draggable", false)
                     glassPane.itemMeta = glassMeta
                     inventory[i] = glassPane
                 }
