@@ -181,7 +181,11 @@ class KitModifier(private val plugin: KnockBackFFA) {
                     if (itemMeta != null) {
                         setCustomValue(itemMeta, plugin, "edit_kit_item", true)
                         item.itemMeta = itemMeta
-                        inventory.setItem(slot.toInt(), item)
+                        when (slot.toInt()) {
+                            in 9..18 -> slot.toInt() - 9
+                            in 0..8 -> slot.toInt() + 9
+                            else -> return@forEach
+                        }.let { inventory[it] = item }
                     }
                 }
             }

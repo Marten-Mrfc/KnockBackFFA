@@ -184,10 +184,18 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             val editItem: Boolean
                             val slot = if (getCustomValue(clickedItem.itemMeta, plugin, "slot") != null) {
                                 editItem = true
-                                getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
+                                when (val slotValue = getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int) {
+                                    in 9..18 -> slotValue - 9
+                                    in 0..8 -> slotValue + 9
+                                    else -> slotValue
+                                }
                             } else {
                                 editItem = false
-                                event.slot
+                                when (event.slot) {
+                                    in 9..18 -> event.slot - 9
+                                    in 0..8 -> event.slot + 9
+                                    else -> event.slot
+                                }
                             }
                             if (itemInHand.type != Material.AIR) {
                                 val itemMeta = event.cursor.itemMeta
@@ -210,6 +218,10 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                     )
                                     save(config)
                                     if (editItem) {
+                                        when (slot) {
+                                            in 9..18 -> slot - 9
+                                            in 0..8 -> slot + 9
+                                        }
                                         ItemModifier(plugin).editKitItem(source, kitName, slot)
                                     } else {
                                         KitModifier(plugin).editKitGUI(source, kitName)
@@ -241,6 +253,20 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                                     ItemModifier(plugin).editKitItem(source, kitName, slot)
                                 }
                             }
+                        }
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "64656C6574655F6974656D",
+                            "delete_item"
+                        ) -> {
+                            event.isCancelled = true
+                            val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                            val slot = getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
+                            val kitConfig = YamlConfiguration.loadConfiguration(config)
+                            kitConfig.set("kit.$kitName.items.$slot", null)
+                            kitConfig.save(config)
+                            KitModifier(plugin).editKitGUI(source, kitName)
                         }
                     }
                 }
