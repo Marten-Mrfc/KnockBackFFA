@@ -18,7 +18,7 @@ scoreboard:
     - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_max-killstreak%</green>'
 
 ################################
 #                              #
