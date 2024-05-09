@@ -20,9 +20,7 @@ I am currently also using these code editors:
 </div>
 
 ## Any eta
-Probably in 1-3 months
-**Why so long?**
-I just started coding the plugin so yeah that will take some time.
+Probably in the next 2 weeks, I will have a working version of the plugin, but it will be in beta, so don't expect much from it.
 
 ## Progress
 ✅ = Done
@@ -41,7 +39,7 @@ I just started coding the plugin so yeah that will take some time.
   * Kit editor gui ️✅
   * kit items list gui✅
   * item editor gui🏗️
-  * kit selector gui❌
+  * kit selector gui🏗️
 
 
 * PlaceholderAPI integration✅
@@ -67,6 +65,6 @@ I just started coding the plugin so yeah that will take some time.
 
 * Player 🏗️
   * Join in arena✅
-  * Give kit ❌(1.20.5)
+  * Give kit ✅
 
 And probably even more!

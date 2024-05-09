@@ -11,8 +11,7 @@ import org.bukkit.scheduler.BukkitRunnable
 class BuildBlocks(private val plugin: KnockBackFFA) : Listener {
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
-        if (checkCustomValue(event.itemInHand.itemMeta, plugin, "modify", "placeBlock")) {
-            val player = event.player
+        if (checkCustomValue(event.itemInHand.itemMeta, plugin, "modify", listOf("placeBlock"))) {
             val itemInHand = event.itemInHand.type.name
             val baseItem = if (itemInHand.startsWith("WHITE_")) itemInHand.removePrefix("WHITE_") else return
             val colors = listOf("WHITE", "YELLOW", "ORANGE", "RED", "AIR")
@@ -30,7 +29,8 @@ class BuildBlocks(private val plugin: KnockBackFFA) : Listener {
                     }
                     counter++
                 }
-            }.runTaskTimer(plugin, 0L, 20L) // 20 ticks = 1 second
+            }.runTaskTimer(plugin, 0L, 15L) // 15L = 0.75 seconds
         }
+        checkInfinite(event.player, event.itemInHand)
     }
 }

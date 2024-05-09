@@ -56,9 +56,7 @@ fun getMessage(messageKey: String, player: Player? = null, vararg args: String):
     return when (val message = messagesConfig.get(messageKey)) {
         is String -> {
             var formattedMessage = PlaceholderAPI.setPlaceholders(player, message)
-            println(formattedMessage)
             formattedMessage = replaceArgs(formattedMessage, args)
-            println(formattedMessage)
             formattedMessage
         }
 

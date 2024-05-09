@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -15,7 +16,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
     fun onPlayerKill(event: PlayerDeathEvent) {
         val source = event.player
         val killer = source.killer
-
         if (killer != null) {
             event.deathMessage(cmessage("killed_by_message", source, killer.name))
         } else {
@@ -24,7 +24,8 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
 
         try {
             val playerDataHandler = PlayerData(plugin)
-
+            source.message("Loading kit...")
+            loadKit(KnockBackFFA.instance, source)
             // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
             playerData.apply {

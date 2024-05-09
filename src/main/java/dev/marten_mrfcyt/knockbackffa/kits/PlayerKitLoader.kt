@@ -21,13 +21,15 @@ fun loadKit(plugin: KnockBackFFA, source: Player) {
         val itemsSection = kitConfig.getConfigurationSection("kit.$kit.items")
         itemsSection?.getKeys(false)?.forEach { slot ->
             val itemSection = itemsSection.getConfigurationSection(slot)
-            KitModifier(plugin).loadItemData(itemSection, kit)?.let { item ->
+            KitModifier(plugin).loadItemData(itemSection, kit, false)?.let { item ->
                 val itemMeta = item.itemMeta
                 val modifiers = itemSection?.getConfigurationSection("modifiers")
                 for (modifier in modifiers?.getKeys(false) ?: emptySet()) {
-                    setCustomValue(itemMeta, plugin, "modify", modifier)
+                    val modifiersList = modifiers?.getKeys(false)?.toList() ?: emptyList()
+                    setCustomValue(itemMeta, plugin, "modify", modifiersList)
                 }
-                source.message("Loaded item: $itemMeta")
+                setCustomValue(itemMeta, plugin, "kit_name", kit)
+                setCustomValue(itemMeta, plugin, "slot", slot.toInt())
                 item.itemMeta = itemMeta
                 source.inventory.setItem(slot.toInt(), item)
             }
