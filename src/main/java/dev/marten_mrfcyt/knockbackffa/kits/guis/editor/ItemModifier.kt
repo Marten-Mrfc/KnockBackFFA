@@ -21,7 +21,6 @@ class ItemModifier(private val plugin: KnockBackFFA) {
     val config = File("${plugin.dataFolder}/kits.yml")
     fun editKitItem(source: CommandSender, kitName: String, slot: Int) {
         val kitConfig = YamlConfiguration.loadConfiguration(config)
-        source.message(slot.toString())
         if (source is Player) {
             val inventorySize = 18
             val edittext = "<gray>Editing slot:</gray><white> $slot".asMini()
@@ -40,7 +39,7 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             val kitItem = kitConfig.getConfigurationSection("kit.$kitName.items.$slot")
 
             if (kitItem != null) {
-                val item = KitModifier(plugin).loadItemData(kitItem, kitName)
+                val item = KitModifier(plugin).loadItemData(kitItem, kitName, true)
                 val itemMeta = item?.itemMeta
                 if (itemMeta != null) {
                     setCustomValue(itemMeta, plugin, "slot", slot)
@@ -66,7 +65,24 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             setCustomValue(isPlaceBlockMeta, plugin, "kit_name", kitName)
             setCustomValue(isPlaceBlockMeta, plugin, "slot", slot)
             isPlaceBlock.itemMeta = isPlaceBlockMeta
-            inventory[0] = isPlaceBlock
+            inventory[9] = isPlaceBlock
+            // Is infinite
+            val isInfinite = ItemStack(Material.BEDROCK)
+            val isInfiniteMeta: ItemMeta = isInfinite.itemMeta
+            if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.infinite", false)){
+                isInfiniteMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                isInfiniteMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+                isInfiniteMeta.lore(listOf("<gray>If Item < 64: set item to 64.".asMini(), "<green>Enabled".asMini()))
+            } else {
+                isInfiniteMeta.lore(listOf("<gray>If Item < 64: set item to 64.".asMini(), "<red>Disabled".asMini()))
+            }
+            isInfiniteMeta.displayName("<dark_gray>Is Infinite".asMini())
+            setCustomValue(isInfiniteMeta, plugin, "6D6F646966696572", "modifier")
+            setCustomValue(isInfiniteMeta, plugin, "modify", "infinite")
+            setCustomValue(isInfiniteMeta, plugin, "kit_name", kitName)
+            setCustomValue(isInfiniteMeta, plugin, "slot", slot)
+            isInfinite.itemMeta = isInfiniteMeta
+            inventory[10] = isInfinite
             // delete button
             val deleteButton = ItemStack(Material.RED_CONCRETE)
             val deleteButtonMeta: ItemMeta = deleteButton.itemMeta

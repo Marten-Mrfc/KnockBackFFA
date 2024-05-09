@@ -176,7 +176,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             kitItemsSection?.getKeys(false)?.forEach { slot ->
                 val itemSection = kitItemsSection.getConfigurationSection(slot)
                 if (itemSection != null) {
-                    val item = loadItemData(itemSection, kitName)
+                    val item = loadItemData(itemSection, kitName, true)
                     val itemMeta = item?.itemMeta
                     if (itemMeta != null) {
                         setCustomValue(itemMeta, plugin, "edit_kit_item", true)
@@ -204,13 +204,8 @@ class KitModifier(private val plugin: KnockBackFFA) {
             source.sendMessage("You must be a player to use this command!")
         }
     }
-    fun loadItemData(itemSelector: ConfigurationSection?, kitName: String): ItemStack? {
+    fun loadItemData(itemSelector: ConfigurationSection?, kitName: String, gui: Boolean): ItemStack? {
         val itemName = itemSelector?.getString("name")?.asMini()
-        val line = "<gray>------------------<reset>".asMini()
-        val toplore = "<dark_purple>Drag an item onto me".asMini()
-        val bottomlore = "<dark_purple>to change me completely!".asMini()
-        val lore = itemSelector?.getStringList("lore")?.map { it.asMini() }
-        val itemLore = lore?.plus(line)?.plus(toplore)?.plus(bottomlore)
         val itemType = itemSelector?.getString("item")?.let { Material.getMaterial(it) }
         val itemAmount = itemSelector?.getInt("amount")
         val itemMetaModel = itemSelector?.getInt("meta.model")
@@ -221,8 +216,16 @@ class KitModifier(private val plugin: KnockBackFFA) {
 
         val itemStack = itemType?.let { ItemStack(it, itemAmount ?: 0) }
         val itemMeta: ItemMeta = itemStack?.itemMeta ?: return null
+        itemMeta.lore(if(gui) {
+            val line = "<gray>------------------<reset>".asMini()
+            val toplore = "<dark_purple>Drag an item onto me".asMini()
+            val bottomlore = "<dark_purple>to change me completely!".asMini()
+            val lore = itemSelector.getStringList("lore").map { it.asMini() }
+            lore.plus(line).plus(toplore).plus(bottomlore)
+        } else {
+            itemSelector.getStringList("lore").map { it.asMini() }
+        })
         itemMeta.displayName(itemName)
-        itemMeta.lore(itemLore)
         itemMeta.setCustomModelData(itemMetaModel)
         if (itemMeta is Damageable) {
             if (itemMetaDurability != null) {
