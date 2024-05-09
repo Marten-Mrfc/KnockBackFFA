@@ -29,7 +29,6 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         val source = event.whoClicked as? Player ?: return
         val clickedInventory = event.clickedInventory
         if (clickedItem.itemMeta != null) {
-        println(clickedItem.toString())
             when {
                 checkCustomValue(clickedItem.itemMeta, plugin, "is_draggable", false) -> {
                     event.isCancelled = true
@@ -239,16 +238,23 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             "modifier"
                         ) -> {
                             event.isCancelled = true
-                            source.message("Modifier clicked")
                             val modify = getCustomValue(clickedItem.itemMeta, plugin, "modify") as String
                             when(modify) {
                                 "placeBlock" -> {
-                                    source.message("Place block modifier clicked")
                                     val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                                     val slot = getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
                                     val kitConfig = YamlConfiguration.loadConfiguration(config)
                                     val isPlaceBlock = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.placeBlock", false)
                                     kitConfig.set("kit.$kitName.items.$slot.modifiers.placeBlock", !isPlaceBlock)
+                                    kitConfig.save(config)
+                                    ItemModifier(plugin).editKitItem(source, kitName, slot)
+                                }
+                                "infinite" -> {
+                                    val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                                    val slot = getCustomValue(clickedItem.itemMeta, plugin, "slot") as Int
+                                    val kitConfig = YamlConfiguration.loadConfiguration(config)
+                                    val isInfinite = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.infinite", false)
+                                    kitConfig.set("kit.$kitName.items.$slot.modifiers.infinite", !isInfinite)
                                     kitConfig.save(config)
                                     ItemModifier(plugin).editKitItem(source, kitName, slot)
                                 }

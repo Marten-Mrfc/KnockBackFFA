@@ -48,6 +48,7 @@ class KnockBackFFA : KotlinPlugin() {
                 ScoreHandler(this),
                 GuiListener(this),
                 BuildBlocks(this)
+                BuildBlocks(this),
             )
         ).forEach { _ -> amount++ }
         logger.info("$amount events registered -> Starting arena handler...")
