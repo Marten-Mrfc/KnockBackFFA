@@ -2,10 +2,8 @@ package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
-import dev.marten_mrfcyt.knockbackffa.utils.message
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import lirand.api.extensions.inventory.set
-import lirand.api.nbt.tagNbtData
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.command.CommandSender
@@ -48,6 +46,24 @@ class ItemModifier(private val plugin: KnockBackFFA) {
                 }
                 inventory[13] = item
             }
+            // edit DisplayName
+            val editDisplayName = ItemStack(Material.NAME_TAG)
+            val editDisplayNameMeta: ItemMeta = editDisplayName.itemMeta
+            editDisplayNameMeta.displayName("<dark_gray>Edit Display Name".asMini())
+            setCustomValue(editDisplayNameMeta, plugin, "656469745F6B69745F6974656D5F446973706C61794E616D65", "edit_kit_item_DisplayName")
+            setCustomValue(editDisplayNameMeta, plugin, "kit_name", kitName)
+            setCustomValue(editDisplayNameMeta, plugin, "slot", slot)
+            editDisplayName.itemMeta = editDisplayNameMeta
+            inventory[0] = editDisplayName
+            // edit Lore
+            val editLore = ItemStack(Material.PAPER)
+            val editLoreMeta: ItemMeta = editLore.itemMeta
+            editLoreMeta.displayName("<dark_gray>Edit Lore".asMini())
+            setCustomValue(editLoreMeta, plugin, "656469745F6B69745F6974656D5F6C6F7265", "edit_kit_item_lore")
+            setCustomValue(editLoreMeta, plugin, "kit_name", kitName)
+            setCustomValue(editLoreMeta, plugin, "slot", slot)
+            editLore.itemMeta = editLoreMeta
+            inventory[1] = editLore
             // modifiers
             // Is place block
             val isPlaceBlock = ItemStack(Material.GRASS_BLOCK)

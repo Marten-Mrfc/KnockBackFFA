@@ -14,8 +14,8 @@ fun checkInfinite(source: Player, item: ItemStack) {
     val config = File("${KnockBackFFA.instance.dataFolder}/kits.yml")
     val kitConfig = YamlConfiguration.loadConfiguration(config)
     checkCustomValue(item.itemMeta, KnockBackFFA.instance, "modify", listOf("infinite")).let {
-        val slot = getCustomValue(item.itemMeta, KnockBackFFA.instance, "slot") as Int
-        val kitName = getCustomValue(item.itemMeta, KnockBackFFA.instance, "kit_name")
+        val slot = (getCustomValue(item.itemMeta, KnockBackFFA.instance, "slot") as? Int) ?: 0
+        val kitName = (getCustomValue(item.itemMeta, KnockBackFFA.instance, "kit_name") as? String) ?: return
         val amount = kitConfig.get("kit.$kitName.items.$slot.amount") as Int
         item.amount = amount
         source.inventory[slot] = item

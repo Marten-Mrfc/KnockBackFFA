@@ -274,6 +274,28 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             kitConfig.save(config)
                             KitModifier(plugin).editKitGUI(source, kitName)
                         }
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "656469745F6B69745F6974656D5F446973706C61794E616D65",
+                            "edit_kit_item_DisplayName"
+                        ) -> {
+                            event.isCancelled = true
+                            source.closeInventory()
+                            source.message("Please enter the new display name in the chat.")
+                            editKitMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
+                        }
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "656469745F6B69745F6974656D5F6C6F7265",
+                            "edit_kit_item_lore"
+                        ) -> {
+                            event.isCancelled = true
+                            source.closeInventory()
+                            source.message("Please enter the new lore in the chat.")
+                            editKitMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
+                        }
                     }
                 }
             }
@@ -310,6 +332,50 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                     if (kitName != null) {
                         handleKitEdit(source, kitName, "show.Lore", message)
                         event.isCancelled = true
+                    }
+                } else if (itemMeta?.let {
+                        checkCustomValue(
+                            it,
+                            plugin,
+                            "656469745F6B69745F6974656D5F446973706C61794E616D65",
+                            "edit_kit_item_DisplayName"
+                        )
+                    } == true) {
+                    val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String?
+                    val slot = getCustomValue(itemMeta, plugin, "slot") as Int?
+                    if (kitName != null && slot != null) {
+                        event.isCancelled = true
+                        val kitConfig = YamlConfiguration.loadConfiguration(config)
+                        kitConfig.set("kit.$kitName.items.$slot.name", message.notMiniText())
+                        kitConfig.save(config)
+                        Bukkit.getScheduler().runTask(plugin, Runnable {
+                        ItemModifier(plugin).editKitItem(source, kitName, slot)
+                        editKitMap[source.uniqueId] = Pair(false, null)
+                        })
+                    } else {
+                        source.error("Kit name or slot could not be found.")
+                    }
+                } else if (itemMeta?.let {
+                        checkCustomValue(
+                            it,
+                            plugin,
+                            "656469745F6B69745F6974656D5F6C6F7265",
+                            "edit_kit_item_lore"
+                        )
+                    } == true) {
+                    val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String?
+                    val slot = getCustomValue(itemMeta, plugin, "slot") as Int?
+                    if (kitName != null && slot != null) {
+                        event.isCancelled = true
+                        val kitConfig = YamlConfiguration.loadConfiguration(config)
+                        kitConfig.set("kit.$kitName.items.$slot.lore", listOf(message.notMiniText()))
+                        kitConfig.save(config)
+                        Bukkit.getScheduler().runTask(plugin, Runnable {
+                        ItemModifier(plugin).editKitItem(source, kitName, slot)
+                        editKitMap[source.uniqueId] = Pair(false, null)
+                        })
+                    } else {
+                        source.error("Kit name or slot could not be found.")
                     }
                 }
             }
