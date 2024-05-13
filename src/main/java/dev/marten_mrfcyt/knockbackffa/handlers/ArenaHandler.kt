@@ -1,4 +1,4 @@
-package dev.marten_mrfcyt.knockbackffa.arena
+package dev.marten_mrfcyt.knockbackffa.handlers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.message
@@ -57,6 +57,11 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             plugin.config.set("currentLocation", arena.location)
             plugin.saveConfig()
         }
+    }
+    fun arenasLoaded(): Int {
+        val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
+        val arenaSection = config.getConfigurationSection("arenas")
+        return arenaSection?.getKeys(false)?.size ?: 0
     }
 
     fun getArenaNames(): CompletableFuture<List<String>> {

@@ -1,11 +1,12 @@
-package dev.marten_mrfcyt.knockbackffa.player
+package dev.marten_mrfcyt.knockbackffa.handlers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.*
+import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
+import org.bukkit.event.player.PlayerRespawnEvent
 import java.math.RoundingMode
 import java.text.DecimalFormat
 
@@ -24,8 +25,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
 
         try {
             val playerDataHandler = PlayerData(plugin)
-            source.message("Loading kit...")
-            loadKit(KnockBackFFA.instance, source)
             // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
             playerData.apply {
@@ -72,6 +71,16 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             plugin.logger.severe("Failed to load or save player data: ${e.message}")
             e.printStackTrace()
             plugin.server.onlinePlayers.forEach { it.error("Failed to load or save player data! Please contact an administrator.") }
+        }
+    }
+    @EventHandler
+    fun respawn(event: PlayerRespawnEvent) {
+        val source = event.player
+        val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
+        source.message("Loading kit...")
+        loadKit(KnockBackFFA.instance, source)
+        if (currentArena != null) {
+            event.respawnLocation = currentArena
         }
     }
 }
