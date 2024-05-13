@@ -2,12 +2,13 @@ package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
-fun Plugin.createArena(source: CommandSender, name: String) {
+fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
     if (source is Player) {
     // Setting location and modifying name.
         val location = source.location
@@ -35,6 +36,7 @@ fun Plugin.createArena(source: CommandSender, name: String) {
                     set("arenas.$arenaName.location.z", location.z)
                     set("arenas.$arenaName.location.yaw", location.yaw)
                     set("arenas.$arenaName.location.pitch", location.pitch)
+                    set("arenas.$arenaName.killBlock", killBlock)
                 }
                 arenaConfig.save(config)
                 source.message("Arena $arenaName <green>created<white> successfully!")

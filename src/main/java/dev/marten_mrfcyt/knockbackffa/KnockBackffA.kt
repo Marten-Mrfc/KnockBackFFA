@@ -1,12 +1,14 @@
 package dev.marten_mrfcyt.knockbackffa
 
-import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.handlers.DeathBlock
+import dev.marten_mrfcyt.knockbackffa.handlers.PlayerHandler
 import dev.marten_mrfcyt.knockbackffa.kits.custom.BuildBlocks
 import dev.marten_mrfcyt.knockbackffa.kits.custom.ItemCooldownListener
 import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
-import dev.marten_mrfcyt.knockbackffa.player.ScoreHandler
+import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import lirand.api.architecture.KotlinPlugin
@@ -41,18 +43,19 @@ class KnockBackFFA : KotlinPlugin() {
         val arenaHandler = ArenaHandler(this)
         kbffaCommand(arenaHandler)
         logger.info("Commands registered -> Registering events...")
-        var amount = 1
-        listOf(
+        var amount = 0
             registerEvents(
                 PlayerJoinListener(scoreboardHandler),
                 PlayerQuitListener(scoreboardHandler),
                 ScoreHandler(this),
                 GuiListener(this),
                 BuildBlocks(this),
-                ItemCooldownListener()
-            )
-        ).forEach { _ -> amount++ }
-        logger.info("$amount events registered -> Starting arena handler...")
+                ItemCooldownListener(),
+                DeathBlock(this),
+                PlayerHandler(this)
+            ).forEach { _ -> amount++ }
+
+        logger.info("$amount/8 events registered -> Starting arena handler...")
         val task = object : BukkitRunnable() {
             override fun run() {
                 lastSwitchTime = Instant.now()
@@ -63,7 +66,9 @@ class KnockBackFFA : KotlinPlugin() {
         }
         task.run()
         task.runTaskTimer(this, 0, mapDuration * 20L)  // mapDuration seconds * 20 ticks/second
-        logger.info("Arena handler started -> Registering placeholders...")
+        val arenas = arenaHandler.arenasLoaded()
+        arenaHandler.switchArena()
+        logger.info("Arena Handler found $arenas arenas -> Registering placeholders...")
         val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
         if (placeholderAPI != null) {
             PlaceHolderAPI(this).register()
@@ -78,10 +83,13 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("KnockBackFFA has been disabled!")
     }
 
-    private fun registerEvents(vararg listeners: Listener) {
+    private fun registerEvents(vararg listeners: Listener): List<Listener> {
         val pluginManager = Bukkit.getPluginManager()
+        val registeredListeners = mutableListOf<Listener>()
         for (listener in listeners) {
             pluginManager.registerEvents(listener, this)
+            registeredListeners.add(listener)
         }
+        return registeredListeners
     }
 }
