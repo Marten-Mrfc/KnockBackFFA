@@ -1,12 +1,21 @@
-mapDuration: 600
+# ###############################
+#                              #
+#           Settings           #
+#                              #
+# ###############################
 
-################################
+mapDuration: 60
+allowDropping: true
+allowPickUp: true
+
+
+# ###############################
 #                              #
 #          Scoreboard          #
 #                              #
-################################
+# ###############################
 scoreboard:
-  title: ""
+  title: ''
   lines:
     - '<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>'
     - '<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>'
@@ -18,11 +27,4 @@ scoreboard:
     - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_max-killstreak%</green>'
-
-################################
-#                              #
-#      DO NOT EDIT THESE!      #
-#                              #
-################################
-currentArena:
+    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'

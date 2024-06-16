@@ -4,9 +4,9 @@ join_message:
   - "<white>%player_name%<gray> has entered the arena!"
 
 leave_message:
-    - "<white>%player_name%<gray> has left the arena!"
-    - "<white>%player_name%<gray> has exited the arena!"
-    - "<white>%player_name%<gray> has abandoned the arena!"
+  - "<white>%player_name%<gray> has left the arena!"
+  - "<white>%player_name%<gray> has exited the arena!"
+  - "<white>%player_name%<gray> has abandoned the arena!"
 
 death_message:
   - "<white>%player_name%<gray> has been knocked into the void!"
