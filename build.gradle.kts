@@ -17,7 +17,7 @@ repositories {
     maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
     maven("https://repo.opencollab.dev/maven-snapshots/")
-    maven { url = uri("https://repo.papermc.io/repository/maven-public/") }
+    maven ("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://libraries.minecraft.net")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
