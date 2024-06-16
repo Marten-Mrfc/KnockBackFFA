@@ -27,6 +27,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             val playerDataHandler = PlayerData(plugin)
             // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
+            source.dropItem(false)
             playerData.apply {
                 set("deaths", getInt("deaths", 0) + 1)
                 set("killstreak", 0)

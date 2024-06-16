@@ -67,7 +67,6 @@ class KnockBackFFA : KotlinPlugin() {
         task.run()
         task.runTaskTimer(this, 0, mapDuration * 20L)  // mapDuration seconds * 20 ticks/second
         val arenas = arenaHandler.arenasLoaded()
-        arenaHandler.switchArena()
         logger.info("Arena Handler found $arenas arenas -> Registering placeholders...")
         val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
         if (placeholderAPI != null) {
