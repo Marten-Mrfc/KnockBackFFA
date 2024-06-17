@@ -7,8 +7,11 @@ import java.util.*
 
 class PlayerData(plugin: KnockBackFFA) {
     // Player data directory
-    private val playerDataDirectory = File(plugin.dataFolder, "PlayerData")
-
+    private val playerDataDirectory = File(plugin.dataFolder, "PlayerData").apply {
+        if (!exists()) {
+            mkdirs()
+        }
+    }
     // Get player data
     fun getPlayerData(playerId: UUID): YamlConfiguration {
         // Load player data from file
