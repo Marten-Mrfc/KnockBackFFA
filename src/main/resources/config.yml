@@ -5,8 +5,11 @@
 # ###############################
 
 mapDuration: 60
-allowDropping: true
-allowPickUp: true
+allowDropping: false
+allowPickUp: false
+allowBlockBreaking: false
+allowDamage: false
+
 
 
 # ###############################
