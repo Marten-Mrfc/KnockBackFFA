@@ -4,6 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.message
 import org.bukkit.Bukkit
 import org.bukkit.Location
+import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
@@ -16,43 +17,45 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
     val arenas: MutableList<Arena> = mutableListOf()
     private val arenasLoaded = CompletableFuture<Void>()
     var areArenasLoaded = false // Add this line
-
     init {
-        // Load arenas from arena.yml asynchronously
-        object : BukkitRunnable() {
-            override fun run() {
-                try {
-                    val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
-                    val arenaSection = config.getConfigurationSection("arenas")
-                    if (arenaSection != null) {
+        if(plugin.isEnabled) {
+            loadArenas()
+        }
+    }
+    fun addArena(arena: Arena) {
+        arenas.add(arena)
+    }
+    fun removeArena(arena: Arena) {
+        arenas.remove(arena)
+    }
+         fun loadArenas() {
+            object : BukkitRunnable() {
+                override fun run() {
+                    try {
+                        println(arenas)
+                        arenas.clear()
+                        val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
+                        val arenaSection = config.getConfigurationSection("arenas") as ConfigurationSection
                         for (key in arenaSection.getKeys(false)) {
-                            val worldName = arenaSection.getString("$key.location.world")
-                            val x = arenaSection.getDouble("$key.location.x")
-                            val y = arenaSection.getDouble("$key.location.y")
-                            val z = arenaSection.getDouble("$key.location.z")
-                            val yaw = arenaSection.getDouble("$key.location.yaw")
-                            val pitch = arenaSection.getDouble("$key.location.pitch")
-                            val world = worldName?.let { Bukkit.getWorld(it) }
-                            if (world != null) {
-                                val location = Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
-                                arenas.add(Arena(key, location))
+                            locationFetcher(key, arenaSection).let { location ->
+                                println("Loading arena $key at $location")
+                                location?.let { Arena(key, it) }?.let { arenas.add(it) }
+                                println(arenas)
                             }
                         }
-                        areArenasLoaded = true // Set the variable to true when arenas are loaded
+                        areArenasLoaded = true
+                        arenasLoaded.complete(null)
+                    } catch (e: Exception) {
+                        areArenasLoaded = false
+                        arenasLoaded.completeExceptionally(e)
                     }
-                    println("Loaded ${arenas.size} arenas") // Debugging line
-                    arenasLoaded.complete(null) // Complete the CompletableFuture when the arenas are loaded
-                } catch (e: Exception) {
-                    println("Error loading arena(s): ${e.message}")
-                    areArenasLoaded = false // Set the variable to false if there's an error
-                    arenasLoaded.completeExceptionally(e)
                 }
-            }
-        }.runTaskAsynchronously(plugin)
-    }
+            }.runTaskAsynchronously(plugin)
+        }
 
     private var currentArena: Arena? = null
     fun switchArena() {
+        println(arenas)
         arenasLoaded.thenRun {
             if (arenas.isNotEmpty()) {
                 val arena = arenas[Random.nextInt(arenas.size)]
@@ -78,5 +81,20 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
 
     fun getArenaNames(): CompletableFuture<List<String>> {
         return arenasLoaded.thenApply { arenas.map { it.name } }
+    }
+
+    fun locationFetcher(key: String, arenaSection: ConfigurationSection): Location? {
+        val worldName = arenaSection.getString("$key.location.world")
+        val x = arenaSection.getDouble("$key.location.x")
+        val y = arenaSection.getDouble("$key.location.y")
+        val z = arenaSection.getDouble("$key.location.z")
+        val yaw = arenaSection.getDouble("$key.location.yaw")
+        val pitch = arenaSection.getDouble("$key.location.pitch")
+        val world = worldName?.let { Bukkit.getWorld(it) }
+        return if (world != null) {
+            Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
+        } else {
+            null
+        }
     }
 }

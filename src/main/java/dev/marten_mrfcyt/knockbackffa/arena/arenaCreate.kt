@@ -1,5 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
+import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.handlers.Arena
+import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
 import org.bukkit.Material
@@ -8,6 +11,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
+
 fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
     if (source is Player) {
     // Setting location and modifying name.
@@ -39,6 +43,7 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
                     set("arenas.$arenaName.killBlock", killBlock)
                 }
                 arenaConfig.save(config)
+                ArenaHandler(KnockBackFFA()).loadArenas()
                 source.message("Arena $arenaName <green>created<white> successfully!")
             }
             else {
