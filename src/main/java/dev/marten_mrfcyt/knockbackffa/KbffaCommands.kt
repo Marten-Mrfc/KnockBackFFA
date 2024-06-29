@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa
 
 import com.mojang.brigadier.arguments.ArgumentType
+import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.string
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
@@ -8,6 +9,7 @@ import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
+import dev.marten_mrfcyt.knockbackffa.handlers.Arena
 import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
@@ -17,6 +19,7 @@ import dev.marten_mrfcyt.knockbackffa.utils.sendMini
 import lirand.api.dsl.command.builders.LiteralDSLBuilder
 import lirand.api.dsl.command.builders.command
 import org.bukkit.Material
+import org.bukkit.Registry
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.CompletableFuture
 
@@ -28,9 +31,13 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
     literal("arena") {
         literal("create") {
             argument("name", string()) {
-                argument("killBlock", string()) {
+                argument("killBlock", StringArgumentType.greedyString() ) {
                     suggests { builder ->
-                        Material.entries.filter { it.isBlock && it != Material.AIR && it.name.startsWith(builder.remaining, ignoreCase = false) }.forEach { builder.suggest(it.name) }
+                        Registry.MATERIAL.stream()
+                            .filter { it.isBlock && it != Material.AIR }
+                            .map { it.key.toString() }
+                            .filter { it.startsWith(builder.remaining, ignoreCase = false) }
+                            .forEach { builder.suggest(it) }
                     }
                     executes {
                         plugin.createArena(source, getArgument("name"), getArgument("killBlock"))
