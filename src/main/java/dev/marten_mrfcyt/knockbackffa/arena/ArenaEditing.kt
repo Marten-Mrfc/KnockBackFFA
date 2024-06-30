@@ -71,17 +71,13 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
     }
 
     val location = KnockBackFFA.instance.arenaHandler.locationFetcher(name)
-    println("Location fetched: $location")
 
     arenaConfig.set("arenas.$name", null)
     arenaConfig.save(configFile)
-    println("Deleted arena $name from arena.yml")
 
     if (location != null) {
         KnockBackFFA.instance.arenaHandler.removeArena(Arena(name, location))
-        println("Successfully removed arena $name from arenas list")
         source.message("Arena $name <dark_red>deleted<white> successfully!")
     } else {
-        println("Location for arena $name not found in configuration")
     }
 }

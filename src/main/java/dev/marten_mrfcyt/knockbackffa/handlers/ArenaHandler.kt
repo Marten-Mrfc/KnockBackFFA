@@ -28,12 +28,10 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
 
     fun addArena(arena: Arena) {
         arenas.add(arena)
-        println("Added: $arena to $arenas")
     }
 
     fun removeArena(arena: Arena) {
         arenas.remove(arena)
-        println("Removed: $arena from $arenas")
     }
 
     private fun loadArenas() {
@@ -47,7 +45,6 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
 
                     for (key in arenaSection.getKeys(false)) {
                         locationFetcher(key)?.let { location ->
-                            println("Loading arena $key at $location")
                             arenas.add(Arena(key, location))
                         }
                     }
@@ -62,12 +59,10 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
     }
 
     fun switchArena() {
-        println("Switching with: $arenas")
         arenasLoaded.thenRun {
             if (arenas.isNotEmpty()) {
                 val arena = arenas.random()
                 currentArena = arena
-                println("Switched to: $arena")
                 Bukkit.getOnlinePlayers().forEach { player ->
                     player.teleport(arena.location)
                     player.message("<green>Teleported to arena <white>${arena.name}<green>!")
@@ -76,7 +71,6 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
                 plugin.config.set("currentLocation", arena.location)
                 plugin.saveConfig()
             } else {
-                println("Error: No arena(s) available to switch to.")
                 plugin.config.set("currentArena", null)
                 plugin.config.set("currentLocation", null)
             }
@@ -94,7 +88,6 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
     }
 
     fun locationFetcher(key: String): Location? {
-        println("Fetching location for $key")
         val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
         val arenaSection = config.getConfigurationSection("arenas")
             ?: throw IllegalArgumentException("Arenas section not found in configuration")
@@ -108,7 +101,6 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         return if (world != null) {
             Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
         } else {
-            println("World $worldName not found for arena $key")
             null
         }
     }
