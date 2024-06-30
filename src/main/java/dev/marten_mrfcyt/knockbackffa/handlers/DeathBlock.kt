@@ -10,15 +10,17 @@ import org.bukkit.event.player.PlayerMoveEvent
 import java.io.File
 
 class DeathBlock(private val plugin: KnockBackFFA) : Listener {
-    val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
+    private val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
+
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onDeathBlock(event: PlayerMoveEvent) {
-        val arena = plugin.config.get("currentArena") as? String ?: return
-        val killBlock = config.get("arenas.$arena.killBlock") as String
-        val source = event.player
-        if (source.location.add(0.0, -0.425, 0.0).block.type.name == killBlock.uppercase()) {
-            source.health = 0.0
-            source.damage(100.0)
+        val arena = plugin.config.getString("currentArena") ?: return
+        val killBlock = config.getString("arenas.$arena.killBlock")?.uppercase()
+
+        // Ensure killBlock is not null before proceeding
+        if (killBlock != null && event.to.block.type.name.uppercase() == killBlock) {
+            event.player.health = 0.0
+            event.player.damage(100.0)
         }
     }
 }
