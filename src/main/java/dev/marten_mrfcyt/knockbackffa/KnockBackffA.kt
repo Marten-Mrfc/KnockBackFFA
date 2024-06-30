@@ -25,70 +25,85 @@ class KnockBackFFA : KotlinPlugin() {
         var nextSwitchTime: Instant = Instant.now()
     }
 
-    override fun onEnable() {
-        val mapDuration = config.getInt("mapDuration", 60)
-        instance = this
+    lateinit var arenaHandler: ArenaHandler
 
-        logger.info("Registering commands...")
+    override fun onEnable() {
+        instance = this
+        arenaHandler = ArenaHandler(this)
+        val mapDuration = config.getInt("mapDuration", 60)
+
+        logger.info("Initializing KnockBackFFA...")
+
         if (!dataFolder.exists() && !dataFolder.mkdir()) {
             logger.severe("Failed to create data folder!")
             return
         }
+
         try {
             saveDefaultConfig()
         } catch (ex: IllegalArgumentException) {
             logger.severe("Failed to save default config: ${ex.message}")
         }
-        val scoreboardHandler = ScoreboardHandler(this)
-        val arenaHandler = ArenaHandler(this)
-        kbffaCommand(arenaHandler)
-        logger.info("Commands registered -> Registering events...")
-        var amount = 0
-            registerEvents(
-                PlayerJoinListener(scoreboardHandler),
-                PlayerQuitListener(scoreboardHandler),
-                ScoreHandler(this),
-                GuiListener(this),
-                BuildBlocks(this),
-                ItemCooldownListener(),
-                DeathBlock(this),
-                PlayerHandler(this)
-            ).forEach { _ -> amount++ }
 
-        logger.info("$amount/8 events registered -> Starting arena handler...")
-        val task = object : BukkitRunnable() {
-            override fun run() {
-                lastSwitchTime = Instant.now()
-                nextSwitchTime =
-                    lastSwitchTime.plusSeconds(mapDuration.toLong()) // Use the map duration from the config file
-                arenaHandler.switchArena()
-            }
-        }
-        task.run()
-        task.runTaskTimer(this, 0, mapDuration * 20L)  // mapDuration seconds * 20 ticks/second
-        val arenas = arenaHandler.arenasLoaded()
-        logger.info("Arena Handler found $arenas arenas -> Registering placeholders...")
-        val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
-        if (placeholderAPI != null) {
-            PlaceHolderAPI(this).register()
-            logger.info("Placeholders registered -> KnockBackFFA has been enabled!")
-        } else {
-            logger.warning("Could not find PlaceholderAPI! This plugin is required.")
-            Bukkit.getPluginManager().disablePlugin(this)
-        }
+        registerCommands()
+        registerEvents(
+            PlayerJoinListener(ScoreboardHandler(this)),
+            PlayerQuitListener(ScoreboardHandler(this)),
+            ScoreHandler(this),
+            GuiListener(this),
+            BuildBlocks(this),
+            ItemCooldownListener(),
+            DeathBlock(this),
+            PlayerHandler(this)
+        )
+
+        startArenaHandler(mapDuration)
+        setupPlaceholders()
+
+        logger.info("KnockBackFFA has been enabled successfully!")
     }
 
     override fun onDisable() {
         logger.info("KnockBackFFA has been disabled!")
     }
 
-    private fun registerEvents(vararg listeners: Listener): List<Listener> {
+    private fun registerCommands() {
+        logger.info("Registering commands...")
+        kbffaCommand(arenaHandler)
+        logger.info("Commands registered successfully!")
+    }
+
+    private fun registerEvents(vararg listeners: Listener) {
         val pluginManager = Bukkit.getPluginManager()
-        val registeredListeners = mutableListOf<Listener>()
-        for (listener in listeners) {
+        listeners.forEach { listener ->
             pluginManager.registerEvents(listener, this)
-            registeredListeners.add(listener)
         }
-        return registeredListeners
+        logger.info("${listeners.size} events registered successfully!")
+    }
+
+    private fun startArenaHandler(mapDuration: Int) {
+        logger.info("Starting arena handler...")
+        object : BukkitRunnable() {
+            override fun run() {
+                lastSwitchTime = Instant.now()
+                nextSwitchTime = lastSwitchTime.plusSeconds(mapDuration.toLong())
+                arenaHandler.switchArena()
+            }
+        }.apply {
+            run()
+            runTaskTimer(this@KnockBackFFA, 0, mapDuration * 20L)
+        }
+        logger.info("Arena handler started successfully with $mapDuration seconds interval.")
+    }
+
+    private fun setupPlaceholders() {
+        val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
+        if (placeholderAPI != null) {
+            PlaceHolderAPI(this).register()
+            logger.info("Placeholders registered successfully!")
+        } else {
+            logger.warning("Could not find PlaceholderAPI! This plugin is required.")
+            Bukkit.getPluginManager().disablePlugin(this)
+        }
     }
 }
