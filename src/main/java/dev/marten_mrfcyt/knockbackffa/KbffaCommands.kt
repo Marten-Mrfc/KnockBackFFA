@@ -34,7 +34,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                 argument("killBlock", StringArgumentType.greedyString() ) {
                     suggests { builder ->
                         Registry.MATERIAL.stream()
-                            .filter { it.isBlock && it != Material.AIR }
+                            .filter { it.isBlock && it != Material.AIR && it.isSolid}
                             .map { it.key.toString() }
                             .filter { it.startsWith(builder.remaining, ignoreCase = false) }
                             .forEach { builder.suggest(it) }
