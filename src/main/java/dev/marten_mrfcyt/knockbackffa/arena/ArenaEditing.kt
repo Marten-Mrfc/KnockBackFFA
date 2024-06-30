@@ -2,10 +2,8 @@ package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.handlers.Arena
-import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
-import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -14,11 +12,10 @@ import java.io.File
 
 fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
     if (source is Player) {
-    // Setting location and modifying name.
         val location = source.location
         val arenaName = name.replace(" ", "_")
         source.message("<green>Creating<white> arena $arenaName at ${"%.1f".format(location.x)}, ${"%.1f".format(location.y)}, ${"%.1f".format(location.z)}")
-    // Save arena to arena.yml
+
         val config = File("$dataFolder/arena.yml")
         if (!config.exists()) {
             source.message("No arena.yml file found, creating a new one!")
@@ -30,6 +27,7 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
             }
             source.message("arena.yml file created!")
         }
+
         val arenaConfig = YamlConfiguration.loadConfiguration(config)
         if (!arenaConfig.contains("arenas.$arenaName")) {
             if (location.world?.pvp == true) {
@@ -43,18 +41,47 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
                     set("arenas.$arenaName.killBlock", killBlock)
                 }
                 arenaConfig.save(config)
-                ArenaHandler(KnockBackFFA()).loadArenas()
+                KnockBackFFA.instance.arenaHandler.addArena(Arena(arenaName, location))
                 source.message("Arena $arenaName <green>created<white> successfully!")
-            }
-            else {
+            } else {
                 source.error("This world needs pvp to be enabled!")
             }
-        }
-        else {
+        } else {
             source.error("Arena $arenaName <green>already exists<white>!")
         }
-    }
-    else {
+    } else {
         source.error("You must be a player to create an arena!")
+    }
+}
+
+fun Plugin.deleteArena(source: CommandSender, name: String) {
+    if (source !is Player) {
+        source.error("You must be a player to delete an arena!")
+        return
+    }
+
+    source.message("<dark_red>Deleting<white> arena $name!")
+
+    val configFile = File("$dataFolder/arena.yml")
+    val arenaConfig = YamlConfiguration.loadConfiguration(configFile)
+
+    if (!arenaConfig.contains("arenas.$name")) {
+        source.error("Arena $name <dark_red>not found. Is it misspelled<white>!")
+        return
+    }
+
+    val location = KnockBackFFA.instance.arenaHandler.locationFetcher(name)
+    println("Location fetched: $location")
+
+    arenaConfig.set("arenas.$name", null)
+    arenaConfig.save(configFile)
+    println("Deleted arena $name from arena.yml")
+
+    if (location != null) {
+        KnockBackFFA.instance.arenaHandler.removeArena(Arena(name, location))
+        println("Successfully removed arena $name from arenas list")
+        source.message("Arena $name <dark_red>deleted<white> successfully!")
+    } else {
+        println("Location for arena $name not found in configuration")
     }
 }
