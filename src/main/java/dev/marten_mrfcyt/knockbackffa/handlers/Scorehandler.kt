@@ -15,6 +15,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
     // Event handler for player death
     @EventHandler
     fun onPlayerKill(event: PlayerDeathEvent) {
+        event.drops.clear()
         val source = event.player
         val killer = source.killer
         if (killer != null) {
@@ -22,12 +23,11 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         } else {
             event.deathMessage(cmessage("death_message", source))
         }
-
+        source.inventory.clear()
         try {
             val playerDataHandler = PlayerData(plugin)
             // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
-            source.dropItem(false)
             playerData.apply {
                 set("deaths", getInt("deaths", 0) + 1)
                 set("killstreak", 0)
