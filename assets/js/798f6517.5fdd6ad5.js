@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocumentation=self.webpackChunkdocumentation||[]).push([[754],{6210:e=>{e.exports=JSON.parse('{"tags":[{"label":"News","permalink":"/KnockBackFFA/blog/tags/docusaurus","description":"News about KnockBackFFA","count":1}]}')}}]);
