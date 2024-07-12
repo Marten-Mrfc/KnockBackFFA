@@ -1,16 +1,12 @@
-facebook:
-  label: Facebook
-  permalink: /facebook
-  description: Facebook tag description
-hello:
-  label: Hello
+release:
+  label: Release
+  permalink: /release
+  description: A blog post about a release
+beta:
+  label: Beta
   permalink: /hello
-  description: Hello tag description
-docusaurus:
-  label: Docusaurus
+  description: A blog post about a beta
+news:
+  label: News
   permalink: /docusaurus
-  description: Docusaurus tag description
-hola:
-  label: Hola
-  permalink: /hola
-  description: Hola tag description
+  description: News about KnockBackFFA
