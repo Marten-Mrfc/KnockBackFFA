@@ -70,6 +70,7 @@ class KnockBackFFA : KotlinPlugin() {
     private fun registerCommands() {
         logger.info("Registering commands...")
         kbffaCommand(arenaHandler)
+        kitSelectorCommand()
         logger.info("Commands registered successfully!")
     }
 

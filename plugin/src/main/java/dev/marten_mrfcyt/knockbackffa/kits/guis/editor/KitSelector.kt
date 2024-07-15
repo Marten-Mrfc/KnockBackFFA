@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.handlers.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import org.bukkit.Bukkit
 import org.bukkit.Material
@@ -8,7 +9,6 @@ import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import kotlin.math.ceil
 
@@ -23,39 +23,65 @@ class KitSelector(private val plugin: KnockBackFFA) {
             val inventory =
                 Bukkit.createInventory(null, inventorySize, "<gray>Please select or create kit</gray>".asMini())
 
-            // Load all kits from kits.yml
             kits?.forEach { kit ->
-                val kitSection = kitConfig.getConfigurationSection("kit.$kit.show")
-                if (kitSection == null) {
-                    source.sendMessage("Kit $kit is missing from kits.yml")
-                    return
-                }
-                val displayName = kitSection.getString("DisplayName")?.asMini()
-                val lore = kitSection.getString("Lore")?.asMini()
-                val displayItemMaterial = kitSection.getConfigurationSection("DisplayItem")?.getString("item")
-                    ?.let { Material.getMaterial(it) }
-                val enchantments =
-                    kitSection.getConfigurationSection("DisplayItem")?.getConfigurationSection("enchants")
-                if (displayName == null || lore == null || displayItemMaterial == null) {
-                    source.sendMessage("Kit $kit is missing required fields in kits.yml")
-                    return
-                }
-                val item = ItemStack(displayItemMaterial)// Create the item with the specified material
-                val meta: ItemMeta = item.itemMeta
-
-                meta.displayName(displayName)
-                meta.lore(listOf(lore))
+                val item = loadKitGUI(kitConfig, kit)
+                val meta = item.itemMeta ?: return@forEach
                 setCustomValue(meta, plugin, "6F70656E5F6B69745F656469746F72", "open_kit_editor")
                 setCustomValue(meta, plugin, "kit_name", kit)
-                // Apply enchantments
-                enchantments?.let { getEnchantments(it, meta) }
                 item.itemMeta = meta
                 inventory.addItem(item)
             }
 
             source.openInventory(inventory)
         } else {
-            source.sendMessage("You must be a player to use this command!")
+            source.error("You must be a player to use this command!")
         }
+    }
+
+    fun kitSelector(source: CommandSender) {
+        if (source is Player) {
+            val config = File("${plugin.dataFolder}/kits.yml")
+            val kitConfig = YamlConfiguration.loadConfiguration(config)
+            val kits = kitConfig.getConfigurationSection("kit")?.getKeys(false)
+            val kitCount = kits?.size ?: 0
+            val inventorySize = ceil((kitCount + 1) / 9.0).toInt() * 9
+            val inventory =
+                Bukkit.createInventory(null, inventorySize, "<gray>Please select a kit</gray>".asMini())
+
+            kits?.forEach { kit ->
+                val item = loadKitGUI(kitConfig, kit)
+                val meta = item.itemMeta ?: return@forEach
+                setCustomValue(meta, plugin, "73656C6563742D6B6974", "select-kit")
+                setCustomValue(meta, plugin, "kit_name", kit)
+                item.itemMeta = meta
+                inventory.addItem(item)
+            }
+
+            source.openInventory(inventory)
+        } else {
+            source.error("You must be a player to use this command!")
+        }
+    }
+
+    fun setKit(kit: String, source: Player) {
+        val playerData = PlayerData(plugin)
+        val playerDataConfig = playerData.getPlayerData(source.uniqueId)
+        playerDataConfig.set("kit", kit)
+        playerData.savePlayerData(source.uniqueId, playerDataConfig)
+        loadKit(plugin, source)
+        source.message("You have selected the $kit kit!")
+    }
+
+    private fun loadKitGUI(kitConfig: YamlConfiguration, kit: String): ItemStack {
+        val kitSection = kitConfig.getConfigurationSection("kit.$kit.show") ?: return ItemStack(Material.BARRIER)
+        val displayName = kitSection.getString("DisplayName")?.asMini() ?: return ItemStack(Material.BARRIER)
+        val lore = kitSection.getString("Lore")?.asMini() ?: return ItemStack(Material.BARRIER)
+        val displayItemMaterial = Material.getMaterial(kitSection.getString("DisplayItem.item") ?: return ItemStack(Material.BARRIER))
+        val item = ItemStack(displayItemMaterial ?: Material.BARRIER)
+        val meta = item.itemMeta ?: return ItemStack(Material.BARRIER)
+        meta.displayName(displayName)
+        meta.lore(listOf(lore))
+        item.itemMeta = meta
+        return item
     }
 }

@@ -296,6 +296,17 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                             source.message("Please enter the new lore in the chat.")
                             editKitMap[source.uniqueId] = Pair(true, clickedItem.itemMeta)
                         }
+                        checkCustomValue(
+                            clickedItem.itemMeta,
+                            plugin,
+                            "73656C6563742D6B6974",
+                            "select-kit"
+                        ) -> {
+                            event.isCancelled = true
+                            source.closeInventory()
+                            val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                            KitSelector(plugin).setKit(kitName, source)
+                        }
                     }
                 }
             }

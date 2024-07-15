@@ -12,6 +12,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.listArena
 import dev.marten_mrfcyt.knockbackffa.handlers.Arena
 import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
@@ -109,7 +110,11 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         }
     }
 }
-
+fun Plugin.kitSelectorCommand() = command("kit") {
+    executes {
+        KitSelector(KnockBackFFA()).kitSelector(source)
+    }
+}
 fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
     return arenaHandler.getArenaNames().thenApply { names ->
         names.forEach {
