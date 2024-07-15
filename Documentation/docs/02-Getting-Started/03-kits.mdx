@@ -1,0 +1,39 @@
+# Kits
+
+Kits are also a big part of KnockBackFFA. They make it so players can have different items in their inventory when they join the game. In this guide, we will show you how to create and manage kits.
+
+:::info[config]
+Everything shown here can also be editted in the kits.yml file.
+:::
+
+## Creating a kit
+To create a kit run the command:
+`/kbffa kit create (name)`
+Replace `(name)` with the name you want for the kit.
+
+## Modifying a kit
+To modify a kit run the command:
+`/kbffa kit` and select the kit you want.\
+![kit-selector](../assets/getting-started/kit-selector.png)
+
+### Kit editor
+In the GUI openend when clicking on a kit you can modify the kit. You can modify the display icon, display name and lore of the kit.\
+![kit-editor](../assets/getting-started/kit-editor.png)
+### inventory editor
+You can also edit the items by clicking on the chest in the Kit editor. This opens the inventory selector. This is were you can select what slot of the inventory you want to edit.\
+![inventory-editor](../assets/getting-started/inventory-editor.png)
+
+### item editor
+Click on an item in the item editor to modify it. You can modify the display name and lore of the item and also the item itself. You can also toggle some things that the item can do like:
+- Is it infinite?
+- Is it a building block?
+    - A building block name should always start with `minecraft:white_` because the system changes `white_` into `yellow_` than `orange_` and lastly `red_` before setting the block to air
+- More are comming soon
+
+![item-editor](../assets/getting-started/item-editor.png)
+
+## Selecting a kit
+You can select a kit by using the command `/kit`.
+
+## Deleting a kit
+You can for now only delete a kit by going into the kits.yml file and deleting it yourself but this will soon be replaced by /kbffa kit delete
