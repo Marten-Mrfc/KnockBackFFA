@@ -201,7 +201,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             kitConfig.save(config)
             source.openInventory(inventory)
         } else {
-            source.sendMessage("You must be a player to use this command!")
+            source.error("You must be a player to use this command!")
         }
     }
     fun loadItemData(itemSelector: ConfigurationSection?, kitName: String, gui: Boolean): ItemStack? {

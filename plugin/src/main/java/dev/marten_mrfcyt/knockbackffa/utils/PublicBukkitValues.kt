@@ -18,7 +18,6 @@ fun setCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any)
         }
     }
 }
-
 fun checkCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any): Boolean {
     val key = NamespacedKey(plugin, id)
     return when (value) {

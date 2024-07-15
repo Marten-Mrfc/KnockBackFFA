@@ -31,15 +31,15 @@ val centralDependencies = listOf(
 
 dependencies {
     compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
-    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-    implementation("net.kyori:adventure-text-minimessage:4.16.0")
+    compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+    compileOnly("net.kyori:adventure-text-minimessage:4.16.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.6.0")
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("net.kyori:adventure-text-minimessage:4.13.1")
     implementation("com.github.marten-mrfc:LirandAPI:621cd466ce")
     compileOnly("me.clip:placeholderapi:2.11.3")
-    implementation("org.junit.jupiter:junit-jupiter-api:5.7.2")
-    implementation("org.mockito:mockito-core:5.11.0")
+    compileOnly("org.junit.jupiter:junit-jupiter-api:5.7.2")
+    compileOnly("org.mockito:mockito-core:5.11.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
 }
 

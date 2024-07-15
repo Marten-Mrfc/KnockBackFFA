@@ -2,6 +2,7 @@ package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
+import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import lirand.api.extensions.inventory.set
 import org.bukkit.Bukkit
@@ -120,7 +121,7 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             kitConfig.save(config)
             source.openInventory(inventory)
         } else {
-            source.sendMessage("You must be a player to use this command!")
+            source.error("You must be a player to use this command!")
         }
     }
  }

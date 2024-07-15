@@ -40,7 +40,7 @@ class PlayerHandler(plugin: KnockBackFFA): Listener {
     fun allowDamage(event: EntityDamageEvent) {
         if (config.get("currentArena") == null) return
         if (config.get("allowDamage") == false) {
-            event.isCancelled = true
+            event.damage = 0.0
         }
     }
 }
