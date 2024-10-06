@@ -7,6 +7,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 
 class PlayerHandler(plugin: KnockBackFFA): Listener {
@@ -41,6 +42,14 @@ class PlayerHandler(plugin: KnockBackFFA): Listener {
         if (config.get("currentArena") == null) return
         if (config.get("allowDamage") == false) {
             event.damage = 0.0
+        }
+    }
+    // Crafting
+    @EventHandler
+    fun allowCrafting(event: CraftItemEvent) {
+        if (config.get("currentArena") == null) return
+        if (config.get("allowCrafting") == false) {
+            event.isCancelled = true
         }
     }
 }
