@@ -105,6 +105,11 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                 source.error("Please insert a name for the kit!")
             }
         }
+        literal("edit") {
+            executes {
+                KitEditor(KnockBackFFA()).openKitCreationGui(source)
+            }
+        }
         literal("delete") {
             argument("name", string()) {
                 executes {
