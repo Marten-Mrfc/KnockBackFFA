@@ -1,8 +1,8 @@
 kit:
   default:
     show:
-      DisplayName: default
-      Lore: De beste kit!
+      DisplayName: <dark_gray>default</dark_gray>
+      Lore: <white>The default kit</white>
       DisplayItem:
         item: STICK
         enchants:
@@ -20,6 +20,8 @@ kit:
           placeBlock: true
           infinite: true
         name: <yellow>Building Blocks
+        lore:
+          - <white>Used for building</white>
       '0':
         item: STICK
         amount: 1
@@ -42,7 +44,18 @@ kit:
           itemFlags: []
         modifiers:
           delay: true
+          amount: 300
         name: <dark_gray>Knock Bow
+      '2':
+        item: ENDER_PEARL
+        amount: 3
+        enchants: { }
+        meta:
+          durability: 0
+          unbreakable: false
+          itemFlags: [ ]
+        modifiers:
+          onKill: false
       '9':
         item: ARROW
         amount: 1

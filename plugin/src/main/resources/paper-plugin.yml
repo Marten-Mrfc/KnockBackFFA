@@ -1,11 +1,11 @@
 name: KnockBackFFA
-version: '0.1-beta'
+version: '0.2.0'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-api-version: '1.20'
+api-version: '1.21'
 authors: [Marten_Mrfcyt]
 description: The best KnockBackFFA plugin!
 dependencies:
   server:
     PlaceholderAPI:
-      load: BEFORE
-      required: false
+      load: OMIT
+      required: true
