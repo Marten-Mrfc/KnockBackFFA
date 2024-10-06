@@ -85,6 +85,8 @@ class KitModifier(private val plugin: KnockBackFFA) {
             val bottomlore = "<dark_purple>To change my DisplayIcon!".asMini()
             modifiedKitMeta.lore(listOf(kitLore, line, toplore, bottomlore))
             // Apply the enchantments
+            val enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
+
             enchantments?.getKeys(false)?.forEach { enchantmentKey ->
                 val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
                 val enchantment = Registry.ENCHANTMENT.get(namespacedKey)
@@ -241,6 +243,22 @@ class KitModifier(private val plugin: KnockBackFFA) {
         itemStack.itemMeta = itemMeta
 
         return itemStack
+    }
+
+    // delete kit
+    fun deleteKit(source: CommandSender, kitName: String) {
+        val kitConfig = YamlConfiguration.loadConfiguration(config)
+        if (source is Player) {
+            if (kitConfig.contains("kit.$kitName")) {
+                kitConfig.set("kit.$kitName", null)
+                kitConfig.save(config)
+                source.message("Kit $kitName has been deleted!")
+            } else {
+                source.error("Kit $kitName does not exist!")
+            }
+        } else {
+            source.error("You must be a player to use this command!")
+        }
     }
 }
 
