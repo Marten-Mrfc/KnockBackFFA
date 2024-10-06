@@ -100,6 +100,23 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             setCustomValue(isInfiniteMeta, plugin, "slot", slot)
             isInfinite.itemMeta = isInfiniteMeta
             inventory[10] = isInfinite
+            // On kill
+            val onKill = ItemStack(Material.DIAMOND_SWORD)
+            val onKillMeta: ItemMeta = onKill.itemMeta
+            if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.onKill", false)){
+                onKillMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                onKillMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+                onKillMeta.lore(listOf("<gray>When you kill a player, get the item again".asMini(), "<green>Enabled".asMini()))
+            } else {
+                onKillMeta.lore(listOf("<gray>When you kill a player, get the item again".asMini(), "<red>Disabled".asMini()))
+            }
+            onKillMeta.displayName("<dark_gray>On Kill".asMini())
+            setCustomValue(onKillMeta, plugin, "6D6F646966696572", "modifier")
+            setCustomValue(onKillMeta, plugin, "modify", "onKill")
+            setCustomValue(onKillMeta, plugin, "kit_name", kitName)
+            setCustomValue(onKillMeta, plugin, "slot", slot)
+            onKill.itemMeta = onKillMeta
+            inventory[11] = onKill
             // delete button
             val deleteButton = ItemStack(Material.RED_CONCRETE)
             val deleteButtonMeta: ItemMeta = deleteButton.itemMeta

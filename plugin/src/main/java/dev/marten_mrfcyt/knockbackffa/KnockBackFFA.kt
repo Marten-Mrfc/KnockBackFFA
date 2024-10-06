@@ -9,6 +9,7 @@ import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
 import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
+import dev.marten_mrfcyt.knockbackffa.kits.custom.OnKill
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import lirand.api.architecture.KotlinPlugin
@@ -54,7 +55,8 @@ class KnockBackFFA : KotlinPlugin() {
             BuildBlocks(this),
             ItemCooldownListener(),
             DeathBlock(this),
-            PlayerHandler(this)
+            PlayerHandler(this),
+            OnKill(this)
         )
 
         startArenaHandler(mapDuration)
