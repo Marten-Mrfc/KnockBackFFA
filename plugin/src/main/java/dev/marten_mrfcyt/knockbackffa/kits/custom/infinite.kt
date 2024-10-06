@@ -1,5 +1,5 @@
 package dev.marten_mrfcyt.knockbackffa.kits.custom
-
+// infinite
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.checkCustomValue
 import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
