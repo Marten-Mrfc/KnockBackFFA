@@ -1,9 +1,9 @@
 name: KnockBackFFA
 version: '0.2.0'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-api-version: '1.21'
 authors: [Marten_Mrfcyt]
 description: The best KnockBackFFA plugin!
+api-version: '1.20'
 dependencies:
   server:
     PlaceholderAPI:

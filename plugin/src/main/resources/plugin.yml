@@ -1,0 +1,6 @@
+name: KnockBackFFA
+version: 0.2.0
+main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+description: The best KnockBackFFA plugin!
+author: Marten_mrfcyt
+api-version: '1.20-1.21'

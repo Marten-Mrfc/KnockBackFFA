@@ -30,7 +30,7 @@ val centralDependencies = listOf(
 )
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.20.6-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compileOnly("net.kyori:adventure-text-minimessage:4.16.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk9:1.6.0")
