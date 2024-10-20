@@ -10,6 +10,7 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
 import kotlin.random.Random
+import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer
 
 private val mm = MiniMessage.builder().build()
 private val messagesConfig = getMessagesConfig()
@@ -25,6 +26,18 @@ fun Component.notMiniText(): String {
 
 fun Component.notMini(): String {
     return mm.serialize(this)
+}
+fun String.toLegacyMini(player: Player? = null): String {
+    // Parse the string with MiniMessage
+    val component = this.asMini(player)
+
+    // Convert the component to legacy text (with § color codes)
+    return LegacyComponentSerializer.legacySection().serialize(component)
+}
+
+// Optional: You can also add an extension for Component to get the legacy version
+fun Component.toLegacy(): String {
+    return LegacyComponentSerializer.legacySection().serialize(this)
 }
 
 fun CommandSender.sendMini(message: String, player: Player? = null) {
