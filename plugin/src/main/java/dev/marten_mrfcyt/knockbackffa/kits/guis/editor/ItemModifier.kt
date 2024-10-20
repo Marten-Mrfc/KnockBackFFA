@@ -3,6 +3,7 @@ package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.error
+import dev.marten_mrfcyt.knockbackffa.utils.isBelowVersion
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import lirand.api.extensions.inventory.set
 import org.bukkit.Bukkit
@@ -70,7 +71,27 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             val isPlaceBlock = ItemStack(Material.GRASS_BLOCK)
             val isPlaceBlockMeta: ItemMeta = isPlaceBlock.itemMeta
             if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.placeBlock", false)){
-                isPlaceBlockMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                if (isBelowVersion("1.20.5")) {
+                    try {
+                        // Use reflection to safely access the DURABILITY enchantment
+                        val durabilityEnchantment = Enchantment::class.java.getField("DURABILITY").get(null) as? Enchantment
+                        durabilityEnchantment?.let {
+                            isPlaceBlockMeta.addEnchant(it, 1, true)
+                        } ?: run {
+                            // Handle the case where DURABILITY enchantment is not available
+                            println("DURABILITY enchantment is not available.")
+                        }
+                    } catch (e: NoSuchFieldException) {
+                        // If DURABILITY is not found, log or handle as needed
+                        println("DURABILITY enchantment not found: ${e.message}")
+                    } catch (e: Exception) {
+                        // Handle other potential exceptions
+                        println("Error adding DURABILITY enchantment: ${e.message}")
+                    }
+                } else {
+                    isPlaceBlockMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                }
+
                 isPlaceBlockMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
                 isPlaceBlockMeta.lore(listOf("<gray>When this item is placed, it will be removed.".asMini(), "<green>Enabled".asMini()))
             } else {
@@ -87,7 +108,32 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             val isInfinite = ItemStack(Material.BEDROCK)
             val isInfiniteMeta: ItemMeta = isInfinite.itemMeta
             if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.infinite", false)){
-                isInfiniteMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.onKill", false)){
+                    if (isBelowVersion("1.20.5")) {
+                        try {
+                            // Use reflection to safely access the DURABILITY enchantment
+                            val durabilityEnchantment = Enchantment::class.java.getField("DURABILITY").get(null) as? Enchantment
+                            durabilityEnchantment?.let {
+                                isInfiniteMeta.addEnchant(it, 1, true)
+                            } ?: run {
+                                // Handle the case where DURABILITY enchantment is not available
+                                println("DURABILITY enchantment is not available.")
+                            }
+                        } catch (e: NoSuchFieldException) {
+                            // If DURABILITY is not found, log or handle as needed
+                            println("DURABILITY enchantment not found: ${e.message}")
+                        } catch (e: Exception) {
+                            // Handle other potential exceptions
+                            println("Error adding DURABILITY enchantment: ${e.message}")
+                        }
+                    } else {
+                        isInfiniteMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                    }
+                    isInfiniteMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+                    isInfiniteMeta.lore(listOf("<gray>When you kill a player, get the item again".asMini(), "<green>Enabled".asMini()))
+                } else {
+                    isInfiniteMeta.lore(listOf("<gray>When you kill a player, get the item again".asMini(), "<red>Disabled".asMini()))
+                }
                 isInfiniteMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
                 isInfiniteMeta.lore(listOf("<gray>If Item < 64: set item to 64.".asMini(), "<green>Enabled".asMini()))
             } else {
@@ -104,7 +150,26 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             val onKill = ItemStack(Material.DIAMOND_SWORD)
             val onKillMeta: ItemMeta = onKill.itemMeta
             if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.onKill", false)){
-                onKillMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                if (isBelowVersion("1.20.5")) {
+                    try {
+                        // Use reflection to safely access the DURABILITY enchantment
+                        val durabilityEnchantment = Enchantment::class.java.getField("DURABILITY").get(null) as? Enchantment
+                        durabilityEnchantment?.let {
+                            onKillMeta.addEnchant(it, 1, true)
+                        } ?: run {
+                            // Handle the case where DURABILITY enchantment is not available
+                            println("DURABILITY enchantment is not available.")
+                        }
+                    } catch (e: NoSuchFieldException) {
+                        // If DURABILITY is not found, log or handle as needed
+                        println("DURABILITY enchantment not found: ${e.message}")
+                    } catch (e: Exception) {
+                        // Handle other potential exceptions
+                        println("Error adding DURABILITY enchantment: ${e.message}")
+                    }
+                } else {
+                    onKillMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                }
                 onKillMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
                 onKillMeta.lore(listOf("<gray>When you kill a player, get the item again".asMini(), "<green>Enabled".asMini()))
             } else {

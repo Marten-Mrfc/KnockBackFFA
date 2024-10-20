@@ -2,9 +2,6 @@ package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.*
-import io.papermc.paper.registry.RegistryAccess
-import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.TypedKey
 import lirand.api.extensions.inventory.set
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
@@ -12,6 +9,7 @@ import org.bukkit.*
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
@@ -86,14 +84,21 @@ class KitModifier(private val plugin: KnockBackFFA) {
             val bottomlore = "<dark_purple>To change my DisplayIcon!".asMini()
             modifiedKitMeta.lore(listOf(kitLore, line, toplore, bottomlore))
             // Apply the enchantments
-            val enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
+            val enchantmentRegistry = Registry.ENCHANTMENT
 
             enchantments?.getKeys(false)?.forEach { enchantmentKey ->
-                val namespacedKey = Key.key("minecraft", enchantmentKey.lowercase(Locale.getDefault()))
-                val enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
+                // Creating an Adventure Key object
+                val adventureKey = Key.key("minecraft", enchantmentKey.lowercase(Locale.getDefault()))
+
+                // Convert Adventure Key to Bukkit NamespacedKey
+                val namespacedKey = NamespacedKey(adventureKey.namespace(), adventureKey.value())
+
+                val enchantment = enchantmentRegistry.get(namespacedKey)
                 val level = enchantments.getInt(enchantmentKey)
 
-                modifiedKitMeta.addEnchant(enchantment, level, true)
+                if (enchantment != null) {
+                    modifiedKitMeta.addEnchant(enchantment, level, true)
+                }
             }
             // Set the custom values
             setCustomValue(
@@ -263,13 +268,13 @@ class KitModifier(private val plugin: KnockBackFFA) {
 }
 
 fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
-    val enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
-
     enchantments?.getKeys(false)?.forEach { enchantmentKey ->
         val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
-        val enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
+        val enchantment = Enchantment.getByKey(namespacedKey)
         val level = enchantments.getInt(enchantmentKey)
 
-        itemMeta.addEnchant(enchantment, level, true)
+        if (enchantment != null) {
+            itemMeta.addEnchant(enchantment, level, true)
+        }
     }
 }

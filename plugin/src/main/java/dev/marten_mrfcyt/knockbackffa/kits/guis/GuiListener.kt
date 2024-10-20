@@ -29,16 +29,20 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
     fun onInventoryClick(event: InventoryClickEvent) {
         val clickedItem = event.currentItem ?: return
         val player = event.whoClicked as? Player ?: return
+
         val clickedInventory = event.clickedInventory ?: return
 
+        // Make sure itemMeta exists
         if (clickedItem.itemMeta == null) return
 
         when {
+            // Check if the item is draggable
             checkCustomValue(clickedItem.itemMeta, plugin, "is_draggable", false) -> {
                 event.isCancelled = true
             }
 
-            clickedInventory == event.whoClicked.openInventory.topInventory -> {
+            // Perform a safer check for the top inventory to avoid version conflicts
+            clickedInventory === player.openInventory.topInventory -> {
                 handleTopInventoryClick(event, player, clickedItem)
             }
         }

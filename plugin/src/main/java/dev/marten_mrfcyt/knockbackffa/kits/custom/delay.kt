@@ -4,21 +4,19 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.checkCustomValue
 import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.EntityShootBowEvent
 import org.bukkit.inventory.ItemStack
-import org.bukkit.persistence.PersistentDataType
 import java.io.File
 
 class ItemCooldownListener : Listener {
 
     @EventHandler
     fun bowShootEvent(event: EntityShootBowEvent) {
-        val player = event.entity as Player
+        val player = if (event.entity is Player) event.entity as Player else return
         val item = player.inventory.itemInMainHand
         onItemCooldown(player, item)
         checkInfinite(player, event.consumable as ItemStack)

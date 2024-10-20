@@ -79,5 +79,6 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
         KnockBackFFA.instance.arenaHandler.removeArena(Arena(name, location))
         source.message("Arena $name <dark_red>deleted<white> successfully!")
     } else {
+        source.error("Failed to delete arena $name!")
     }
 }
