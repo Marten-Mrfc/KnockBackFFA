@@ -15,15 +15,12 @@ import org.bukkit.util.Vector
 class JumpPad(private val plugin: KnockBackFFA) : Listener {
     @EventHandler
     fun placePressurePlateEvent(event: BlockPlaceEvent) {
-        println(event.block)
         if (checkCustomValue(event.itemInHand.itemMeta, plugin, "modify", listOf("jumpPad"))) {
             if (event.block.type.name.uppercase().endsWith("_PRESSURE_PLATE")) {
                 event.block.setMetadata("jumpPad", FixedMetadataValue(plugin, true))
                 // Schedule the block to turn into air after 5 seconds
                 object : BukkitRunnable() {
-                    override fun run() {
-                        println("Removing jump pad")
-                        event.block.type = Material.AIR
+                    override fun run() { event.block.type = Material.AIR
                     }
                 }.runTaskLater(plugin, 100L) // 5 seconds later
             }
@@ -32,11 +29,9 @@ class JumpPad(private val plugin: KnockBackFFA) : Listener {
 
     @EventHandler
     fun onPressurePlatePressEvent(event: PlayerInteractEvent) {
-        println(event.action)
         if (event.action != Action.PHYSICAL) return
         val block = event.clickedBlock
         if (block != null && block.type.name.endsWith("_PRESSURE_PLATE") && block.hasMetadata("jumpPad")) {
-            println("Player stepped on jump pad")
             val player = event.player
             player.velocity = Vector(0, 1, 0) // Launch the player upwards
             object : BukkitRunnable() {
