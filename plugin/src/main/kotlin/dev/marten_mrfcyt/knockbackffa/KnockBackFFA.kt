@@ -9,6 +9,7 @@ import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
 import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
+import dev.marten_mrfcyt.knockbackffa.kits.custom.JumpPad
 import dev.marten_mrfcyt.knockbackffa.kits.custom.OnKill
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
@@ -53,6 +54,7 @@ class KnockBackFFA : KotlinPlugin() {
             ScoreHandler(this),
             GuiListener(this),
             BuildBlocks(this),
+            JumpPad(this),
             ItemCooldownListener(),
             DeathBlock(this),
             PlayerHandler(this),
