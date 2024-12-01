@@ -117,6 +117,23 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             setCustomValue(onKillMeta, plugin, "slot", slot)
             onKill.itemMeta = onKillMeta
             inventory[11] = onKill
+            // Is JumpPad
+            val isJumpPad = ItemStack(Material.LIGHT_WEIGHTED_PRESSURE_PLATE)
+            val isJumpPadMeta: ItemMeta = isJumpPad.itemMeta
+            if(kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.jumpPad", false)){
+                isJumpPadMeta.addEnchant(Enchantment.UNBREAKING, 1, true)
+                isJumpPadMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+                isJumpPadMeta.lore(listOf("<gray>When stepped on, the player will be launched.".asMini(), "<green>Enabled".asMini()))
+            } else {
+                isJumpPadMeta.lore(listOf("<gray>When stepped on, the player will be launched.".asMini(), "<red>Disabled".asMini()))
+            }
+            isJumpPadMeta.displayName("<dark_gray>Is JumpPad".asMini())
+            setCustomValue(isJumpPadMeta, plugin, "6D6F646966696572", "modifier")
+            setCustomValue(isJumpPadMeta, plugin, "modify", "jumpPad")
+            setCustomValue(isJumpPadMeta, plugin, "kit_name", kitName)
+            setCustomValue(isJumpPadMeta, plugin, "slot", slot)
+            isJumpPad.itemMeta = isJumpPadMeta
+            inventory[12] = isJumpPad
             // delete button
             val deleteButton = ItemStack(Material.RED_CONCRETE)
             val deleteButtonMeta: ItemMeta = deleteButton.itemMeta

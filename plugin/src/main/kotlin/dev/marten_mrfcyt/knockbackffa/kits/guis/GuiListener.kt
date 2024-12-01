@@ -265,7 +265,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         val slot = getCustomValue(itemMeta, plugin, "slot") as Int
 
         when (modify) {
-            "placeBlock", "infinite", "onKill" -> {
+            "placeBlock", "infinite", "onKill", "jumpPad" -> {
                 val currentValue = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.$modify", false)
                 kitConfig.set("kit.$kitName.items.$slot.modifiers.$modify", !currentValue)
                 kitConfig.save(config)
