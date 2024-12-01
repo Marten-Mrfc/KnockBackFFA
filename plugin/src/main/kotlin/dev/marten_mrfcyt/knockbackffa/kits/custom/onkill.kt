@@ -15,13 +15,10 @@ class OnKill(private val plugin: KnockBackFFA) : Listener {
     @EventHandler
     fun onKill(event: PlayerDeathEvent) {
         val source = event.entity.killer ?: return
-        println("Checking items for player: ${source.name}")
         for (item in source.inventory.contents) {
-            println("Checking item: $item")
             if (item == null) continue
             val itemMeta = item.itemMeta ?: continue
             if (checkCustomValue(itemMeta, KnockBackFFA.instance, "modify", listOf("onKill"))) {
-                println("Item is onKill item")
                 val slot = (getCustomValue(itemMeta, KnockBackFFA.instance, "slot") as? Int) ?: 0
                 val kitName = (getCustomValue(itemMeta, KnockBackFFA.instance, "kit_name") as? String) ?: continue
                 val config = File("${KnockBackFFA.instance.dataFolder}/kits.yml")
