@@ -10,6 +10,7 @@ import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
 import dev.marten_mrfcyt.knockbackffa.kits.custom.*
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
+import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import lirand.api.architecture.KotlinPlugin
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
@@ -25,14 +26,14 @@ class KnockBackFFA : KotlinPlugin() {
     }
 
     lateinit var arenaHandler: ArenaHandler
+    lateinit var playerData: PlayerData
 
     override fun onEnable() {
+        logger.info("Initializing KnockBackFFA...")
         instance = this
         arenaHandler = ArenaHandler(this)
+        playerData = PlayerData.getInstance(this)
         val mapDuration = config.getInt("mapDuration", 60)
-
-        logger.info("Initializing KnockBackFFA...")
-
         if (!dataFolder.exists() && !dataFolder.mkdir()) {
             logger.severe("Failed to create data folder!")
             return
@@ -67,6 +68,7 @@ class KnockBackFFA : KotlinPlugin() {
 
     override fun onDisable() {
         logger.info("KnockBackFFA has been disabled!")
+        playerData.mysqlHandler.disconnect()
     }
 
     private fun registerCommands() {

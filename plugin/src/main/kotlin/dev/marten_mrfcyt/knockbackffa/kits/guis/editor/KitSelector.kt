@@ -64,7 +64,7 @@ class KitSelector(private val plugin: KnockBackFFA) {
     }
 
     fun setKit(kit: String, source: Player) {
-        val playerData = PlayerData(plugin)
+        val playerData = plugin.playerData
         val playerDataConfig = playerData.getPlayerData(source.uniqueId)
         playerDataConfig.set("kit", kit)
         playerData.savePlayerData(source.uniqueId, playerDataConfig)

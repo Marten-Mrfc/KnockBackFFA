@@ -77,12 +77,6 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         }
     }
 
-    fun arenasLoaded(): Int {
-        val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
-        val arenaSection = config.getConfigurationSection("arenas")
-        return arenaSection?.getKeys(false)?.size ?: 0
-    }
-
     fun getArenaNames(): CompletableFuture<List<String>> {
         return arenasLoaded.thenApply { arenas.map { it.name } }
     }

@@ -8,7 +8,7 @@ import java.time.Duration
 import java.time.Instant
 
 @Suppress("UnstableApiUsage")
-class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
+class PlaceHolderAPI(private val knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
     private val plugin: Plugin = knockBackFFA
     override fun getAuthor(): String {
         return plugin.pluginMeta.authors[0]
@@ -24,7 +24,7 @@ class PlaceHolderAPI(knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         if (player == null) return null
-        val playerData = PlayerData(KnockBackFFA()).getPlayerData(player.uniqueId)
+        val playerData = knockBackFFA.playerData.getPlayerData(player.uniqueId)
         return when (params) {
             "deaths" -> {
                 playerData.getInt("deaths", 0).toString()

@@ -11,8 +11,6 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 
 class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
-    // Player data directory
-    // Event handler for player death
     @EventHandler
     fun onPlayerKill(event: PlayerDeathEvent) {
         event.drops.clear()
@@ -25,7 +23,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         }
         source.inventory.clear()
         try {
-            val playerDataHandler = PlayerData(plugin)
+            val playerDataHandler = plugin.playerData
             // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
             playerData.apply {
@@ -74,6 +72,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             plugin.server.onlinePlayers.forEach { it.error("Failed to load or save player data! Please contact an administrator.") }
         }
     }
+
     @EventHandler
     fun respawn(event: PlayerRespawnEvent) {
         val source = event.player
