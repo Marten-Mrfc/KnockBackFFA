@@ -1,0 +1,1 @@
+"use strict";(self.webpackChunkdocumentation=self.webpackChunkdocumentation||[]).push([[759],{6458:t=>{t.exports=JSON.parse('{"authors":[{"name":"Marten Mrfc","title":"Maintainer of KnockBackFFA","url":"https://github.com/Marten-Mrfc","imageURL":"https://github.com/Marten-mrfc.png","key":"Marten","page":null,"count":1}]}')}}]);
