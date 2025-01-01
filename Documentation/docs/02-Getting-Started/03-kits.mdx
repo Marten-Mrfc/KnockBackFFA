@@ -24,11 +24,16 @@ You can also edit the items by clicking on the chest in the Kit editor. This ope
 ![inventory-editor](../assets/getting-started/inventory-editor.png)
 
 ### item editor
-Click on an item in the item editor to modify it. You can modify the display name and lore of the item and also the item itself. You can also toggle some things that the item can do like:
-- Is it infinite?
-- Is it a building block?
-    - A building block name should always start with `minecraft:white_` because the system changes `white_` into `yellow_` than `orange_` and lastly `red_` before setting the block to air
-- More are comming soon
+Click on an item in the item editor to modify it. You can change the display name, lore, and the item itself. Additionally, there has been made an dynamic Modifier system. This system allows you to add custom modifiers to the item. The following modifiers are currently available:
+
+- Delay Modifier: Adds a delay to an item (item must be a bow).
+- BuildBlock Modifier: Makes the item buildblock.
+  - A building block name should always start with `minecraft:white_` because the system changes `white_` to `yellow_`, then `orange_`, and finally `red_` before setting the block to air.
+- On Kill Modifier: Restores item amount on kill.
+- Execute Command Modifier: Executes a command on kill.
+- Infinite Modifier: Makes the item infinite.
+- JumpPad Modifier: A pressure plate that launches you upwards (item must be a pressure plate).
+- More features are coming soon.
 
 ![item-editor](../assets/getting-started/item-editor.png)
 

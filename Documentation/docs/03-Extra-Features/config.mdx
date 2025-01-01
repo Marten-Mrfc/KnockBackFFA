@@ -1,15 +1,59 @@
 # Config settings
 The config also contains some configurations you can change.
 
-## Settings
-- `mapDuration: 600` - The duration between map switches.
-- `allowDropping: false` - If players can drop items.
-- `allowPickUp: false` - If players can pick up items.
-- `allowBlockBreaking: false` - If players can break blocks.
-- `allowDamage: false` - If players can damage each other.
+## config.yml
+```yml title="plugins/KnockBackFFA/config.yml"
+# ###############################
+#                              #
+#           Settings           #
+#                              #
+# ###############################
 
-## Scoreboard
-You can also fully customize the scoreboard to your likings.
+mapDuration: 60
+allowDropping: false
+allowPickUp: false
+allowCrafting: true
+allowBlockBreaking: false
+allowDamage: false
+
+
+# ###############################
+#                              #
+#          Scoreboard          #
+#                              #
+# ###############################
+
+scoreboard:
+  title: ''
+  lines:
+    - '<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>'
+    - '<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>'
+    - '<gray><b>└</b></gray><white>Current map:</white> <green>%knockbackffa_map%</green>'
+    - ''
+    - '<gray><b>┌─</b></gray><gold><b>STATS</b></gold>'
+    - '<gray><b>├</b></gray><white>Your ping: </white><green>%player_ping%</green>'
+    - '<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_kills%</green>'
+    - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
+    - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
+    - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
+    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+
+
+# ###############################
+#                              #
+#        File System(Beta)     #
+#                              #
+# ###############################
+
+storage:
+  type: file # Options: file, MySQL
+  mysql:
+    host: localhost # MySQL host(IP)
+    port: 3306 # MySQL port
+    database: knockbackffa # The database name
+    user: root # Username for MySQL
+    password: '' # MySQL password
+```
 
 ## currentArena & currentLocation
 These 2 are useless if you change them because these are changing each map switch this is just an easy way for me to save and pull what map currently is playing.
