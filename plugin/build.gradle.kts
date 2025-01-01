@@ -17,16 +17,16 @@ repositories {
     maven("https://repo.codemc.io/repository/maven-releases/")
     maven("https://repo.codemc.io/repository/maven-snapshots/")
     maven("https://repo.opencollab.dev/maven-snapshots/")
-    maven ("https://repo.papermc.io/repository/maven-public/")
+    maven("https://repo.papermc.io/repository/maven-public/")
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://libraries.minecraft.net")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
 }
+
 val centralDependencies = listOf(
-    "org.jetbrains.kotlin:kotlin-stdlib:1.9.22",
-    "org.jetbrains.kotlin:kotlin-reflect:1.9.22",
+    "org.jetbrains.kotlin:kotlin-stdlib:2.1",
     "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1",
-    "com.corundumstudio.socketio:netty-socketio:1.7.19", // Keep this on a lower version as the newer version breaks the ping
+    "com.corundumstudio.socketio:netty-socketio:1.7.19"
 )
 
 dependencies {
@@ -41,6 +41,8 @@ dependencies {
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.7.2")
     compileOnly("org.mockito:mockito-core:5.11.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
+    implementation(kotlin("reflect"))
+    implementation("org.reflections:reflections:0.9.10")
 }
 
 val targetJavaVersion = 21
@@ -65,23 +67,28 @@ kotlin {
     jvmToolchain(21)
 }
 
-task<ShadowJar>("buildAndMove") {
+tasks.register<ShadowJar>("buildAndMove") {
     dependsOn("shadowJar")
 
     group = "build"
     description = "Builds the jar and moves it to the server folder"
 
-    // Move the jar from the build/libs folder to the server/plugins folder
     doLast {
-        val jar = file("build/libs/%s-%s-all.jar".format(project.name, version))
-        val server = file("server/plugins/%s-%s.jar".format(project.name.capitalizeAsciiOnly(), version))
+        val jar = file("build/libs/${project.name}-${version}-all.jar")
+        val server = file("server/plugins/${project.name.capitalizeAsciiOnly()}-${version}.jar")
 
-        // Delete the old file if it exists
         if (server.exists()) {
             server.delete()
         }
 
-        // Copy the new file to the server
         jar.copyTo(server, overwrite = true)
     }
+}
+
+tasks.register<JavaExec>("runServer") {
+    group = "application"
+    description = "Run the Minecraft server with the plugin"
+    mainClass.set("-jar")
+    args = listOf("D:/projects/Knockbackffa/KnockBackFFA/plugin/server/paper.jar")
+    workingDir = file("D:/projects/Knockbackffa/KnockBackFFA/plugin/server")
 }

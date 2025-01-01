@@ -2,12 +2,12 @@ package dev.marten_mrfcyt.knockbackffa
 
 import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.handlers.DeathBlock
+import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.handlers.PlayerHandler
 import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
 import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
-import dev.marten_mrfcyt.knockbackffa.kits.custom.*
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
@@ -51,17 +51,12 @@ class KnockBackFFA : KotlinPlugin() {
             PlayerQuitListener(ScoreboardHandler(this)),
             ScoreHandler(this),
             GuiListener(this),
-            BuildBlocks(this),
-            JumpPad(this),
-            OnKillExecute(),
-            ItemCooldownListener(),
             DeathBlock(this),
             PlayerHandler(this),
-            OnKill(this)
         )
-
         startArenaHandler(mapDuration)
         setupPlaceholders()
+        ModifyHandler().registerEvents(this)
 
         logger.info("KnockBackFFA has been enabled successfully!")
     }
