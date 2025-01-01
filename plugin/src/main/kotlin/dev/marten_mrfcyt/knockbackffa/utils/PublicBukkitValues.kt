@@ -5,6 +5,14 @@ import org.bukkit.NamespacedKey
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.persistence.PersistentDataType
 
+/**
+ * Sets a custom value in the item's persistent data container.
+ *
+ * @param meta The ItemMeta of the item.
+ * @param plugin The instance of the plugin.
+ * @param id The key to store the value under.
+ * @param value The value to store, can be String, Boolean, Int, or List<String>.
+ */
 fun setCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any) {
     val key = NamespacedKey(plugin, id)
     when (value) {
@@ -18,6 +26,16 @@ fun setCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any)
         }
     }
 }
+
+/**
+ * Checks if a custom value in the item's persistent data container matches the given value.
+ *
+ * @param meta The ItemMeta of the item.
+ * @param plugin The instance of the plugin.
+ * @param id The key to check the value under.
+ * @param value The value to check against, can be String, Boolean, Int, or List<String>.
+ * @return True if the stored value matches the given value, false otherwise.
+ */
 fun checkCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: Any): Boolean {
     val key = NamespacedKey(plugin, id)
     return when (value) {
@@ -36,6 +54,15 @@ fun checkCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String, value: An
         else -> false
     }
 }
+
+/**
+ * Retrieves a custom value from the item's persistent data container.
+ *
+ * @param meta The ItemMeta of the item.
+ * @param plugin The instance of the plugin.
+ * @param id The key to retrieve the value from.
+ * @return The stored value, can be String, Boolean, Int, List<String>, or null if not found.
+ */
 fun getCustomValue(meta: ItemMeta, plugin: KnockBackFFA, id: String): Any? {
     val key = NamespacedKey(plugin, id)
     return when {
