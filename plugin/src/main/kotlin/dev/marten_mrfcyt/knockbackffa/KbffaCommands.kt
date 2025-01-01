@@ -27,6 +27,7 @@ import org.bukkit.plugin.Plugin
 import java.util.concurrent.CompletableFuture
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
+    requiresPermissions("kbffa.command")
     setup(arenaHandler)
 }
 fun debug(source: Player) {
@@ -35,11 +36,13 @@ fun debug(source: Player) {
 }
 private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
     literal("debug") {
+        requiresPermissions("kbffa.debug")
         executes {
             debug(source as Player)
         }
     }
     literal("arena") {
+        requiresPermissions("kbffa.arena")
         literal("create") {
             argument("name", string()) {
                 argument("killBlock", StringArgumentType.greedyString() ) {
@@ -93,6 +96,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         }
     }
     literal("kit") {
+        requiresPermissions("kbffa.kit")
         literal("create") {
             argument("name", string()) { // Fixed line
                 argument("lore", string()) {
