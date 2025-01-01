@@ -21,14 +21,24 @@ import lirand.api.dsl.command.builders.LiteralDSLBuilder
 import lirand.api.dsl.command.builders.command
 import org.bukkit.Material
 import org.bukkit.Registry
+import org.bukkit.command.CommandSender
+import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.CompletableFuture
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
     setup(arenaHandler)
 }
-
+fun debug(source: Player) {
+    source.message("Debug command")
+    source.message(source.inventory.itemInMainHand.toString())
+}
 private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
+    literal("debug") {
+        executes {
+            debug(source as Player)
+        }
+    }
     literal("arena") {
         literal("create") {
             argument("name", string()) {
