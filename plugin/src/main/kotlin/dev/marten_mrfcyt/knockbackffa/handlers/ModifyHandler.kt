@@ -32,6 +32,27 @@ abstract class ModifyObject(
 ) {
     abstract fun handle(player: Player, item: ItemStack, args: Map<String, Any>)
 
+    fun createGuiItem(kitName: String, slot: Int, modifyObject: ModifyObject): ItemStack {
+        val descriptionWithStatus = description.toMutableList()
+        val kitConfig = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/kits.yml"))
+        val item = ItemStack(icon)
+        val meta: ItemMeta = item.itemMeta
+        if (kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.$id", false)) {
+            meta.addEnchant(Enchantment.UNBREAKING, 1, true)
+            meta.addItemFlags(ItemFlag.HIDE_ENCHANTS)
+            descriptionWithStatus.add("<green>Enabled")
+        } else {
+            descriptionWithStatus.add("<red>Disabled")
+        }
+        meta.displayName(name.asMini())
+        meta.lore(descriptionWithStatus.map { it.asMini() })
+        setCustomValue(meta, plugin, "isModifier", true)
+        setCustomValue(meta, plugin, "modifier", modifyObject.id)
+        setCustomValue(meta, plugin, "kit_name", kitName)
+        setCustomValue(meta, plugin, "slot", slot)
+        item.itemMeta = meta
+        return item
+    }
 }
 
 class ModifyHandler {

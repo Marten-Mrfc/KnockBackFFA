@@ -15,6 +15,7 @@ import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
@@ -47,90 +48,39 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
     private fun handleTopInventoryClick(
         event: InventoryClickEvent,
         player: Player,
-        clickedItem: org.bukkit.inventory.ItemStack
+        clickedItem: ItemStack
     ) {
         event.isCancelled = true
-
         when {
             checkCustomValue(
-                clickedItem.itemMeta,
-                plugin,
-                "6B69745F646973706C61795F6974656D",
-                "kit_display_item_check"
+                clickedItem.itemMeta, plugin, "isModifier", true
             ) -> {
+                handleModifier(player, clickedItem.itemMeta)
+            }
+            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6974656D", "kit_display_item_check") -> {
                 handleKitDisplayItemChange(event, player)
             }
-
             checkCustomValue(clickedItem.itemMeta, plugin, "6F70656E5F6B69745F656469746F72", "open_kit_editor") -> {
                 openKitEditor(player, clickedItem.itemMeta)
             }
-
-            checkCustomValue(
-                clickedItem.itemMeta,
-                plugin,
-                "6B69745F646973706C61795F6E616D655F65646974",
-                "kit_display_name_edit"
-            ) -> {
+            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6E616D655F65646974", "kit_display_name_edit") -> {
                 initiateKitEdit(player, clickedItem.itemMeta, "Please enter the new display name in the chat.")
             }
-
-            checkCustomValue(
-                clickedItem.itemMeta,
-                plugin,
-                "6B69745F646973706C61795F6C6F72655F65646974",
-                "kit_display_lore_edit"
-            ) -> {
+            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6C6F72655F65646974", "kit_display_lore_edit") -> {
                 initiateKitEdit(player, clickedItem.itemMeta, "Please enter the new lore in the chat.")
             }
-
-            checkCustomValue(
-                clickedItem.itemMeta,
-                plugin,
-                "6B69745F646973706C61795F6974656D5F65646974",
-                "kit_display_item_edit"
-            ) -> {
+            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6974656D5F65646974", "kit_display_item_edit") -> {
                 val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                 KitModifier(plugin).editKitGUI(player, kitName)
             }
-
             checkCustomValue(clickedItem.itemMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button") -> {
                 handleGoBackButton(player, clickedItem.itemMeta)
             }
-
             checkCustomValue(clickedItem.itemMeta, plugin, "edit_kit_item", true) -> {
                 handleEditKitItem(event, player)
             }
-
-            checkCustomValue(clickedItem.itemMeta, plugin, "6D6F646966696572", "modifier") -> {
-                handleModifier(player, clickedItem.itemMeta)
-            }
-
             checkCustomValue(clickedItem.itemMeta, plugin, "64656C6574655F6974656D", "delete_item") -> {
                 handleDeleteItem(player, clickedItem.itemMeta)
-            }
-
-            checkCustomValue(
-                clickedItem.itemMeta,
-                plugin,
-                "656469745F6B69745F6974656D5F446973706C61794E616D65",
-                "edit_kit_item_DisplayName"
-            ) -> {
-                initiateKitEdit(player, clickedItem.itemMeta, "Please enter the new display name in the chat.")
-            }
-
-            checkCustomValue(
-                clickedItem.itemMeta,
-                plugin,
-                "656469745F6B69745F6974656D5F6C6F7265",
-                "edit_kit_item_lore"
-            ) -> {
-                initiateKitEdit(player, clickedItem.itemMeta, "Please enter the new lore in the chat.")
-            }
-
-            checkCustomValue(clickedItem.itemMeta, plugin, "73656C6563742D6B6974", "select-kit") -> {
-                val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
-                KitSelector(plugin).setKit(kitName, player)
-                player.closeInventory()
             }
         }
     }
@@ -145,7 +95,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         }
     }
 
-    private fun updateKitDisplayItem(kitName: String, newItem: org.bukkit.inventory.ItemStack) {
+    private fun updateKitDisplayItem(kitName: String, newItem: ItemStack) {
         kitConfig.apply {
             set("kit.$kitName.show.DisplayItem.item", newItem.type.name)
             set(
@@ -239,7 +189,7 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         }
     }
 
-    private fun updateKitItem(kitName: String, slot: Int, item: org.bukkit.inventory.ItemStack) {
+    private fun updateKitItem(kitName: String, slot: Int, item: ItemStack) {
         val itemMeta = item.itemMeta
         kitConfig.apply {
             set("kit.$kitName.items.$slot.name", itemMeta.displayName()?.notMini())
@@ -260,18 +210,14 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
     }
 
     private fun handleModifier(player: Player, itemMeta: ItemMeta) {
-        val modify = getCustomValue(itemMeta, plugin, "modify") as String
+        val modify = getCustomValue(itemMeta, plugin, "modifier") as String
         val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String
         val slot = getCustomValue(itemMeta, plugin, "slot") as Int
 
-        when (modify) {
-            "placeBlock", "infinite", "onKill", "jumpPad" -> {
-                val currentValue = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.$modify", false)
-                kitConfig.set("kit.$kitName.items.$slot.modifiers.$modify", !currentValue)
-                kitConfig.save(config)
-                ItemModifier(plugin).editKitItem(player, kitName, slot)
-            }
-        }
+        val currentValue = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.$modify", false)
+        kitConfig.set("kit.$kitName.items.$slot.modifiers.$modify", !currentValue)
+        kitConfig.save(config)
+        ItemModifier(plugin).editKitItem(player, kitName, slot)
     }
 
     private fun handleDeleteItem(player: Player, itemMeta: ItemMeta) {
@@ -286,10 +232,8 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
     fun onPlayerChat(event: AsyncChatEvent) {
         val player = event.player
         val (isEditing, itemMeta) = editKitMap[player.uniqueId] ?: return
-        println("isEditing: $isEditing, itemMeta: $itemMeta")
         if (!isEditing) return
         if (itemMeta == null) return
-        println("There is an itemMeta")
         event.isCancelled = true
         when {
             checkCustomValue(itemMeta, plugin, "6b69745f646973706c61795f6e616d655f65646974", "kit_display_name_edit") -> {
