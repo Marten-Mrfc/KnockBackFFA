@@ -33,11 +33,14 @@ class KnockBackFFA : KotlinPlugin() {
     lateinit var arenaHandler: ArenaHandler
     lateinit var playerData: PlayerData
 
+    @OptIn(DelicateCoroutinesApi::class)
     override fun onEnable() {
         logger.info("--------------------------------")
         logger.info("--- KnockBackFFA is starting ---")
         instance = this
-        arenaHandler = ArenaHandler(this)
+        if (isEnabled) {
+            arenaHandler = ArenaHandler(this)
+        }
         playerData = PlayerData.getInstance(this)
         val mapDuration = config.getInt("mapDuration", 60)
         if (!dataFolder.exists() && !dataFolder.mkdir()) {

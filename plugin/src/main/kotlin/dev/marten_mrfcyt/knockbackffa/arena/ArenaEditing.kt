@@ -2,6 +2,7 @@ package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.handlers.Arena
+import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -35,16 +36,6 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
         val arenaConfig = YamlConfiguration.loadConfiguration(config)
         if (!arenaConfig.contains("arenas.$arenaName")) {
             if (location.world?.pvp == true) {
-                with(arenaConfig) {
-                    set("arenas.$arenaName.location.world", location.world?.name)
-                    set("arenas.$arenaName.location.x", location.x)
-                    set("arenas.$arenaName.location.y", location.y)
-                    set("arenas.$arenaName.location.z", location.z)
-                    set("arenas.$arenaName.location.yaw", location.yaw)
-                    set("arenas.$arenaName.location.pitch", location.pitch)
-                    set("arenas.$arenaName.killBlock", killBlock)
-                }
-                arenaConfig.save(config)
                 GlobalScope.launch {
                     KnockBackFFA.instance.arenaHandler.addArena(Arena(arenaName, location))
                 }
@@ -68,7 +59,6 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
     }
 
     source.message("<dark_red>Deleting<white> arena $name!")
-
     val configFile = File("$dataFolder/arena.yml")
     val arenaConfig = YamlConfiguration.loadConfiguration(configFile)
 
@@ -77,14 +67,11 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
         return
     }
 
-    val location = KnockBackFFA.instance.arenaHandler.locationFetcher(name)
-
-    arenaConfig.set("arenas.$name", null)
-    arenaConfig.save(configFile)
+    val location = ArenaHandler(KnockBackFFA.instance).locationFetcher(name)
 
     if (location != null) {
         GlobalScope.launch {
-            KnockBackFFA.instance.arenaHandler.removeArena(Arena(name, location))
+            ArenaHandler(KnockBackFFA.instance).removeArena(Arena(name, location))
         }
         source.message("Arena $name <dark_red>deleted<white> successfully!")
     }
