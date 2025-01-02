@@ -1,6 +1,5 @@
 package dev.marten_mrfcyt.knockbackffa
 
-import com.mojang.brigadier.arguments.ArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.string
 import com.mojang.brigadier.suggestion.Suggestions
@@ -9,7 +8,6 @@ import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
-import dev.marten_mrfcyt.knockbackffa.handlers.Arena
 import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
@@ -21,7 +19,6 @@ import lirand.api.dsl.command.builders.LiteralDSLBuilder
 import lirand.api.dsl.command.builders.command
 import org.bukkit.Material
 import org.bukkit.Registry
-import org.bukkit.command.CommandSender
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.CompletableFuture
@@ -29,6 +26,18 @@ import java.util.concurrent.CompletableFuture
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
     requiresPermissions("kbffa.command")
     setup(arenaHandler)
+    executes {
+        source.message("<gray>---<reset> <gold>KnockBackFFA<reset> <gray>---")
+        @Suppress("UnstableApiUsage")
+        source.message("<white>Version: <gold>${pluginMeta.version}")
+        source.message("<white>Author: <gold>Marten_mrfcyt")
+        source.message("<gray>---<reset> <gold>Commands<reset> <gray>---")
+        source.sendMessage("<green>* <white>/kbffa arena <green>create/list/delete<gray>: <gold>Arena commands".asMini())
+        source.sendMessage("<green>* <white>/kbffa kit <green>create/edit/delete<gray>: <gold>Kit commands".asMini())
+        source.sendMessage("<green>* <white>/kit<gray>: <gold>Select a kit as a player".asMini())
+        source.sendMessage("<green>* <white>/kbffa debug<gray>: <gold>Debug command".asMini())
+        source.message("<gray>-------------------")
+    }
 }
 fun debug(source: Player) {
     source.message("Debug command")
@@ -146,8 +155,8 @@ fun Plugin.kitSelectorCommand() = command("kit") {
 }
 fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
     return arenaHandler.getArenaNames().thenApply { names ->
-        names.forEach {
-            builder.suggest(it)
+        names.forEach { name ->
+            builder.suggest(name)
         }
         builder.build()
     }
