@@ -157,7 +157,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
         if (source is Player) {
             val name = kitConfig.get("kit.$kitName.show.DisplayName")
             val inventorySize = 18
-            val edittext = "<gray>Editing:</gray><white> $name".asMini()
+            val edittext = "<!italic><gray>Editing:</gray><white> $name".asMini()
             val inventory = Bukkit.createInventory(null, inventorySize, edittext)
             for (i in 0..17) {
                 if (i < 8 || i > 8) {
@@ -194,7 +194,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             // go back button
             val goBack = ItemStack(Material.BARRIER)
             val goBackMeta: ItemMeta = goBack.itemMeta
-            goBackMeta.displayName("<gray>Go Back".asMini())
+            goBackMeta.displayName("<!italic><gray>Go Back".asMini())
             setCustomValue(goBackMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button")
             setCustomValue(goBackMeta, plugin, "kit_name", kitName)
             setCustomValue(goBackMeta, plugin, "menu", "kit_editor")
@@ -207,7 +207,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
         }
     }
     fun loadItemData(itemSelector: ConfigurationSection?, kitName: String, gui: Boolean): ItemStack? {
-        val itemName = itemSelector?.getString("name")?.asMini()
+        val itemName = "<!italic>${itemSelector?.getString("name")}".asMini()
         val itemType = itemSelector?.getString("item")?.let { Material.getMaterial(it) }
         val itemAmount = itemSelector?.getInt("amount")
         val itemMetaModel = itemSelector?.getInt("meta.model")

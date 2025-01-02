@@ -74,7 +74,7 @@ class KitSelector(private val plugin: KnockBackFFA) {
 
     private fun loadKitGUI(kitConfig: YamlConfiguration, kit: String): ItemStack {
         val kitSection = kitConfig.getConfigurationSection("kit.$kit.show") ?: return ItemStack(Material.BARRIER)
-        val displayName = kitSection.getString("DisplayName")?.asMini() ?: return ItemStack(Material.BARRIER)
+        val displayName = "<!italic>${kitSection.getString("DisplayName")}".asMini() ?: return ItemStack(Material.BARRIER)
         val lore = kitSection.getString("Lore")?.asMini() ?: return ItemStack(Material.BARRIER)
         val displayItemMaterial = Material.getMaterial(kitSection.getString("DisplayItem.item") ?: return ItemStack(Material.BARRIER))
         val item = ItemStack(displayItemMaterial ?: Material.BARRIER)

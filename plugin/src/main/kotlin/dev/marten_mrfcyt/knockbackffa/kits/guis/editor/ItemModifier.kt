@@ -23,7 +23,7 @@ class ItemModifier(private val plugin: KnockBackFFA) {
         val kitConfig = YamlConfiguration.loadConfiguration(config)
         if (source is Player) {
             val inventorySize = 18
-            val edittext = "<gray>Editing slot:</gray><white> $slot".asMini()
+            val edittext = "<!italic><gray>Editing slot:</gray><white> $slot".asMini()
             val inventory = Bukkit.createInventory(null, inventorySize, edittext)
             for (i in 0..17) {
                 if (i < 8 || i > 8) {
@@ -52,7 +52,7 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             // delete button
             val deleteButton = ItemStack(Material.RED_CONCRETE)
             val deleteButtonMeta: ItemMeta = deleteButton.itemMeta
-            deleteButtonMeta.displayName("<red>Delete Item".asMini())
+            deleteButtonMeta.displayName("<!italic><red>Delete Item".asMini())
             setCustomValue(deleteButtonMeta, plugin, "64656C6574655F6974656D", "delete_item")
             setCustomValue(deleteButtonMeta, plugin, "kit_name", kitName)
             setCustomValue(deleteButtonMeta, plugin, "slot", slot)
@@ -62,7 +62,7 @@ class ItemModifier(private val plugin: KnockBackFFA) {
             // go back button
             val goBack = ItemStack(Material.BARRIER)
             val goBackMeta: ItemMeta = goBack.itemMeta
-            goBackMeta.displayName("<gray>Go Back".asMini())
+            goBackMeta.displayName("<!italic><gray>Go Back".asMini())
             setCustomValue(goBackMeta, plugin, "kit_name", kitName)
             setCustomValue(goBackMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button")
             setCustomValue(goBackMeta, plugin, "menu", "edit_kit_gui")
