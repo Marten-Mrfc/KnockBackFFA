@@ -1,28 +1,15 @@
 kit:
   default:
     show:
-      DisplayName: <dark_gray>default</dark_gray>
+      DisplayName: <dark_gray>Default</dark_gray>
       Lore: <white>The default kit</white>
       DisplayItem:
         item: STICK
         enchants:
           KNOCKBACK: 2
     items:
-      '8':
-        item: WHITE_WOOL
-        amount: 64
-        enchants: {}
-        meta:
-          durability: 0
-          unbreakable: false
-          itemFlags: []
-        modifiers:
-          placeBlock: true
-          infinite: true
-        name: <yellow>Building Blocks
-        lore:
-          - <white>Used for building</white>
       '0':
+        name: <dark_gray>KnockBack Stick
         item: STICK
         amount: 1
         enchants:
@@ -32,8 +19,8 @@ kit:
           unbreakable: false
           itemFlags: []
           model: 0
-        name: <dark_gray>KnockBack Stick
       '1':
+        name: <dark_gray>Knock Bow
         item: BOW
         amount: 1
         enchants:
@@ -44,19 +31,49 @@ kit:
           itemFlags: []
         modifiers:
           delay: true
-          amount: 300
-        name: <dark_gray>Knock Bow
+          amount: 10
       '2':
+        name: <dark_gray>Ender Pearl
         item: ENDER_PEARL
         amount: 3
-        enchants: { }
+        enchants: {}
         meta:
           durability: 0
           unbreakable: false
-          itemFlags: [ ]
+          itemFlags: []
         modifiers:
-          onKill: false
+          onKill: true
+      '7':
+        name: <yellow>Jump Pad
+        lore:
+          - <white>When placed acts as a Jump Pad</white>
+          - <white>Disappears over time</white>
+        item: LIGHT_WEIGHTED_PRESSURE_PLATE
+        amount: 3
+        enchants: {}
+        meta:
+          durability: 0
+          unbreakable: false
+          itemFlags: []
+        modifiers:
+          jumpPad: true
+          onKill: true
+      '8':
+        name: <yellow>Building Blocks
+        lore:
+          - <white>Used for building</white>
+        item: WHITE_WOOL
+        amount: 64
+        enchants: {}
+        meta:
+          durability: 0
+          unbreakable: false
+          itemFlags: []
+        modifiers:
+          buildBlock: true
+          infinite: true
       '9':
+        name: <dark_gray>Arrow
         item: ARROW
         amount: 1
         enchants: {}
