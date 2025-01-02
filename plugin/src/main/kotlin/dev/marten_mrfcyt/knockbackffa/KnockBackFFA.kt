@@ -11,10 +11,13 @@ import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
+import kotlinx.coroutines.DelicateCoroutinesApi
 import lirand.api.architecture.KotlinPlugin
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
-import org.bukkit.scheduler.BukkitRunnable
 import java.time.Instant
 
 class KnockBackFFA : KotlinPlugin() {
@@ -81,17 +84,16 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("${listeners.size} events registered successfully!")
     }
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun startArenaHandler(mapDuration: Int) {
         logger.info("Starting arena handler...")
-        object : BukkitRunnable() {
-            override fun run() {
+        GlobalScope.launch {
+            while (true) {
                 lastSwitchTime = Instant.now()
                 nextSwitchTime = lastSwitchTime.plusSeconds(mapDuration.toLong())
                 arenaHandler.switchArena()
+                delay(mapDuration * 1000L)
             }
-        }.apply {
-            run()
-            runTaskTimer(this@KnockBackFFA, 0, mapDuration * 20L)
         }
         logger.info("Arena handler started successfully with $mapDuration seconds interval.")
     }

@@ -2,100 +2,112 @@ package dev.marten_mrfcyt.knockbackffa.handlers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.message
+import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
-import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
 import java.util.concurrent.CompletableFuture
+import kotlin.text.clear
 
 data class Arena(val name: String, val location: Location)
 
+@OptIn(DelicateCoroutinesApi::class)
 class ArenaHandler(private val plugin: KnockBackFFA) {
-    val arenas: MutableList<Arena> = mutableListOf()
-    private val arenasLoaded = CompletableFuture<Void>()
-    var areArenasLoaded = false
-        private set
-
+    private val arenas: MutableList<Arena> = mutableListOf()
     private var currentArena: Arena? = null
+    private val arenaConfig: YamlConfiguration = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
 
     init {
         if (plugin.isEnabled) {
-            loadArenas()
+            GlobalScope.launch {
+                loadArenas()
+            }
         }
     }
 
-    fun addArena(arena: Arena) {
-        arenas.add(arena)
+    suspend fun addArena(arena: Arena) {
+        withContext<Unit>(Dispatchers.IO) {
+            arenas.add(arena)
+            switchArena()
+        }
     }
 
-    fun removeArena(arena: Arena) {
-        arenas.remove(arena)
+    suspend fun removeArena(arena: Arena) {
+        withContext<Unit>(Dispatchers.IO) {
+            arenas.remove(arena)
+            switchArena()
+        }
     }
 
-    private fun loadArenas() {
-        object : BukkitRunnable() {
-            override fun run() {
-                try {
-                    arenas.clear()
-                    val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
-                    val arenaSection = config.getConfigurationSection("arenas")
-                        ?: throw IllegalArgumentException("Arenas section not found in configuration")
+    private suspend fun loadArenas() {
+        withContext(Dispatchers.IO) {
+            arenas.clear()
+            val arenaSection = arenaConfig.getConfigurationSection("arenas")
+            if (arenaSection == null) {
+                plugin.logger.warning("Arenas section not found in configuration | Please run /kbffa arena create <name> <killBlock>")
+                return@withContext
+            }
 
-                    for (key in arenaSection.getKeys(false)) {
-                        locationFetcher(key)?.let { location ->
-                            arenas.add(Arena(key, location))
-                        }
-                    }
-                    areArenasLoaded = true
-                    arenasLoaded.complete(null)
-                } catch (e: Exception) {
-                    areArenasLoaded = false
-                    arenasLoaded.completeExceptionally(e)
+            for (key in arenaSection.getKeys(false)) {
+                val location = locationFetcher(key)
+                if (location != null) {
+                    arenas.add(Arena(key, location))
+                } else {
+                    plugin.logger.warning("Failed to load arena: $key")
                 }
             }
-        }.runTaskAsynchronously(plugin)
+
+            if (arenas.isEmpty()) {
+                plugin.logger.warning("No arenas loaded")
+            } else {
+                plugin.logger.info("Loaded ${arenas.size} arenas")
+            }
+        }
     }
 
-    fun switchArena() {
-        arenasLoaded.thenRun {
+    suspend fun switchArena() {
+        withContext<Unit>(Dispatchers.IO) {
             if (arenas.isNotEmpty()) {
                 val arena = arenas.random()
                 currentArena = arena
-                Bukkit.getOnlinePlayers().forEach { player ->
-                    player.teleport(arena.location)
-                    player.message("<green>Teleported to arena <white>${arena.name}<green>!")
-                }
-                plugin.config.set("currentArena", arena.name)
-                plugin.config.set("currentLocation", arena.location)
-                plugin.saveConfig()
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    Bukkit.getOnlinePlayers().forEach { player ->
+                        player.teleport(arena.location)
+                        player.message("<green>Teleported to arena <white>${arena.name}<green>!")
+                    }
+                    plugin.config.set("currentArena", arena.name)
+                    plugin.config.set("currentLocation", arena.location)
+                    plugin.saveConfig()
+                })
             } else {
-                plugin.config.set("currentArena", null)
-                plugin.config.set("currentLocation", null)
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    plugin.config.set("currentArena", null)
+                    plugin.config.set("currentLocation", null)
+                })
             }
         }
     }
 
-    fun getArenaNames(): CompletableFuture<List<String>> {
-        return arenasLoaded.thenApply { arenas.map { it.name } }
-    }
-
-    fun locationFetcher(key: String): Location? {
-        val config = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
-        val arenaSection = config.getConfigurationSection("arenas")
-            ?: throw IllegalArgumentException("Arenas section not found in configuration")
-        val worldName = arenaSection.getString("$key.location.world")
-        val x = arenaSection.getDouble("$key.location.x")
-        val y = arenaSection.getDouble("$key.location.y")
-        val z = arenaSection.getDouble("$key.location.z")
-        val yaw = arenaSection.getDouble("$key.location.yaw")
-        val pitch = arenaSection.getDouble("$key.location.pitch")
+    internal fun locationFetcher(key: String): Location? {
+        val worldName = arenaConfig.getString("arenas.$key.location.world")
+        val x = arenaConfig.getDouble("arenas.$key.location.x")
+        val y = arenaConfig.getDouble("arenas.$key.location.y")
+        val z = arenaConfig.getDouble("arenas.$key.location.z")
+        val yaw = arenaConfig.getDouble("arenas.$key.location.yaw")
+        val pitch = arenaConfig.getDouble("arenas.$key.location.pitch")
         val world = worldName?.let { Bukkit.getWorld(it) }
         return if (world != null) {
             Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
         } else {
             null
+        }
+    }
+
+    fun getArenaNames(): CompletableFuture<List<String>> {
+        return CompletableFuture.supplyAsync {
+            arenas.map { it.name }
         }
     }
 }
