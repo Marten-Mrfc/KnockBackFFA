@@ -12,7 +12,7 @@ import kotlin.collections.set
 import kotlin.text.clear
 
 fun loadKit(plugin: KnockBackFFA, source: Player) {
-    val config = File("${plugin.dataFolder}/kits.yml")
+    val config = File(KnockBackFFA.instance.dataFolder, "kits.yml")
     val kitConfig = YamlConfiguration.loadConfiguration(config)
     val playerData = plugin.playerData.getPlayerData(source.uniqueId)
     val kit = playerData.getString("kit")

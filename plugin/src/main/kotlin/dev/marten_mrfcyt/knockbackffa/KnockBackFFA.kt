@@ -44,7 +44,13 @@ class KnockBackFFA : KotlinPlugin() {
             logger.severe("Failed to create data folder!")
             return
         }
-
+        val config = File(dataFolder, "kits.yml")
+        if (!config.exists()) {
+            logger.log(Level.INFO, "kits.yml does not exist. Saving resource...")
+            saveResource("kits.yml", false)
+        } else {
+            logger.log(Level.INFO, "kits.yml found.")
+        }
         try {
             saveDefaultConfig()
         } catch (ex: IllegalArgumentException) {
