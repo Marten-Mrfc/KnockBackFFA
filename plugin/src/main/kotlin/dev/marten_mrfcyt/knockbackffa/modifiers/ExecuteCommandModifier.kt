@@ -4,7 +4,6 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.annotations.Modify
 import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
 import me.clip.placeholderapi.PlaceholderAPI
 import org.bukkit.Bukkit
@@ -48,7 +47,7 @@ object ExecuteCommandModifier : ModifyObject(
                 "slot" to slot,
                 "kit_name" to kitName
             )
-            ModifyHandler().handleEvent(event, source, item, args, id)
+            ModifyHandler().handleEvent(source, item, args, id)
         }
     }
 }

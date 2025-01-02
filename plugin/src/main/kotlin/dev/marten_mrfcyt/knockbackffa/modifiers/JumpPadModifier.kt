@@ -37,7 +37,7 @@ object JumpPadModifier : ModifyObject(
     @EventHandler
     fun placePressurePlateEvent(event: BlockPlaceEvent) {
         val args = mapOf("block" to event.block)
-        ModifyHandler().handleEvent(event, event.player, event.itemInHand, args, id)
+        ModifyHandler().handleEvent(event.player, event.itemInHand, args, id)
     }
 
     @EventHandler

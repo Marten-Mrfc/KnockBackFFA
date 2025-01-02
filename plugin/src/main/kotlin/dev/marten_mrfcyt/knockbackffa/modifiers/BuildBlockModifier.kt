@@ -41,7 +41,7 @@ object BuildBlockModifier : ModifyObject(
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
         val args = mapOf("block" to event.block)
-        ModifyHandler().handleEvent(event, event.player, event.itemInHand, args, id)
-        ModifyHandler().handleEvent(event, event.player, event.itemInHand, args, "infinite")
+        ModifyHandler().handleEvent(event.player, event.itemInHand, args, id)
+        ModifyHandler().handleEvent(event.player, event.itemInHand, args, "infinite")
     }
 }

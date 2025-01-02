@@ -5,12 +5,10 @@ import dev.marten_mrfcyt.knockbackffa.annotations.Modify
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.checkCustomValue
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
-import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.enchantments.Enchantment
 import org.bukkit.entity.Player
-import org.bukkit.event.Event
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
@@ -22,7 +20,6 @@ import kotlin.reflect.full.primaryConstructor
 import org.reflections.Reflections
 import java.io.File
 import kotlin.reflect.jvm.jvmName
-import kotlin.text.get
 
 abstract class ModifyObject(
     open val id: String,
@@ -90,7 +87,7 @@ class ModifyHandler {
 
     fun getModifyObjects(): Collection<ModifyObject> = modify.values
 
-    fun handleEvent(event: Event, player: Player, item: ItemStack?, args: Map<String, Any>, id: String) {
+    fun handleEvent(player: Player, item: ItemStack?, args: Map<String, Any>, id: String) {
         item?.let {
             modify[id]?.takeIf { checkCustomValue(item.itemMeta ?: return, KnockBackFFA.instance, "modify", id) }
                 ?.handle(player, it, args)

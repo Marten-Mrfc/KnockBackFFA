@@ -4,7 +4,6 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.annotations.Modify
 import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -43,7 +42,7 @@ object DelayModifier : ModifyObject(
             "slot" to slot,
             "kit_name" to kitName
         )
-        ModifyHandler().handleEvent(event, player, item, args, id)
-        ModifyHandler().handleEvent(event, player, event.consumable, args, "infinite")
+        ModifyHandler().handleEvent(player, item, args, id)
+        ModifyHandler().handleEvent(player, event.consumable, args, "infinite")
     }
 }

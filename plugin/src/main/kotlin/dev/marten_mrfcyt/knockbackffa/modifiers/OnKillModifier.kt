@@ -44,7 +44,7 @@ object OnKillModifier : ModifyObject(
                 "slot" to slot,
                 "kit_name" to kitName
             )
-            ModifyHandler().handleEvent(event, source, item, args, id)
+            ModifyHandler().handleEvent(source, item, args, id)
         }
     }
 }
