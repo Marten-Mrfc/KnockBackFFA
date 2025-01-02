@@ -18,7 +18,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
+import java.io.File
 import java.time.Instant
+import java.util.logging.Level
 
 class KnockBackFFA : KotlinPlugin() {
     companion object {
@@ -32,7 +34,8 @@ class KnockBackFFA : KotlinPlugin() {
     lateinit var playerData: PlayerData
 
     override fun onEnable() {
-        logger.info("Initializing KnockBackFFA...")
+        logger.info("--------------------------------")
+        logger.info("--- KnockBackFFA is starting ---")
         instance = this
         arenaHandler = ArenaHandler(this)
         playerData = PlayerData.getInstance(this)
@@ -60,8 +63,9 @@ class KnockBackFFA : KotlinPlugin() {
         startArenaHandler(mapDuration)
         setupPlaceholders()
         ModifyHandler().registerEvents(this)
-
-        logger.info("KnockBackFFA has been enabled successfully!")
+        logger.info("${ModifyHandler().getModifyObjects().size} modify objects registered successfully!")
+        logger.info("--- KnockBackFFA has started ---")
+        logger.info("--------------------------------")
     }
 
     override fun onDisable() {

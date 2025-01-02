@@ -7,6 +7,7 @@ import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
+import java.util.logging.Level
 import kotlin.collections.set
 import kotlin.text.clear
 
@@ -16,6 +17,7 @@ fun loadKit(plugin: KnockBackFFA, source: Player) {
     val playerData = plugin.playerData.getPlayerData(source.uniqueId)
     val kit = playerData.getString("kit")
     if (kit != null) {
+        plugin.logger.log(Level.INFO, "Loading kit: $kit for player: ${source.name}")
         // clear whole inventory
         source.inventory.clear()
         // load kit
@@ -36,6 +38,7 @@ fun loadKit(plugin: KnockBackFFA, source: Player) {
             }
         }
     } else {
+        plugin.logger.log(Level.INFO, "No kit found for player: ${source.name}. Setting default kit.")
         playerData.set("kit", "default")
         plugin.playerData.savePlayerData(source.uniqueId, playerData)
         loadKit(plugin, source)
