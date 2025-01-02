@@ -23,6 +23,7 @@ object ExecuteCommandModifier : ModifyObject(
     name = "<white>Execute Command Modifier",
     description = listOf("Executes a command on kill"),
     icon = Material.COMMAND_BLOCK,
+    args = listOf("command" to String::class.java),
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {

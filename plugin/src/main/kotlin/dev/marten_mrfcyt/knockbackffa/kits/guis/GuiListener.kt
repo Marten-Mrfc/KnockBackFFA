@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.guis
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.ItemModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
@@ -20,6 +21,9 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.*
+import kotlin.collections.set
+import kotlin.text.get
+import kotlin.text.set
 
 class GuiListener(private val plugin: KnockBackFFA) : Listener {
     private val editKitMap = HashMap<UUID, Pair<Boolean, ItemMeta?>>()
@@ -53,8 +57,9 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         event.isCancelled = true
         when {
             checkCustomValue(
-                clickedItem.itemMeta, plugin, "isModifier", true
+                clickedItem.itemMeta, plugin, "is_modifier", true
             ) -> {
+                print("Modifier")
                 handleModifier(player, clickedItem.itemMeta)
             }
             checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6974656D", "kit_display_item_check") -> {
@@ -81,6 +86,11 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
             }
             checkCustomValue(clickedItem.itemMeta, plugin, "64656C6574655F6974656D", "delete_item") -> {
                 handleDeleteItem(player, clickedItem.itemMeta)
+            }
+            checkCustomValue(clickedItem.itemMeta, plugin, "73656C6563742D6B6974", "select-kit") -> {
+                val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
+                KitSelector(plugin).setKit(kitName, player)
+                player.closeInventory()
             }
         }
     }
@@ -213,8 +223,22 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         val modify = getCustomValue(itemMeta, plugin, "modifier") as String
         val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String
         val slot = getCustomValue(itemMeta, plugin, "slot") as Int
-
         val currentValue = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.$modify", false)
+        val modifyObject = ModifyHandler().getModifyObjects().find { it.id == modify }
+        if (modifyObject != null && modifyObject.args.isNotEmpty() && !currentValue) {
+            player.closeInventory()
+            player.message("Please provide the following values for the modifier:")
+            modifyObject.args.forEach { arg ->
+                player.message("${arg.first}:")
+            }
+            editKitMap[player.uniqueId] = Pair(true, itemMeta)
+            return
+        }
+        if (modifyObject != null && modifyObject.args.isNotEmpty() && currentValue) {
+            modifyObject.args.forEach { arg ->
+                kitConfig.set("kit.$kitName.items.$slot.modifiers.${arg.first}", null)
+            }
+        }
         kitConfig.set("kit.$kitName.items.$slot.modifiers.$modify", !currentValue)
         kitConfig.save(config)
         ItemModifier(plugin).editKitItem(player, kitName, slot)
@@ -232,9 +256,34 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
     fun onPlayerChat(event: AsyncChatEvent) {
         val player = event.player
         val (isEditing, itemMeta) = editKitMap[player.uniqueId] ?: return
-        if (!isEditing) return
-        if (itemMeta == null) return
+        if (!isEditing || itemMeta == null) return
         event.isCancelled = true
+
+        val modify = getCustomValue(itemMeta, plugin, "modifier") as String
+        val kitName = getCustomValue(itemMeta, plugin, "kit_name") as String
+        val slot = getCustomValue(itemMeta, plugin, "slot") as Int
+
+        val modifyObject = ModifyHandler().getModifyObjects().find { it.id == modify }
+        modifyObject?.let {
+            if (it.args.isNotEmpty()) {
+                val args = it.args.associate { arg ->
+                    arg.first to when (arg.second) {
+                        Int::class.java -> event.message().notMiniText().toIntOrNull() ?: 0
+                        else -> event.message().notMiniText()
+                    }
+                }
+                kitConfig.set("kit.$kitName.items.$slot.modifiers.$modify", true)
+                args.forEach { (key, value) -> kitConfig.set("kit.$kitName.items.$slot.modifiers.$key", value) }
+                kitConfig.save(config)
+                player.message("Modifier arguments saved successfully!")
+                editKitMap[player.uniqueId] = Pair(false, null)
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    ItemModifier(plugin).editKitItem(player, kitName, slot)
+                })
+                return
+            }
+        }
+
         when {
             checkCustomValue(itemMeta, plugin, "6b69745f646973706c61795f6e616d655f65646974", "kit_display_name_edit") -> {
                 handleKitAttributeEdit(player, itemMeta, "show.DisplayName", event.message())

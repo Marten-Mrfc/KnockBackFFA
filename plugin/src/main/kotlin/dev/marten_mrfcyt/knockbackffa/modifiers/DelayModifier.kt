@@ -21,6 +21,7 @@ object DelayModifier : ModifyObject(
     name = "<white>Delay Modifier",
     description = listOf("Adds a delay to an item", "item must be a bow"),
     icon = Material.CLOCK,
+    args = listOf("amount" to Int::class.java),
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {
@@ -28,7 +29,7 @@ object DelayModifier : ModifyObject(
         val kitConfig = YamlConfiguration.loadConfiguration(config)
         val slot = (args["slot"] as? Int) ?: return
         val kitName = (args["kit_name"] as? String) ?: return
-        val delay = kitConfig.getInt("kit.$kitName.items.$slot.modifiers.delay.amount", 20)
+        val delay = kitConfig.getInt("kit.$kitName.items.$slot.modifiers.amount", 20)
         player.setCooldown(item.type, delay)
     }
 
