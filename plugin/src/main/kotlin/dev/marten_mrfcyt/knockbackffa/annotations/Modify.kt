@@ -1,7 +1,5 @@
 package dev.marten_mrfcyt.knockbackffa.annotations
 
-import org.bukkit.Material
-
 /**
  * Annotation to define a modifier for an item.
  *
