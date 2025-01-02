@@ -267,6 +267,7 @@ fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
 
     enchantments?.getKeys(false)?.forEach { enchantmentKey ->
         val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
+        @Suppress("UnstableApiUsage")
         val enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
         val level = enchantments.getInt(enchantmentKey)
 
