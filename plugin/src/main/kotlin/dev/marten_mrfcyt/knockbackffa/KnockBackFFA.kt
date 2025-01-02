@@ -1,21 +1,17 @@
 package dev.marten_mrfcyt.knockbackffa
 
-import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.DeathBlock
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.PlayerHandler
+import dev.marten_mrfcyt.knockbackffa.handlers.*
 import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
-import dev.marten_mrfcyt.knockbackffa.handlers.ScoreHandler
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import kotlinx.coroutines.DelicateCoroutinesApi
-import lirand.api.architecture.KotlinPlugin
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import lirand.api.architecture.KotlinPlugin
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import java.io.File

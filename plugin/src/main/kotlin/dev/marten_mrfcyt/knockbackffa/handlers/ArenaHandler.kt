@@ -6,10 +6,8 @@ import kotlinx.coroutines.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.configuration.file.YamlConfiguration
-import org.bukkit.entity.Player
 import java.io.File
 import java.util.concurrent.CompletableFuture
-import kotlin.collections.set
 
 data class Arena(val name: String, val location: Location)
 

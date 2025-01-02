@@ -14,11 +14,11 @@ import org.bukkit.inventory.ItemFlag
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import org.bukkit.plugin.Plugin
+import org.reflections.Reflections
+import java.io.File
 import java.util.logging.Logger
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.primaryConstructor
-import org.reflections.Reflections
-import java.io.File
 import kotlin.reflect.jvm.jvmName
 
 abstract class ModifyObject(

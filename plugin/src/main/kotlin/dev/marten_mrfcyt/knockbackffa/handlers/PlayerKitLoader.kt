@@ -2,14 +2,11 @@ package dev.marten_mrfcyt.knockbackffa.handlers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
-import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
 import java.util.logging.Level
-import kotlin.collections.set
-import kotlin.text.clear
 
 fun loadKit(plugin: KnockBackFFA, source: Player) {
     val config = File(KnockBackFFA.instance.dataFolder, "kits.yml")

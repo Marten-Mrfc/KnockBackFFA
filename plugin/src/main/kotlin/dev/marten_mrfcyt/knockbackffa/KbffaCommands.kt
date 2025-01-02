@@ -4,10 +4,10 @@ import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.string
 import com.mojang.brigadier.suggestion.Suggestions
 import com.mojang.brigadier.suggestion.SuggestionsBuilder
-import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
+import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
@@ -39,10 +39,12 @@ fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
         source.message("<gray>-------------------")
     }
 }
+
 fun debug(source: Player) {
     source.message("Debug command")
     source.message(source.inventory.itemInMainHand.toString())
 }
+
 private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
     literal("debug") {
         requiresPermissions("kbffa.debug")
@@ -54,10 +56,10 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         requiresPermissions("kbffa.arena")
         literal("create") {
             argument("name", string()) {
-                argument("killBlock", StringArgumentType.greedyString() ) {
+                argument("killBlock", StringArgumentType.greedyString()) {
                     suggests { builder ->
                         Registry.MATERIAL.stream()
-                            .filter { it.isBlock && it != Material.AIR && it.isSolid}
+                            .filter { it.isBlock && it != Material.AIR && it.isSolid }
                             .map { it.key.toString() }
                             .filter { it.startsWith(builder.remaining, ignoreCase = false) }
                             .forEach { builder.suggest(it) }
@@ -148,11 +150,13 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         }
     }
 }
+
 fun Plugin.kitSelectorCommand() = command("kit") {
     executes {
         KitSelector(KnockBackFFA()).kitSelector(source)
     }
 }
+
 fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
     return arenaHandler.getArenaNames().thenApply { names ->
         names.forEach { name ->

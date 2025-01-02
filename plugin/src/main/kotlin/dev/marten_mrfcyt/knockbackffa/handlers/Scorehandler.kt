@@ -1,7 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.handlers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.*
+import dev.marten_mrfcyt.knockbackffa.utils.cmessage
+import dev.marten_mrfcyt.knockbackffa.utils.error
+import dev.marten_mrfcyt.knockbackffa.utils.message
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -58,7 +60,8 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
 
                     val killerDeaths = getInt("deaths", 0)
                     val killerKills = getInt("kills", 0)
-                    val killerKdRatio = if (killerDeaths != 0) killerKills.toDouble() / killerDeaths else killerKills.toDouble()
+                    val killerKdRatio =
+                        if (killerDeaths != 0) killerKills.toDouble() / killerDeaths else killerKills.toDouble()
                     val df = DecimalFormat("#.##")
                     df.roundingMode = RoundingMode.CEILING
                     val killerKdRatioRounded = df.format(killerKdRatio).replace(',', '.').toDouble()

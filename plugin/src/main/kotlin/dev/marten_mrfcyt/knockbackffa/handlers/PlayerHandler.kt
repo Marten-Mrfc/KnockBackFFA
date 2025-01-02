@@ -1,7 +1,6 @@
 package dev.marten_mrfcyt.knockbackffa.handlers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import io.papermc.paper.event.player.PlayerPickItemEvent
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -10,8 +9,9 @@ import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 
-class PlayerHandler(plugin: KnockBackFFA): Listener {
+class PlayerHandler(plugin: KnockBackFFA) : Listener {
     val config = plugin.config
+
     // Item Dropping
     @EventHandler
     fun allowDropping(event: PlayerDropItemEvent) {
@@ -20,6 +20,7 @@ class PlayerHandler(plugin: KnockBackFFA): Listener {
             event.isCancelled = true
         }
     }
+
     //Item PickUp
     @EventHandler
     fun allowPickUp(event: EntityPickupItemEvent) {
@@ -28,6 +29,7 @@ class PlayerHandler(plugin: KnockBackFFA): Listener {
             event.isCancelled = true
         }
     }
+
     // BlockBreaking
     @EventHandler
     fun allowBlockBreaking(event: BlockBreakEvent) {
@@ -36,6 +38,7 @@ class PlayerHandler(plugin: KnockBackFFA): Listener {
             event.isCancelled = true
         }
     }
+
     // Damage
     @EventHandler
     fun allowDamage(event: EntityDamageEvent) {
@@ -44,6 +47,7 @@ class PlayerHandler(plugin: KnockBackFFA): Listener {
             event.damage = 0.0
         }
     }
+
     // Crafting
     @EventHandler
     fun allowCrafting(event: CraftItemEvent) {

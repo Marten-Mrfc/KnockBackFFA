@@ -8,7 +8,9 @@ import io.papermc.paper.registry.TypedKey
 import lirand.api.extensions.inventory.set
 import net.kyori.adventure.key.Key
 import net.kyori.adventure.text.Component
-import org.bukkit.*
+import org.bukkit.Bukkit
+import org.bukkit.Material
+import org.bukkit.NamespacedKey
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -90,7 +92,8 @@ class KitModifier(private val plugin: KnockBackFFA) {
 
             enchantments?.getKeys(false)?.forEach { enchantmentKey ->
                 val namespacedKey = Key.key("minecraft", enchantmentKey.lowercase(Locale.getDefault()))
-                val enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
+                val enchantment =
+                    enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
                 val level = enchantments.getInt(enchantmentKey)
 
                 modifiedKitMeta.addEnchant(enchantment, level, true)
@@ -206,6 +209,7 @@ class KitModifier(private val plugin: KnockBackFFA) {
             source.error("You must be a player to use this command!")
         }
     }
+
     fun loadItemData(itemSelector: ConfigurationSection?, kitName: String, gui: Boolean): ItemStack? {
         val itemName = "<!italic>${itemSelector?.getString("name")}".asMini()
         val itemType = itemSelector?.getString("item")?.let { Material.getMaterial(it) }
@@ -218,7 +222,8 @@ class KitModifier(private val plugin: KnockBackFFA) {
 
         val itemStack = itemType?.let { ItemStack(it, itemAmount ?: 0) }
         val itemMeta: ItemMeta = itemStack?.itemMeta ?: return null
-        itemMeta.lore(if(gui) {
+        itemMeta.lore(
+            if (gui) {
             val line = "<gray>------------------<reset>".asMini()
             val toplore = "<dark_purple>Drag an item onto me".asMini()
             val bottomlore = "<dark_purple>to change me completely!".asMini()
@@ -267,6 +272,7 @@ fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
 
     enchantments?.getKeys(false)?.forEach { enchantmentKey ->
         val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
+
         @Suppress("UnstableApiUsage")
         val enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
         val level = enchantments.getInt(enchantmentKey)

@@ -21,9 +21,6 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.*
-import kotlin.collections.set
-import kotlin.text.get
-import kotlin.text.set
 
 class GuiListener(private val plugin: KnockBackFFA) : Listener {
     private val editKitMap = HashMap<UUID, Pair<Boolean, ItemMeta?>>()
@@ -62,31 +59,60 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
                 print("Modifier")
                 handleModifier(player, clickedItem.itemMeta)
             }
-            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6974656D", "kit_display_item_check") -> {
+
+            checkCustomValue(
+                clickedItem.itemMeta,
+                plugin,
+                "6B69745F646973706C61795F6974656D",
+                "kit_display_item_check"
+            ) -> {
                 handleKitDisplayItemChange(event, player)
             }
+
             checkCustomValue(clickedItem.itemMeta, plugin, "6F70656E5F6B69745F656469746F72", "open_kit_editor") -> {
                 openKitEditor(player, clickedItem.itemMeta)
             }
-            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6E616D655F65646974", "kit_display_name_edit") -> {
+
+            checkCustomValue(
+                clickedItem.itemMeta,
+                plugin,
+                "6B69745F646973706C61795F6E616D655F65646974",
+                "kit_display_name_edit"
+            ) -> {
                 initiateKitEdit(player, clickedItem.itemMeta, "Please enter the new display name in the chat.")
             }
-            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6C6F72655F65646974", "kit_display_lore_edit") -> {
+
+            checkCustomValue(
+                clickedItem.itemMeta,
+                plugin,
+                "6B69745F646973706C61795F6C6F72655F65646974",
+                "kit_display_lore_edit"
+            ) -> {
                 initiateKitEdit(player, clickedItem.itemMeta, "Please enter the new lore in the chat.")
             }
-            checkCustomValue(clickedItem.itemMeta, plugin, "6B69745F646973706C61795F6974656D5F65646974", "kit_display_item_edit") -> {
+
+            checkCustomValue(
+                clickedItem.itemMeta,
+                plugin,
+                "6B69745F646973706C61795F6974656D5F65646974",
+                "kit_display_item_edit"
+            ) -> {
                 val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                 KitModifier(plugin).editKitGUI(player, kitName)
             }
+
             checkCustomValue(clickedItem.itemMeta, plugin, "676F5F6261636B5F627574746F6E", "go_back_button") -> {
                 handleGoBackButton(player, clickedItem.itemMeta)
             }
+
             checkCustomValue(clickedItem.itemMeta, plugin, "edit_kit_item", true) -> {
                 handleEditKitItem(event, player)
             }
+
             checkCustomValue(clickedItem.itemMeta, plugin, "64656C6574655F6974656D", "delete_item") -> {
                 handleDeleteItem(player, clickedItem.itemMeta)
             }
+
             checkCustomValue(clickedItem.itemMeta, plugin, "73656C6563742D6B6974", "select-kit") -> {
                 val kitName = getCustomValue(clickedItem.itemMeta, plugin, "kit_name") as String
                 KitSelector(plugin).setKit(kitName, player)
@@ -285,15 +311,33 @@ class GuiListener(private val plugin: KnockBackFFA) : Listener {
         }
 
         when {
-            checkCustomValue(itemMeta, plugin, "6b69745f646973706c61795f6e616d655f65646974", "kit_display_name_edit") -> {
+            checkCustomValue(
+                itemMeta,
+                plugin,
+                "6b69745f646973706c61795f6e616d655f65646974",
+                "kit_display_name_edit"
+            ) -> {
                 handleKitAttributeEdit(player, itemMeta, "show.DisplayName", event.message())
             }
-            checkCustomValue(itemMeta, plugin, "6b69745f646973706c61795f6c6f72655f65646974", "kit_display_lore_edit") -> {
+
+            checkCustomValue(
+                itemMeta,
+                plugin,
+                "6b69745f646973706c61795f6c6f72655f65646974",
+                "kit_display_lore_edit"
+            ) -> {
                 handleKitAttributeEdit(player, itemMeta, "show.Lore", event.message())
             }
-            checkCustomValue(itemMeta, plugin, "656469745f6b69745f6974656d5f446973706c61794e616d65", "edit_kit_item_DisplayName") -> {
+
+            checkCustomValue(
+                itemMeta,
+                plugin,
+                "656469745f6b69745f6974656d5f446973706c61794e616d65",
+                "edit_kit_item_DisplayName"
+            ) -> {
                 handleKitItemAttributeEdit(player, itemMeta, "name", event.message())
             }
+
             checkCustomValue(itemMeta, plugin, "656469745f6b69745f6974656d5f6c6f7265", "edit_kit_item_lore") -> {
                 handleKitItemAttributeEdit(player, itemMeta, "lore", event.message())
             }
