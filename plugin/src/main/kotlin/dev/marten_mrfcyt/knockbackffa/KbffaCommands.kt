@@ -17,11 +17,17 @@ import dev.marten_mrfcyt.knockbackffa.utils.message
 import dev.marten_mrfcyt.knockbackffa.utils.sendMini
 import lirand.api.dsl.command.builders.LiteralDSLBuilder
 import lirand.api.dsl.command.builders.command
-import org.bukkit.Material
 import org.bukkit.Registry
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.util.concurrent.CompletableFuture
+
+private val blockSuggestions: List<String> by lazy {
+    Registry.MATERIAL.stream()
+        .filter { it.isBlock }
+        .map { it.key.toString() }
+        .toList()
+}
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
     requiresPermissions("kbffa.command")
@@ -58,11 +64,8 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
             argument("name", string()) {
                 argument("killBlock", StringArgumentType.greedyString()) {
                     suggests { builder ->
-                        Registry.MATERIAL.stream()
-                            .filter { it.isBlock && it != Material.AIR && it.isSolid }
-                            .map { it.key.toString() }
-                            .filter { it.startsWith(builder.remaining, ignoreCase = false) }
-                            .forEach { builder.suggest(it) }
+                        blockSuggestions.forEach { builder.suggest(it) }
+                        builder.build()
                     }
                     executes {
                         plugin.createArena(source, getArgument("name"), getArgument("killBlock"))

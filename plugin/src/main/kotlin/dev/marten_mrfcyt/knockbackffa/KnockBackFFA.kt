@@ -97,6 +97,7 @@ class KnockBackFFA : KotlinPlugin() {
     private fun startArenaHandler(mapDuration: Int) {
         logger.info("Starting arena handler...")
         GlobalScope.launch {
+            arenaHandler.loadArenas()
             while (true) {
                 lastSwitchTime = Instant.now()
                 nextSwitchTime = lastSwitchTime.plusSeconds(mapDuration.toLong())
