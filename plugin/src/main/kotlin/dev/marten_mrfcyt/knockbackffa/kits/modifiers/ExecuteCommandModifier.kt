@@ -1,25 +1,28 @@
-package dev.marten_mrfcyt.knockbackffa.modifiers
+package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
+import me.clip.placeholderapi.PlaceholderAPI
+import org.bukkit.Bukkit
 import org.bukkit.Material
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.ItemStack
+import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
-@Modify("onKill")
-object OnKillModifier : ModifyObject(
-    id = "onKill",
-    name = "<white>On Kill Modifier",
-    description = listOf("Restores item amount on kill"),
-    icon = Material.DIAMOND_SWORD,
+@Modify("executeCommand")
+object ExecuteCommandModifier : ModifyObject(
+    id = "executeCommand",
+    name = "<white>Execute Command Modifier",
+    description = listOf("Executes a command on kill"),
+    icon = Material.COMMAND_BLOCK,
+    args = listOf("command" to String::class.java),
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {
@@ -27,13 +30,13 @@ object OnKillModifier : ModifyObject(
         val kitConfig = YamlConfiguration.loadConfiguration(config)
         val slot = (args["slot"] as? Int) ?: return
         val kitName = (args["kit_name"] as? String) ?: return
-        val amount = kitConfig.getInt("kit.$kitName.items.$slot.amount")
-        item.amount = amount
-        player.inventory.setItem(slot, item)
+        val command = kitConfig.getString("kit.$kitName.items.$slot.modifiers.command") ?: return
+        val parsedCommand = PlaceholderAPI.setPlaceholders(player, command)
+        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand)
     }
 
     @EventHandler
-    fun onKill(event: PlayerDeathEvent) {
+    fun onKillExecute(event: PlayerDeathEvent) {
         val source = event.entity.killer ?: return
         for (item in source.inventory.contents) {
             if (item == null) continue

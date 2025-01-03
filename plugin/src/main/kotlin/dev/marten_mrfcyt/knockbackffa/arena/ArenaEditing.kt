@@ -1,14 +1,11 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.handlers.Arena
-import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player

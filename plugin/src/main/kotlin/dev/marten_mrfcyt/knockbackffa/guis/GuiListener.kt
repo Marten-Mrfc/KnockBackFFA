@@ -1,10 +1,10 @@
-package dev.marten_mrfcyt.knockbackffa.kits.guis
+package dev.marten_mrfcyt.knockbackffa.guis
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.ItemModifier
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.guis.editor.ItemModifier
+import dev.marten_mrfcyt.knockbackffa.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import io.papermc.paper.event.player.AsyncChatEvent
 import lirand.api.extensions.inventory.customModel

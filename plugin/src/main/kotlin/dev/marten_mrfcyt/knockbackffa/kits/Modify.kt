@@ -1,4 +1,4 @@
-package dev.marten_mrfcyt.knockbackffa.annotations
+package dev.marten_mrfcyt.knockbackffa.kits
 
 /**
  * Annotation to define a modifier for an item.

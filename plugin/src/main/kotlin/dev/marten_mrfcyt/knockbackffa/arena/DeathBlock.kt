@@ -1,4 +1,4 @@
-package dev.marten_mrfcyt.knockbackffa.handlers
+package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import org.bukkit.configuration.file.YamlConfiguration

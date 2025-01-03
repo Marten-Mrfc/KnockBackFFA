@@ -1,8 +1,8 @@
-package dev.marten_mrfcyt.knockbackffa.modifiers
+package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration

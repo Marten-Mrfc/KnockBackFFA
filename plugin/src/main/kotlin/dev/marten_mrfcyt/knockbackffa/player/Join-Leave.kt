@@ -1,7 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.handlers.loadKit
+import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.cmessage
 import org.bukkit.Location
 import org.bukkit.event.EventHandler

@@ -1,7 +1,7 @@
-package dev.marten_mrfcyt.knockbackffa.handlers
+package dev.marten_mrfcyt.knockbackffa.kits
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.checkCustomValue
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
@@ -69,7 +69,7 @@ class ModifyHandler {
 
     init {
         try {
-            val reflections = Reflections("dev.marten_mrfcyt.knockbackffa.modifiers")
+            val reflections = Reflections("dev.marten_mrfcyt.knockbackffa.kits.modifiers")
             val classes = reflections.getSubTypesOf(ModifyObject::class.java)
             for (clazz in classes) {
                 clazz.kotlin.findAnnotation<Modify>()?.let { annotation ->

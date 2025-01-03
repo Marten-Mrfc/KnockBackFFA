@@ -7,10 +7,10 @@ import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
-import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
+import dev.marten_mrfcyt.knockbackffa.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.message

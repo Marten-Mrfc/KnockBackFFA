@@ -1,4 +1,4 @@
-package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.*

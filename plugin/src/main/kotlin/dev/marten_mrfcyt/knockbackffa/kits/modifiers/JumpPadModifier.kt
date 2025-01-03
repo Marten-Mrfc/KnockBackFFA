@@ -1,10 +1,11 @@
-package dev.marten_mrfcyt.knockbackffa.modifiers
+package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -25,7 +26,7 @@ object JumpPadModifier : ModifyObject(
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {
-        val block = args["block"] as? org.bukkit.block.Block ?: return
+        val block = args["block"] as? Block ?: return
         block.setMetadata("jumpPad", FixedMetadataValue(plugin, true))
         object : BukkitRunnable() {
             override fun run() {

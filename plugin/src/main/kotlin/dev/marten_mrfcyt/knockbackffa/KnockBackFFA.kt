@@ -1,10 +1,15 @@
 package dev.marten_mrfcyt.knockbackffa
 
-import dev.marten_mrfcyt.knockbackffa.handlers.*
-import dev.marten_mrfcyt.knockbackffa.kits.guis.GuiListener
+import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.arena.DeathBlock
+import dev.marten_mrfcyt.knockbackffa.guis.GuiListener
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.player.PlayerHandler
 import dev.marten_mrfcyt.knockbackffa.player.PlayerJoinListener
 import dev.marten_mrfcyt.knockbackffa.player.PlayerQuitListener
+import dev.marten_mrfcyt.knockbackffa.player.ScoreHandler
 import dev.marten_mrfcyt.knockbackffa.player.ScoreboardHandler
+import dev.marten_mrfcyt.knockbackffa.utils.BStatsMetrics
 import dev.marten_mrfcyt.knockbackffa.utils.PlaceHolderAPI
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -69,6 +74,7 @@ class KnockBackFFA : KotlinPlugin() {
         setupPlaceholders()
         ModifyHandler().registerEvents(this)
         logger.info("${ModifyHandler().getModifyObjects().size} modify objects registered successfully!")
+        BStatsMetrics.registerMetrics()
         logger.info("--- KnockBackFFA has started ---")
         logger.info("--------------------------------")
     }

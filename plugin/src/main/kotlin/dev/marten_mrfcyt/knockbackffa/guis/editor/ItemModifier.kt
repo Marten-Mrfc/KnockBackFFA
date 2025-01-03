@@ -1,7 +1,7 @@
-package dev.marten_mrfcyt.knockbackffa.kits.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.utils.asMini
 import dev.marten_mrfcyt.knockbackffa.utils.error
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue

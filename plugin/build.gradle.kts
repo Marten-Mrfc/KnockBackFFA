@@ -5,7 +5,7 @@ plugins {
     id("java")
     kotlin("jvm") version "1.9.22"
     `maven-publish`
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.github.goooler.shadow") version "8.1.7"
 }
 
 group = "dev.Marten_mrfcyt"
@@ -42,7 +42,8 @@ dependencies {
     compileOnly("org.mockito:mockito-core:5.11.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     implementation(kotlin("reflect"))
-    implementation("org.reflections:reflections:0.9.10")
+    implementation("org.reflections:reflections:0.10.2")
+    implementation("org.bstats:bstats-bukkit:3.1.0")
 }
 
 val targetJavaVersion = 21
@@ -66,8 +67,15 @@ tasks.processResources {
 kotlin {
     jvmToolchain(21)
 }
-
-tasks.register<ShadowJar>("buildAndMove") {
+tasks.withType<ShadowJar> {
+    relocate("org.bstats", "com.typewritermc.engine.paper.extensions.bstats")
+    minimize {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
+        exclude(dependency("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core"))
+    }
+}
+task<ShadowJar>("buildAndMove") {
     dependsOn("shadowJar")
 
     group = "build"
@@ -83,12 +91,4 @@ tasks.register<ShadowJar>("buildAndMove") {
 
         jar.copyTo(server, overwrite = true)
     }
-}
-
-tasks.register<JavaExec>("runServer") {
-    group = "application"
-    description = "Run the Minecraft server with the plugin"
-    mainClass.set("-jar")
-    args = listOf("D:/projects/Knockbackffa/KnockBackFFA/plugin/server/paper.jar")
-    workingDir = file("D:/projects/Knockbackffa/KnockBackFFA/plugin/server")
 }

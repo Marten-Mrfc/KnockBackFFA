@@ -1,7 +1,7 @@
-package dev.marten_mrfcyt.knockbackffa.handlers
+package dev.marten_mrfcyt.knockbackffa.kits
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.guis.editor.KitModifier
 import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player

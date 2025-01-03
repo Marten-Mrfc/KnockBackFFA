@@ -1,6 +1,7 @@
-package dev.marten_mrfcyt.knockbackffa.handlers
+package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
@@ -25,7 +26,7 @@ class PlayerHandler(plugin: KnockBackFFA) : Listener {
     @EventHandler
     fun allowPickUp(event: EntityPickupItemEvent) {
         if (config.get("currentArena") == null) return
-        if (config.get("allowPickUp") == false && event.entity is org.bukkit.entity.Player) {
+        if (config.get("allowPickUp") == false && event.entity is Player) {
             event.isCancelled = true
         }
     }
