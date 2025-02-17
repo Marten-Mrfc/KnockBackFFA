@@ -41,8 +41,8 @@ object ExecuteCommandModifier : ModifyObject(
         for (item in source.inventory.contents) {
             if (item == null) continue
             val itemMeta = item.itemMeta ?: continue
-            val slot = getCustomValue(itemMeta, plugin, "slot") as? Int ?: continue
             val kitName = getCustomValue(itemMeta, plugin, "kit_name") as? String ?: continue
+            val slot = getCustomValue(itemMeta, plugin, "slot") as? Int ?: continue
             val args = mapOf(
                 "slot" to slot,
                 "kit_name" to kitName
