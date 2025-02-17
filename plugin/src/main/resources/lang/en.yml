@@ -35,7 +35,12 @@ scoreboard:
     - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
     - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
 
+bossbar:
+  format: "<green>Arena<gray>: <white><arena_name> <gray>| <yellow><time_left>"
+
 arena:
+  switch:
+    success: "<green>Teleported to arena <white><arena_name><green>!"
   create:
     success: "<green>Created arena <white><arena_name>"
     location: "<green>Creating <white>arena <arena_name> at <x>, <y>, <z>"
@@ -58,8 +63,6 @@ arena:
     failed: "Failed to load arena <arena_name>"
     success: "⚔️ Loaded <count> arenas"
     killblock_not_found: "Failed to load arena <arena_name>: Kill block not found"
-  switch:
-    success: "<green>Teleported to arena <white><arena_name><green>!"
   deathblock:
     killblock_null: "Kill block is null for arena: <arena_name>"
 error:
