@@ -33,7 +33,11 @@ scoreboard:
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Munten: </white><green>%knockbackffa_coins%</green>'
     - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+bossbar:
+  format: "<green>Arena<gray>: <white><arena_name> <gray>| <yellow><time_left>"
 arena:
+  switch:
+    success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
   create:
     success: "<green>Arena <white><arena_name> <green>gemaakt"
     location: "<green>Arena <white><arena_name> <green>maken op <x>, <y>, <z>"
@@ -56,8 +60,6 @@ arena:
     failed: "Laden van arena <arena_name> mislukt"
     success: "⚔️ <count> arena's geladen"
     killblock_not_found: "Laden van arena <arena_name> mislukt: Kill block niet gevonden"
-  switch:
-    success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
   deathblock:
     killblock_null: "Kill block is null voor arena: <arena_name>"
 error:
