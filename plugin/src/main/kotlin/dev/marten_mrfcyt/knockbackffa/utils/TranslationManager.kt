@@ -4,9 +4,11 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.File
 import java.util.*
+import kotlin.collections.get
+import kotlin.random.Random
 
 class TranslationManager(private val plugin: Plugin) {
-    private val translations = mutableMapOf<Locale, Map<String, String>>()
+    private val translations = mutableMapOf<Locale, Map<String, Any>>()
     private val defaultLocale = Locale.ENGLISH
     private lateinit var configuredLocale: Locale
 
@@ -38,7 +40,20 @@ class TranslationManager(private val plugin: Plugin) {
             ?: translations[defaultLocale]?.get(key)
             ?: key
 
-        return args.entries.fold(translation) { acc, (key, value) ->
+        if (translation == key) {
+            plugin.logger.warning("Translation key '$key' not found for locale '${locale.language}'")
+        }
+        val message = if (translation is List<*>) {
+            if (translation.isNotEmpty()) {
+                translation[Random.nextInt(translation.size)].toString()
+            } else {
+                "Empty list for message key '$key'"
+            }
+        } else {
+            translation.toString()
+        }
+
+        return args.entries.fold(message) { acc, (key, value) ->
             acc.replace("<$key>", value)
         }
     }
@@ -71,9 +86,16 @@ class TranslationManager(private val plugin: Plugin) {
         langFolder.listFiles { file -> file.extension == "yml" }?.forEach { file ->
             try {
                 val locale = Locale.forLanguageTag(file.nameWithoutExtension)
-                translations[locale] = YamlConfiguration.loadConfiguration(file)
+                val loadedTranslations = YamlConfiguration.loadConfiguration(file)
                     .getValues(true)
-                    .mapValues { it.value.toString() }
+                    .mapValues { (_, value) ->
+                        when (value) {
+                            is List<*> -> value.map { it.toString() }
+                            else -> value.toString()
+                        }
+                    }
+                translations[locale] = loadedTranslations
+                plugin.logger.info("Loaded ${loadedTranslations.size} translations for locale '${locale.language}'")
             } catch (e: Exception) {
                 plugin.logger.warning("Failed to load language file ${file.name}: ${e.message}")
             }

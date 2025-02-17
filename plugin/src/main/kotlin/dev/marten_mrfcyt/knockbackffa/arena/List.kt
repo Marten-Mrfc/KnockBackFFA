@@ -22,7 +22,7 @@ fun Plugin.listArena(source: CommandSender) {
             val location = arenaConfig.getConfigurationSection("arenas.$it.location")
             source.sendMini(translate("arena.list.entry",
                 "arena_name" to it,
-                "world" to location?.getString("world"),
+                "world" to (location?.getString("world") ?: "unknown"),
                 "x" to "%.1f".format(location?.getDouble("x")),
                 "y" to "%.1f".format(location?.getDouble("y")),
                 "z" to "%.1f".format(location?.getDouble("z"))

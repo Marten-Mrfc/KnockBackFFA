@@ -3,6 +3,7 @@ package dev.marten_mrfcyt.knockbackffa.guis.editor
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.*
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.gui.Gui
 import mlib.api.gui.GuiSize
 import mlib.api.utilities.*
@@ -19,7 +20,7 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
     private val kitConfig = YamlConfiguration.loadConfiguration(config)
     private val kits = kitConfig.getConfigurationSection("kit")?.getKeys(false)
     private val kitCount = kits?.size ?: 0
-    private val inventorySize = ceil((kitCount + 1) / 9.0).toInt() * 9
+    private val inventorySize = ceil((kitCount + 1) / 9.0).toInt()
 
     init {
         val gui = Gui("<gray>Please select a kit</gray>".asMini(), GuiSize.fromRows(inventorySize)).apply {
@@ -46,6 +47,6 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
         playerData.savePlayerData(player.uniqueId, playerDataConfig)
         loadKit(plugin, player)
         player.inventory.close()
-        player.sendMessage("You have selected the $kitName kit!")
+        player.message(translate("player.kit_selected", "kit_name" to kitName))
     }
 }

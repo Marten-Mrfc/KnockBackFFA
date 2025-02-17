@@ -10,7 +10,7 @@ object BStatsMetrics {
     fun registerMetrics() {
         val metrics = Metrics(KnockBackFFA.instance, ID)
         metrics.addCustomChart(SingleLineChart("total_arenas_created") {
-            KnockBackFFA.instance.arenaHandler.getArenaNames().get().size
+            KnockBackFFA.instance.arenaHandler.getArenaNames().size
         })
     }
 }

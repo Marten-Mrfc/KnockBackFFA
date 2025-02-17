@@ -1,30 +1,50 @@
-# lang/en.yml
+# lang/nl.yml
+player:
+  kit_selected: "<green>Geselecteerde kit <white><kit_name>"
+  join_message:
+    - "<white><player_name><gray> sprong in de arena!"
+    - "<white><player_name><gray> is de arena binnengekomen!"
+    - "<white><player_name><gray> heeft zich bij de arena gevoegd!"
+  leave_message:
+    - "<white><player_name><gray> heeft de arena verlaten!"
+    - "<white><player_name><gray> is de arena uitgegaan!"
+    - "<white><player_name><gray> heeft de arena verlaten als een ninja!"
+  death_message:
+    - "<white><player_name><gray> is in de leegte geslagen!"
+    - "<white><player_name><gray> kon de knockback niet aan en viel naar zijn ondergang!"
+    - "<white><player_name><gray> werd van het platform geslingerd!"
+    - "<white><player_name><gray> ontmoette een snelle dood door de zwaartekracht!"
+  killed_by_message:
+    - "<white><player_name><gray> werd in de leegte geslagen door <white><killer_name><gray>!"
+    - "<white><player_name><gray> ontmoette zijn einde dankzij <white><killer_name><gray>'s knockback!"
+    - "<white><player_name><gray> werd van het platform geslingerd door <white><killer_name><gray>!"
+    - "<white><player_name><gray> kon de kracht van <white><killer_name><gray>'s aanval niet weerstaan en viel!"
 arena:
   create:
-    success: "<green>Arena <white><arena_name> <green>aangemaakt"
-    location: "<green>Arena <white><arena_name> <green>wordt aangemaakt op <x>, <y>, <z>"
+    success: "<green>Arena <white><arena_name> <green>gemaakt"
+    location: "<green>Arena <white><arena_name> <green>maken op <x>, <y>, <z>"
     file:
-      not_found: "Geen arena.yml bestand gevonden, nieuw bestand wordt aangemaakt!"
+      not_found: "Geen arena.yml bestand gevonden, een nieuw bestand wordt aangemaakt!"
       created: "arena.yml bestand aangemaakt!"
-      error: "<red>Kon arena.yml bestand niet aanmaken: <error>"
+      error: "<red>Het aanmaken van arena.yml bestand is mislukt: <error>"
     exists: "<red>Arena <arena_name> bestaat al!"
-    pvp_required: "<red>PvP moet ingeschakeld zijn in deze wereld!"
+    pvp_required: "<red>Deze wereld moet pvp ingeschakeld hebben!"
   delete:
-    start: "<dark_red>Arena <white><arena_name> <dark_red>wordt verwijderd!"
-    success: "Arena <arena_name> <dark_red>succesvol <white>verwijderd!"
-    not_found: "<red>Arena <arena_name> niet gevonden. Is de naam correct gespeld?"
+    start: "<dark_red>Arena <white><arena_name> <dark_red>verwijderen!"
+    success: "Arena <arena_name> <dark_red>succesvol verwijderd!"
+    not_found: "<red>Arena <arena_name> niet gevonden. Is het verkeerd gespeld?"
   list:
-    none: "<red>No arenas found!"
-    header: "<bold>Arenas:<reset>"
-    entry: "<white><bold>*</bold> <green><arena_name><reset> <gray>at <white><world><dark_gray> (<gray><x><white> <gray><y><white> <gray><z><dark_gray>)<reset>"
+    none: "<red>Geen arena's gevonden!"
+    header: "<bold>Arena's:<reset>"
+    entry: "<white><bold>*</bold> <green><arena_name><reset> <gray>op <white><world><dark_gray> (<gray><x><white> <gray><y><white> <gray><z><dark_gray>)<reset>"
   load:
-    none: "Arenas section not found in configuration | Please run /kbffa arena create <name> <killBlock>"
-    failed: "Failed to load arena <arena_name>"
-    success: "⚔️ Loaded <count> arenas"
-    killblock_not_found: "Failed to load arena <arena_name>: Kill block not found"
+    none: "Arena's sectie niet gevonden in configuratie | Voer /kbffa arena create <name> <killBlock> uit"
+    failed: "Laden van arena <arena_name> mislukt"
+    success: "⚔️ <count> arena's geladen"
+    killblock_not_found: "Laden van arena <arena_name> mislukt: Kill block niet gevonden"
   switch:
-    success: "<green>Teleported to arena <white><arena_name><green>!"
+    success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
   deathblock:
-    killblock_null: "Kill block is null for arena: <arena_name>"
+    killblock_null: "Kill block is null voor arena: <arena_name>"
 error:
   player_only: "<red>Je moet een speler zijn om deze actie uit te voeren!"
