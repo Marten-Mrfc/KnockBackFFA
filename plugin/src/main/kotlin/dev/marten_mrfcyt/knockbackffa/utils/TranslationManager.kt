@@ -4,10 +4,6 @@ import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.File
 import java.util.*
-import kotlin.collections.get
-import kotlin.random.Random
-import kotlin.text.get
-import kotlin.text.isNotEmpty
 import kotlin.toString
 
 class TranslationManager(private val plugin: Plugin) {

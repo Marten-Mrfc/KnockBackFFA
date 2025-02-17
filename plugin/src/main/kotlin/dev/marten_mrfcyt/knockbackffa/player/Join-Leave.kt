@@ -10,12 +10,17 @@ import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
 
-class PlayerJoinListener(private val scoreboardHandler: ScoreboardHandler) : Listener {
+class PlayerJoinListener(
+    private val scoreboardHandler: ScoreboardHandler,
+    private val bossBarHandler: BossBarHandler
+) : Listener {
     @EventHandler
     fun onPlayerJoin(event: PlayerJoinEvent) {
         val source = event.player
         event.joinMessage((translateListRandom("player.join_message", "player_name" to source.name)).asMini())
         scoreboardHandler.startUpdatingScoreboard(source)
+        bossBarHandler.showBossBar(source)
+
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
         if (currentArena != null) {
             loadKit(KnockBackFFA.instance, source)
@@ -24,11 +29,15 @@ class PlayerJoinListener(private val scoreboardHandler: ScoreboardHandler) : Lis
     }
 }
 
-class PlayerQuitListener(private val scoreboardHandler: ScoreboardHandler) : Listener {
+class PlayerQuitListener(
+    private val scoreboardHandler: ScoreboardHandler,
+    private val bossBarHandler: BossBarHandler
+) : Listener {
     @EventHandler
     fun onPlayerQuit(event: PlayerQuitEvent) {
         val source = event.player
         event.quitMessage((translateListRandom("player.leave_message", "player_name" to source.name)).asMini())
         scoreboardHandler.stopUpdatingScoreboard(source)
+        bossBarHandler.removeBossBar(source)
     }
 }

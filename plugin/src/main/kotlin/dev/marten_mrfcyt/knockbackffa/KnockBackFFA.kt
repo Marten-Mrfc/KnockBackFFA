@@ -55,8 +55,8 @@ class KnockBackFFA : KotlinPlugin() {
 
         registerCommands()
         registerEvents(
-            PlayerJoinListener(ScoreboardHandler(this)),
-            PlayerQuitListener(ScoreboardHandler(this)),
+            PlayerJoinListener(ScoreboardHandler(this), BossBarHandler(this)),
+            PlayerQuitListener(ScoreboardHandler(this), BossBarHandler(this)),
             ScoreHandler(this),
             DeathBlock(this),
             PlayerHandler(this),

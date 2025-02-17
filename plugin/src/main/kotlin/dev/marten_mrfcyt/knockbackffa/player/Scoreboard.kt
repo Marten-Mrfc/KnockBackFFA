@@ -62,6 +62,7 @@ class ScoreboardHandler(private val plugin: KnockBackFFA) {
     }
 
     fun startUpdatingScoreboard(player: Player) {
+        if (!plugin.config.getBoolean("scoreboard.enabled", true)) return
         createScoreboard(player)
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
             updateScoreboard(player)
