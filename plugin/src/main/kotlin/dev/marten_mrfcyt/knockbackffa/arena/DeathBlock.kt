@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -21,7 +22,7 @@ class DeathBlock(private val plugin: KnockBackFFA) : Listener {
         }
         val killBlock = config.getString("arenas.$arena.killBlock")?.replace("minecraft:", "", ignoreCase = true)?.uppercase()
         if (killBlock == null) {
-            logger.warning("Kill block is null for arena: $arena")
+            logger.warning(translate("arena.deathblock.killblock_null", "arena_name" to arena))
             return
         }
 

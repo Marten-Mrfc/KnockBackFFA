@@ -4,6 +4,7 @@
 #                              #
 # ###############################
 
+language: "en"
 mapDuration: 60
 allowDropping: false
 allowPickUp: false

@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.utilities.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
@@ -50,7 +51,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
 
         if (arenaSection == null) {
-            plugin.logger.warning("Arenas section not found in configuration | Please run /kbffa arena create <name> <killBlock>")
+            plugin.logger.warning(translate("arena.load.none"))
             return
         }
 
@@ -61,10 +62,10 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             if (location != null) {
                 loadedCount++
             } else {
-                plugin.logger.warning("Failed to load arena $key")
+                plugin.logger.warning(translate("arena.load.failed", "arena_name" to key))
             }
         }
-        plugin.logger.info("⚔️ Loaded $loadedCount arenas")
+        plugin.logger.info(translate("arena.load.success", "count" to loadedCount.toString()))
     }
 
     fun switchArena() {
@@ -80,7 +81,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     Bukkit.getOnlinePlayers().forEach { player ->
                         player.teleport(location)
-                        player.message("<green>Teleported to arena <white>${arenaName}<green>!")
+                        player.message(translate("arena.switch.success", "arena_name" to arenaName))
                     }
                     plugin.config.set("currentArena", arenaName)
                     plugin.config.set("currentLocation", location)
@@ -115,7 +116,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             if (killBlock.isNotEmpty()) {
                 Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
             } else {
-                plugin.logger.warning("Failed to load arena $key: Kill block not found")
+                plugin.logger.warning(translate("arena.load.killblock_not_found", "arena_name" to key))
                 null
             }
         } else {

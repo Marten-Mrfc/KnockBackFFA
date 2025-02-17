@@ -27,6 +27,7 @@ class KnockBackFFA : KotlinPlugin() {
 
         super.onEnable()
         instance = this
+        TranslationManager.init(this)
         if (isEnabled) {
             arenaHandler = ArenaHandler(this)
         }

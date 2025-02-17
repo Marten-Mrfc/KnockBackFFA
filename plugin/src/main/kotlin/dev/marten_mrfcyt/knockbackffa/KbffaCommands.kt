@@ -11,6 +11,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
 import mlib.api.commands.builders.command
 import mlib.api.utilities.*
@@ -53,6 +54,13 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         requiresPermissions("kbffa.debug")
         executes {
             debug(source as Player)
+        }
+    }
+    literal("reload") {
+        requiresPermissions("kbffa.reload")
+        executes {
+            TranslationManager.reload(plugin)
+            source.sendMini("<green>Successfully reloaded translations!")
         }
     }
     literal("arena") {

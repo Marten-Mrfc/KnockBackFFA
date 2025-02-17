@@ -1,0 +1,17 @@
+# lang/nl.yml
+arena:
+  create:
+    success: "<green>Arena <white><arena_name> <green>aangemaakt"
+    location: "<green>Arena <white><arena_name> <green>wordt aangemaakt op <x>, <y>, <z>"
+    file:
+      not_found: "Geen arena.yml bestand gevonden, nieuw bestand wordt aangemaakt!"
+      created: "arena.yml bestand aangemaakt!"
+      error: "<red>Kon arena.yml bestand niet aanmaken: <error>"
+    exists: "<red>Arena <arena_name> bestaat al!"
+    pvp_required: "<red>PvP moet ingeschakeld zijn in deze wereld!"
+  delete:
+    start: "<dark_red>Arena <white><arena_name> <dark_red>wordt verwijderd!"
+    success: "Arena <arena_name> <dark_red>succesvol <white>verwijderd!"
+    not_found: "<red>Arena <arena_name> niet gevonden. Is de naam correct gespeld?"
+error:
+  player_only: "<red>Je moet een speler zijn om deze actie uit te voeren!"
