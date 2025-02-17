@@ -124,10 +124,8 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         }
     }
 
-    fun getArenaNames(): CompletableFuture<List<String>> {
-        return CompletableFuture.supplyAsync {
-            val arenaSection = arenaConfig.getConfigurationSection("arenas")
-            arenaSection?.getKeys(false)?.toList() ?: emptyList()
-        }
+    fun getArenaNames(): List<String> {
+        val arenaSection = arenaConfig.getConfigurationSection("arenas")
+        return arenaSection?.getKeys(false)?.toList() ?: emptyList()
     }
 }

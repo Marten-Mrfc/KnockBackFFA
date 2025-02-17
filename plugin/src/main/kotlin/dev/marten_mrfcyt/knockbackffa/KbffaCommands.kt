@@ -60,7 +60,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         requiresPermissions("kbffa.reload")
         executes {
             TranslationManager.reload(plugin)
-            source.sendMini("<green>Successfully reloaded translations!")
+            source.message("<green>Successfully reloaded translations!")
         }
     }
     literal("arena") {
@@ -92,7 +92,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         literal("delete") {
             argument("name", string()) {
                 suggests { builder ->
-                    getArenaNamesSuggestions(builder, arenaHandler)
+                    arenaHandler.getArenaNames().forEach { builder.suggest(it) }
                 }
                 executes {
                     plugin.deleteArena(source, getArgument("name"))
@@ -161,14 +161,5 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
 fun Plugin.kitSelectorCommand() = command("kit") {
     executes {
         KitSelector(KnockBackFFA(), source as Player)
-    }
-}
-
-fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
-    return arenaHandler.getArenaNames().thenApply { names ->
-        names.forEach { name ->
-            builder.suggest(name)
-        }
-        builder.build()
     }
 }
