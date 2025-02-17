@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.arena.currentArena
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.utilities.asMini
 import net.kyori.adventure.bossbar.BossBar
@@ -17,7 +18,7 @@ class BossBarHandler(private val plugin: KnockBackFFA) {
         if (!plugin.config.getBoolean("bossbar.enabled", true)) return
 
         val bossBar = BossBar.bossBar(
-            formatBossBarText(plugin.config.getString("currentArena", "None") ?: return),
+            formatBossBarText(currentArena?.name ?: "None"),
             1.0f,
             BossBar.Color.GREEN,
             BossBar.Overlay.PROGRESS
@@ -44,7 +45,7 @@ class BossBarHandler(private val plugin: KnockBackFFA) {
             val progress = duration.seconds.toFloat() / totalDuration
             bossBar.progress(progress.coerceIn(0f, 1f))
 
-            bossBar.name(formatBossBarText(plugin.config.getString("currentArena", "None") ?: "None"))
+            bossBar.name(formatBossBarText(currentArena?.name ?: "None"))
         }
     }
 

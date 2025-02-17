@@ -75,7 +75,6 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             val arenaName = arenaSection.getKeys(false).random()
             val location = locationFetcher(arenaName)
             val killBlock = arenaConfig.getString("arenas.$arenaName.killBlock") ?: Material.VOID_AIR.name
-
             if (location != null) {
                 currentArena = Arena(arenaName, location, Material.valueOf(killBlock))
                 Bukkit.getScheduler().runTask(plugin, Runnable {
@@ -100,6 +99,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             plugin.config.set("currentArena", null)
             plugin.config.set("currentLocation", null)
         })
+        currentArena = null
     }
 
     internal fun locationFetcher(key: String): Location? {

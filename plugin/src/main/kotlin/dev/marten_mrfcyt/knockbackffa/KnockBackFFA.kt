@@ -24,7 +24,7 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
         logger.info("┃      🚀 KnockBackFFA Start      ┃")
         logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
-
+        saveDefaultConfig()
         super.onEnable()
         instance = this
         TranslationManager.init(this)
