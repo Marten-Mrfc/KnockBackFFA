@@ -20,6 +20,21 @@ player:
     - "<white><player_name><gray> was sent flying off the platform by <white><killer_name><gray>!"
     - "<white><player_name><gray> couldn't withstand the force of <white><killer_name><gray>'s attack and fell!"
 
+scoreboard:
+  title: ''
+  lines:
+    - '<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>'
+    - '<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>'
+    - '<gray><b>└</b></gray><white>Current map:</white> <green>%knockbackffa_map%</green>'
+    - ''
+    - '<gray><b>┌─</b></gray><gold><b>STATS</b></gold>'
+    - '<gray><b>├</b></gray><white>Your ping: </white><green>%player_ping%</green>'
+    - '<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_kills%</green>'
+    - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
+    - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
+    - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
+    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+
 arena:
   create:
     success: "<green>Created arena <white><arena_name>"
