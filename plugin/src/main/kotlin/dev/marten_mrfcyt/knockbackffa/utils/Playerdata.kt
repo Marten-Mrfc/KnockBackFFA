@@ -17,7 +17,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     internal val mysqlHandler = MySQLHandler(storageConfig, plugin)
 
     init {
-        plugin.logger.info("Storage type: ${storageConfig.storageType}")
+        plugin.logger.info("📃 Storage type: ${storageConfig.storageType}")
         if (storageConfig.storageType.lowercase() == "mysql") {
             mysqlHandler.connect()
             createPlayerDataTable()

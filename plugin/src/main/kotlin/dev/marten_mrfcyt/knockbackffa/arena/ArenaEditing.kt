@@ -1,18 +1,13 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.message
-import kotlinx.coroutines.DelicateCoroutinesApi
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import mlib.api.utilities.*
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
 
-@OptIn(DelicateCoroutinesApi::class)
 fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
     if (source is Player) {
         val location = source.location
@@ -34,9 +29,9 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
         val arenaConfig = YamlConfiguration.loadConfiguration(config)
         if (!arenaConfig.contains("arenas.$arenaName")) {
             if (location.world?.pvp == true) {
-                GlobalScope.launch {
+                server.scheduler.runTaskAsynchronously(this, Runnable {
                     KnockBackFFA.instance.arenaHandler.addArena(Arena(arenaName, location, killBlock))
-                }
+                })
                 source.message("Arena $arenaName <green>created<white> successfully!")
             } else {
                 source.error("This world needs pvp to be enabled!")
@@ -49,7 +44,6 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
     }
 }
 
-@OptIn(DelicateCoroutinesApi::class)
 fun Plugin.deleteArena(source: CommandSender, name: String) {
     if (source !is Player) {
         source.error("You must be a player to delete an arena!")
@@ -68,9 +62,9 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
     val location = ArenaHandler(KnockBackFFA.instance).locationFetcher(name)
 
     if (location != null) {
-        GlobalScope.launch {
+        server.scheduler.runTaskAsynchronously(this, Runnable {
             ArenaHandler(KnockBackFFA.instance).removeArena(Arena(name, location))
-        }
+        })
         source.message("Arena $name <dark_red>deleted<white> successfully!")
     }
 }

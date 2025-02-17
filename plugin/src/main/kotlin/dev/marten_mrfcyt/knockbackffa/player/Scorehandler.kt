@@ -2,9 +2,9 @@ package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.loadKit
+import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import dev.marten_mrfcyt.knockbackffa.utils.cmessage
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.message
+import mlib.api.utilities.*
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -26,7 +26,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         }
         source.inventory.clear()
         try {
-            val playerDataHandler = plugin.playerData
+            val playerDataHandler = PlayerData.getInstance(plugin)
             // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
             playerData.apply {

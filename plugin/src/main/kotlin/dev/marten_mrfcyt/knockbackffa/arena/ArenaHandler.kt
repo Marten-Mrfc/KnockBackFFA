@@ -1,8 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.message
-import kotlinx.coroutines.*
+import mlib.api.utilities.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -12,13 +11,21 @@ import java.util.concurrent.CompletableFuture
 
 data class Arena(val name: String, val location: Location, val killBlock: String = Material.VOID_AIR.name)
 
-@OptIn(DelicateCoroutinesApi::class)
 class ArenaHandler(private val plugin: KnockBackFFA) {
     private var currentArena: Arena? = null
-    private val arenaConfig = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/arena.yml"))
+    private val arenaConfig: YamlConfiguration
 
-    suspend fun addArena(arena: Arena) {
-        withContext(Dispatchers.IO) {
+    init {
+        val arenaFile = File("${plugin.dataFolder}/arena.yml")
+        if (!arenaFile.exists()) {
+            arenaFile.createNewFile()
+            YamlConfiguration().save(arenaFile)
+        }
+        arenaConfig = YamlConfiguration.loadConfiguration(arenaFile)
+    }
+
+    fun addArena(arena: Arena) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
             arenaConfig.set("arenas.${arena.name}.location.world", arena.location.world?.name)
             arenaConfig.set("arenas.${arena.name}.location.x", arena.location.x)
             arenaConfig.set("arenas.${arena.name}.location.y", arena.location.y)
@@ -27,71 +34,71 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             arenaConfig.set("arenas.${arena.name}.location.pitch", arena.location.pitch)
             arenaConfig.set("arenas.${arena.name}.killBlock", arena.killBlock)
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
-        }
+        })
     }
 
-    suspend fun removeArena(arena: Arena) {
-        withContext(Dispatchers.IO) {
+    fun removeArena(arena: Arena) {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
             arenaConfig.set("arenas.${arena.name}", null)
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
             plugin.saveConfig()
-        }
+        })
     }
 
-    suspend fun loadArenas() {
-        arenaConfig.load(File("${plugin.dataFolder}/arena.yml")) // Reload the configuration
+    fun loadArenas() {
+        arenaConfig.load(File("${plugin.dataFolder}/arena.yml"))
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
-        withContext(Dispatchers.IO) {
-            if (arenaSection == null) {
-                plugin.logger.warning("Arenas section not found in configuration | Please run /kbffa arena create <name> <killBlock>")
-                return@withContext
-            }
 
-            val keys = arenaSection.getKeys(false)
-            var loadedCount = 0
-            for (key in keys) {
-                val location = locationFetcher(key)
-                if (location != null) {
-                    loadedCount++
-                } else {
-                    plugin.logger.warning("Failed to load arena $key")
-                }
+        if (arenaSection == null) {
+            plugin.logger.warning("Arenas section not found in configuration | Please run /kbffa arena create <name> <killBlock>")
+            return
+        }
+
+        val keys = arenaSection.getKeys(false)
+        var loadedCount = 0
+        for (key in keys) {
+            val location = locationFetcher(key)
+            if (location != null) {
+                loadedCount++
+            } else {
+                plugin.logger.warning("Failed to load arena $key")
             }
-            plugin.logger.info("Loaded $loadedCount arenas")
+        }
+        plugin.logger.info("⚔️ Loaded $loadedCount arenas")
+    }
+
+    fun switchArena() {
+        arenaConfig.load(File("${plugin.dataFolder}/arena.yml"))
+        val arenaSection = arenaConfig.getConfigurationSection("arenas")
+
+        if (arenaSection != null && arenaSection.getKeys(false).isNotEmpty()) {
+            val arenaName = arenaSection.getKeys(false).random()
+            val location = locationFetcher(arenaName)
+
+            if (location != null) {
+                currentArena = Arena(arenaName, location)
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    Bukkit.getOnlinePlayers().forEach { player ->
+                        player.teleport(location)
+                        player.message("<green>Teleported to arena <white>${arenaName}<green>!")
+                    }
+                    plugin.config.set("currentArena", arenaName)
+                    plugin.config.set("currentLocation", location)
+                    plugin.saveConfig()
+                })
+            } else {
+                clearArenaData()
+            }
+        } else {
+            clearArenaData()
         }
     }
 
-    suspend fun switchArena() {
-        withContext(Dispatchers.IO) {
-            arenaConfig.load(File("${plugin.dataFolder}/arena.yml")) // Reload the configuration
-            val arenaSection = arenaConfig.getConfigurationSection("arenas")
-            if (arenaSection != null && arenaSection.getKeys(false).isNotEmpty()) {
-                val arenaName = arenaSection.getKeys(false).random()
-                val location = locationFetcher(arenaName)
-                if (location != null) {
-                    currentArena = Arena(arenaName, location)
-                    Bukkit.getScheduler().runTask(plugin, Runnable {
-                        Bukkit.getOnlinePlayers().forEach { player ->
-                            player.teleport(location)
-                            player.message("<green>Teleported to arena <white>${arenaName}<green>!")
-                        }
-                        plugin.config.set("currentArena", arenaName)
-                        plugin.config.set("currentLocation", location)
-                        plugin.saveConfig()
-                    })
-                } else {
-                    Bukkit.getScheduler().runTask(plugin, Runnable {
-                        plugin.config.set("currentArena", null)
-                        plugin.config.set("currentLocation", null)
-                    })
-                }
-            } else {
-                Bukkit.getScheduler().runTask(plugin, Runnable {
-                    plugin.config.set("currentArena", null)
-                    plugin.config.set("currentLocation", null)
-                })
-            }
-        }
+    private fun clearArenaData() {
+        Bukkit.getScheduler().runTask(plugin, Runnable {
+            plugin.config.set("currentArena", null)
+            plugin.config.set("currentLocation", null)
+        })
     }
 
     internal fun locationFetcher(key: String): Location? {
@@ -103,9 +110,10 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         val pitch = arenaConfig.getDouble("arenas.$key.location.pitch")
         val world = worldName?.let { Bukkit.getWorld(it) }
         val killBlock = arenaConfig.getString("arenas.$key.killBlock") ?: Material.VOID_AIR.name
+
         return if (world != null) {
-            if(!killBlock.isEmpty()) {
-            Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
+            if (killBlock.isNotEmpty()) {
+                Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
             } else {
                 plugin.logger.warning("Failed to load arena $key: Kill block not found")
                 null

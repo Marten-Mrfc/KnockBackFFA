@@ -10,3 +10,8 @@ gradleEnterprise {
         termsOfServiceAgree = "yes"
     }
 }
+includeBuild("D:\\projects\\MLib") {
+    dependencySubstitution {
+        substitute(module("mlib.api:MLib")).using(project(":"))
+    }
+}

@@ -8,15 +8,12 @@ import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
-import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
-import dev.marten_mrfcyt.knockbackffa.guis.editor.KitModifier
+import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
+import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.message
-import dev.marten_mrfcyt.knockbackffa.utils.sendMini
-import lirand.api.dsl.command.builders.LiteralDSLBuilder
-import lirand.api.dsl.command.builders.command
+import mlib.api.commands.builders.LiteralDSLBuilder
+import mlib.api.commands.builders.command
+import mlib.api.utilities.*
 import org.bukkit.Registry
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
@@ -117,11 +114,11 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                     executes {
                         val name = getArgument<String>("name")
                         val lore = getArgument<String>("lore")
-                        KitModifier(KnockBackFFA()).kitEditor(
-                            source,
+                        EditKit(KnockBackFFA()).kitEditor(
+                            source as Player,
                             name.asMini(),
                             lore.asMini(),
-                            name.replace(" ", "_")
+                            name
                         )
                     }
                 }
@@ -135,13 +132,12 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         }
         literal("edit") {
             executes {
-                KitEditor(KnockBackFFA()).openKitCreationGui(source)
+                EditKitSelector(KnockBackFFA(), source as Player)
             }
         }
         literal("delete") {
             argument("name", string()) {
                 executes {
-                    KitModifier(KnockBackFFA()).deleteKit(source, getArgument("name"))
                 }
             }
             executes {
@@ -149,14 +145,14 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
             }
         }
         executes {
-            KitEditor(KnockBackFFA()).openKitCreationGui(source)
+            EditKitSelector(KnockBackFFA(), source as Player)
         }
     }
 }
 
 fun Plugin.kitSelectorCommand() = command("kit") {
     executes {
-        KitSelector(KnockBackFFA()).kitSelector(source)
+        KitSelector(KnockBackFFA(), source as Player)
     }
 }
 

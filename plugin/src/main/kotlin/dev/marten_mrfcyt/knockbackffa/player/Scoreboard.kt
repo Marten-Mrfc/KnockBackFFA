@@ -1,7 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
+import mlib.api.utilities.asMini
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Criteria
