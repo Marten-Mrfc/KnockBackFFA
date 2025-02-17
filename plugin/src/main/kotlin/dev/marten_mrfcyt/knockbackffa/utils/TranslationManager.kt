@@ -6,6 +6,9 @@ import java.io.File
 import java.util.*
 import kotlin.collections.get
 import kotlin.random.Random
+import kotlin.text.get
+import kotlin.text.isNotEmpty
+import kotlin.toString
 
 class TranslationManager(private val plugin: Plugin) {
     private val translations = mutableMapOf<Locale, Map<String, Any>>()
@@ -27,7 +30,37 @@ class TranslationManager(private val plugin: Plugin) {
         }
 
         fun translate(key: String, vararg args: Pair<String, Any>): String {
-            return instance.get(key, instance.configuredLocale, args.toMap().mapValues { it.value.toString() })
+            val message = instance.get(key, args = args.toMap().mapValues { it.value.toString() })
+            return if (message is List<*>) {
+                message.firstOrNull()?.toString() ?: ""
+            } else {
+                message.toString()
+            }.let { str ->
+                args.fold(str) { acc, (placeholder, value) ->
+                    acc.replace("<$placeholder>", value.toString())
+                }
+            }
+        }
+
+        fun getStringList(key: String, vararg args: Pair<String, Any>): List<String> {
+            val message = instance.get(key, args = args.toMap().mapValues { it.value.toString() })
+            return when (message) {
+                is List<*> -> message.mapNotNull { it?.toString() }.map { str ->
+                    args.fold(str) { acc, (placeholder, value) ->
+                        acc.replace("<$placeholder>", value.toString())
+                    }
+                }
+                else -> listOf(message.toString())
+            }
+        }
+
+        fun translateListRandom(key: String, vararg args: Pair<String, Any>): String {
+            val list = getStringList(key, *args)
+            return if (list.isNotEmpty()) {
+                list.random()
+            } else {
+                key
+            }
         }
 
         fun reload(plugin: Plugin) {
@@ -35,7 +68,7 @@ class TranslationManager(private val plugin: Plugin) {
         }
     }
 
-    private fun get(key: String, locale: Locale = configuredLocale, args: Map<String, String> = emptyMap()): String {
+    private fun get(key: String, locale: Locale = configuredLocale, args: Map<String, String> = emptyMap()): Any {
         val translation = translations[locale]?.get(key)
             ?: translations[defaultLocale]?.get(key)
             ?: key
@@ -43,9 +76,10 @@ class TranslationManager(private val plugin: Plugin) {
         if (translation == key) {
             plugin.logger.warning("Translation key '$key' not found for locale '${locale.language}'")
         }
+
         val message = if (translation is List<*>) {
             if (translation.isNotEmpty()) {
-                translation[Random.nextInt(translation.size)].toString()
+                translation
             } else {
                 "Empty list for message key '$key'"
             }
@@ -53,9 +87,7 @@ class TranslationManager(private val plugin: Plugin) {
             translation.toString()
         }
 
-        return args.entries.fold(message) { acc, (key, value) ->
-            acc.replace("<$key>", value)
-        }
+        return message
     }
 
     private fun loadConfiguredLanguage() {

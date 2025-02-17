@@ -4,7 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
-import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translateListRandom
 import mlib.api.utilities.*
 import org.bukkit.Location
 import org.bukkit.event.EventHandler
@@ -21,9 +21,9 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         val source = event.player
         val killer = source.killer
         if (killer != null) {
-            event.deathMessage((translate("player.killed_by_message", "player_name" to source.name, "killer_name" to killer.name)).asMini())
+            event.deathMessage((translateListRandom("player.killed_by_message", "player_name" to source.name, "killer_name" to killer.name)).asMini())
         } else {
-            event.deathMessage((translate("player.death_message", "player_name" to source.name)).asMini())
+            event.deathMessage((translateListRandom("player.death_message", "player_name" to source.name)).asMini())
         }
         source.inventory.clear()
         try {
