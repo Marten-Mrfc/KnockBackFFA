@@ -2,6 +2,8 @@ package dev.marten_mrfcyt.knockbackffa.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.*
+import mlib.api.forms.Form
+import mlib.api.forms.FormType
 import mlib.api.gui.Gui
 import mlib.api.gui.GuiSize
 import mlib.api.utilities.*
@@ -14,6 +16,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
+import kotlin.collections.set
 
 class EditKit(private val plugin: KnockBackFFA) {
     private val config = File("${plugin.dataFolder}/kits.yml")
@@ -51,13 +54,13 @@ class EditKit(private val plugin: KnockBackFFA) {
                 name("<gray>Edit Display Name".asMini())
                 description(listOf())
                 slots(0)
-                onClick { event -> editDisplayName(event) }
+                onClick { event -> editDisplayName(event, kitName) }
             }
             item(Material.BOOK) {
                 name("<gray>Edit Lore".asMini())
                 description(listOf())
                 slots(1)
-                onClick { event -> editLore(event) }
+                onClick { event -> editLore(event, kitName) }
             }
             item(Material.BARRIER) {
                 name("<gray>Go Back".asMini())
@@ -111,18 +114,28 @@ class EditKit(private val plugin: KnockBackFFA) {
         EditKitItemSelector(plugin, player, kitName).initialize()
     }
 
-    private fun editDisplayName(event: InventoryClickEvent) {
-        val item = event.currentItem ?: return
+    private fun editDisplayName(event: InventoryClickEvent, kitName: String) {
         val player = event.whoClicked as? Player ?: return
-        val kitName = getCustomValue(item.itemMeta, plugin, "kit_name") ?: return
-        player.sendMessage("Editing display name for kit: $kitName")
+
+        val form = Form("Enter the new display name for kit $kitName", FormType.STRING, 30) { p, response ->
+            kitConfig.set("kit.$kitName.show.DisplayName", (response as String))
+            kitConfig.save(config)
+            p.message("Display name updated!")
+            kitEditor(p, response.asMini(), kitConfig.getString("kit.$kitName.show.Lore")?.asMini() ?: "".asMini(), kitName, false)
+        }
+        form.show(player)
     }
 
-    private fun editLore(event: InventoryClickEvent) {
-        val item = event.currentItem ?: return
+    private fun editLore(event: InventoryClickEvent, kitName: String) {
         val player = event.whoClicked as? Player ?: return
-        val kitName = getCustomValue(item.itemMeta, plugin, "kit_name") ?: return
-        player.sendMessage("Editing lore for kit: $kitName")
+
+        val form = Form("Enter the new lore for kit $kitName", FormType.STRING, 30) { p, response ->
+            kitConfig.set("kit.$kitName.show.Lore", (response as String))
+            kitConfig.save(config)
+            p.message("Lore updated!")
+            kitEditor(p, kitConfig.getString("kit.$kitName.show.DisplayName")?.asMini() ?: "".asMini(), response.asMini(), kitName, false)
+        }
+        form.show(player)
     }
 
     private fun goBack(event: InventoryClickEvent) {

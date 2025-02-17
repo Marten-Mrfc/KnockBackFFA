@@ -104,7 +104,6 @@ class ItemModifierGUI(val plugin: KnockBackFFA, val source: Player, kitName: Str
         event.isCancelled = true
         val player = event.whoClicked as? Player ?: return
         ModifyHandler().handleModifier(player, kitName, slot, modifierId)
-        ItemModifierGUI(plugin, player, kitName, slot)
     }
 
     private fun handleDeleteItem(event: InventoryClickEvent, player: Player, kitName: String, slot: Int) {

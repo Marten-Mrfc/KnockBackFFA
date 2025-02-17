@@ -1,7 +1,11 @@
 package dev.marten_mrfcyt.knockbackffa.kits
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.guis.editor.ItemModifierGUI
 import dev.marten_mrfcyt.knockbackffa.utils.*
+import mlib.api.forms.Form
+import mlib.api.forms.FormType
+import mlib.api.gui.Gui
 import mlib.api.utilities.*
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
@@ -15,8 +19,6 @@ import org.bukkit.plugin.Plugin
 import org.reflections.Reflections
 import java.io.File
 import java.util.logging.Logger
-import kotlin.collections.set
-import kotlin.text.set
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.jvmName
@@ -29,8 +31,8 @@ abstract class ModifyObject(
     open val args: List<Pair<String, Class<*>>> = emptyList(),
     open val plugin: KnockBackFFA
 ) {
-
     abstract fun handle(player: Player, item: ItemStack, args: Map<String, Any>)
+
     fun createGuiItem(kitName: String, slot: Int, modifyObject: ModifyObject): ItemStack {
         val descriptionWithStatus = description.toMutableList()
         val kitConfig = YamlConfiguration.loadConfiguration(File("${plugin.dataFolder}/kits.yml"))
@@ -67,10 +69,12 @@ class ModifyHandler {
     private val plugin = KnockBackFFA.instance
     private val logger: Logger = plugin.logger
     private val modify = mutableMapOf<String, ModifyObject>()
+
     companion object {
         private val reflections: Reflections = Reflections("dev.marten_mrfcyt.knockbackffa.kits.modifiers")
         val classes = reflections.getSubTypesOf(ModifyObject::class.java)!!
     }
+
     init {
         try {
             for (clazz in classes) {
@@ -97,25 +101,62 @@ class ModifyHandler {
         slot: Int,
         modifierId: String
     ) {
-        println("Handling modifier")
         val config = File("${plugin.dataFolder}/kits.yml")
         val kitConfig = YamlConfiguration.loadConfiguration(config)
         val currentValue = kitConfig.getBoolean("kit.$kitName.items.$slot.modifiers.$modifierId", false)
         val modifyObject = getModifyObjects().find { it.id == modifierId }
-        println("Current value: $currentValue, modifyObject: $modifyObject")
+
         if (modifyObject != null && modifyObject.args.isNotEmpty() && !currentValue) {
-            player.closeInventory()
-            player.message("Please provide the following values for the modifier:")
-            modifyObject.args.forEach { arg -> player.message("${arg.first}:") }
+            handleModifierArgs(player, kitName, slot, modifyObject)
             return
         }
 
         if (modifyObject != null && modifyObject.args.isNotEmpty() && currentValue) {
-            modifyObject.args.forEach { arg -> kitConfig.set("kit.$kitName.items.$slot.modifiers.${arg.first}", null) }
+            modifyObject.args.forEach { arg ->
+                kitConfig.set("kit.$kitName.items.$slot.modifiers.${arg.first}", null)
+            }
         }
 
         kitConfig.set("kit.$kitName.items.$slot.modifiers.$modifierId", !currentValue)
         kitConfig.save(config)
+        ItemModifierGUI(plugin, player, kitName, slot)
+    }
+
+    private fun handleModifierArgs(player: Player, kitName: String, slot: Int, modifyObject: ModifyObject) {
+        var currentArgIndex = 0
+        val args = mutableMapOf<String, Any>()
+
+        fun processNextArg() {
+            if (currentArgIndex >= modifyObject.args.size) {
+                // All args collected, save to config
+                val config = File("${plugin.dataFolder}/kits.yml")
+                val kitConfig = YamlConfiguration.loadConfiguration(config)
+                args.forEach { (key, value) ->
+                    kitConfig.set("kit.$kitName.items.$slot.modifiers.$key", value)
+                }
+                kitConfig.set("kit.$kitName.items.$slot.modifiers.${modifyObject.id}", true)
+                kitConfig.save(config)
+                ItemModifierGUI(plugin, player, kitName, slot)
+                return
+            }
+
+            val (argName, argType) = modifyObject.args[currentArgIndex]
+            val formType = when (argType) {
+                Int::class.java -> FormType.INTEGER
+                Boolean::class.java -> FormType.BOOLEAN
+                else -> FormType.STRING
+            }
+
+            val form = Form("Enter value for $argName", formType, 30) { p, response ->
+                args[argName] = response
+                currentArgIndex++
+                processNextArg()
+            }
+            player.closeInventory()
+            form.show(player)
+        }
+
+        processNextArg()
     }
 
     fun handleEvent(player: Player, item: ItemStack?, args: Map<String, Any>, id: String) {
