@@ -2,8 +2,6 @@ package dev.marten_mrfcyt.knockbackffa
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.string
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
@@ -15,15 +13,17 @@ import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
 import mlib.api.commands.builders.command
 import mlib.api.utilities.*
+import org.bukkit.Material
 import org.bukkit.Registry
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
-import java.util.concurrent.CompletableFuture
+import java.io.File
 
 private val blockSuggestions: List<String> by lazy {
     Registry.MATERIAL.stream()
         .filter { it.isBlock }
-        .map { it.key.toString() }
+        .map { it.name }
         .toList()
 }
 
@@ -73,7 +73,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                         builder.build()
                     }
                     executes {
-                        plugin.createArena(source, getArgument("name"), getArgument("killBlock"))
+                        plugin.createArena(source, getArgument("name"), Material.valueOf(getArgument("killBlock")))
                     }
                 }
                 executes {
@@ -126,7 +126,8 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                             source as Player,
                             name.asMini(),
                             lore.asMini(),
-                            name
+                            name,
+                            true
                         )
                     }
                 }
@@ -146,6 +147,16 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         literal("delete") {
             argument("name", string()) {
                 executes {
+                    val name = getArgument<String>("name")
+                    val config = File("${plugin.dataFolder}/kits.yml")
+                    val kitConfig = YamlConfiguration.loadConfiguration(config)
+                    if (kitConfig.contains("kit.$name")) {
+                        kitConfig.set("kit.$name", null)
+                        kitConfig.save(config)
+                        source.message("Successfully deleted kit $name")
+                    } else {
+                        source.error("Kit $name does not exist!")
+                    }
                 }
             }
             executes {
