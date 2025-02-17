@@ -34,7 +34,7 @@ scoreboard:
     - '<gray><b>├</b></gray><white>Munten: </white><green>%knockbackffa_coins%</green>'
     - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
 bossbar:
-  format: "<green>Arena<gray>: <white><arena_name> <gray>| <yellow><time_left>"
+  format: "<white><arena_name> <gray>| <yellow><time_left>"
 arena:
   switch:
     success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
