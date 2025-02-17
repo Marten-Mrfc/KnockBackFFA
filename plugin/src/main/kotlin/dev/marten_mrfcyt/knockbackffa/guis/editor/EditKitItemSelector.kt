@@ -64,7 +64,6 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
                         in 0..8 -> slot.toInt() + 9
                         else -> return@forEach
                     }
-                    println("adding item to slot $adjustedSlot")
                     gui.item(item.type) {
                         name(itemMeta.displayName() ?: "".asMini())
                         description(itemMeta.lore()?.map { it } ?: listOf())
@@ -119,13 +118,9 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
     }
 
     private fun onItemClick(event: InventoryClickEvent, kitName: String) {
-        println("Item clicked")
         val item = event.currentItem ?: return
-        println("Item: $item")
         val slot = getCustomValue(item.itemMeta, plugin, "slot") as Int
-        println("Slot: $slot")
         val player = event.whoClicked as Player
-        println("Player: $player")
         ItemModifierGUI(plugin, player, kitName, slot)
     }
 

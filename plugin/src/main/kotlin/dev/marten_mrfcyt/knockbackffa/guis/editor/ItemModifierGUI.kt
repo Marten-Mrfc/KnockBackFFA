@@ -22,7 +22,6 @@ class ItemModifierGUI(val plugin: KnockBackFFA, val source: Player, kitName: Str
     private val inventoryTitle = "<!italic><gray>Editing slot:</gray><white> $slot".asMini()
 
     init {
-        println("ItemModifierGUI")
         val gui = Gui(inventoryTitle, GuiSize.ROW_TWO).apply {
             item(Material.GRAY_STAINED_GLASS_PANE) {
                 name(Component.text(""))
@@ -48,7 +47,6 @@ class ItemModifierGUI(val plugin: KnockBackFFA, val source: Player, kitName: Str
         }
         loadKitItem(gui, kitName, slot)
         loadModifyObjects(gui, kitName, slot)
-        println("ItemModifierGUI.open")
         gui.open(source)
     }
 
