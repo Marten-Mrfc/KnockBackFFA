@@ -20,6 +20,7 @@ import org.bukkit.inventory.meta.Damageable
 import org.bukkit.inventory.meta.ItemMeta
 import java.io.File
 import java.util.Locale
+import kotlin.text.set
 import kotlin.text.toInt
 
 class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: Player, private val kitName: String) {
@@ -167,7 +168,10 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
         itemSection.set("meta.unbreakable", clickedItem.itemMeta?.isUnbreakable)
         itemSection.set("meta.itemFlags", clickedItem.itemMeta?.itemFlags?.map { it.name })
         itemSection.set("meta.model", clickedItem.itemMeta?.customModelData)
-
+        val enchantmentsSection = itemSection.createSection("enchants")
+        clickedItem.itemMeta?.enchants?.forEach { (enchantment, level) ->
+            enchantmentsSection.set(enchantment.key.key, level)
+        }
         kitConfig.save(config)
 
         player.message("Item added to the kit in slot $slot.")

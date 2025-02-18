@@ -25,7 +25,7 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
     init {
         val gui = Gui("<gray>Please select a kit</gray>".asMini(), GuiSize.fromRows(inventorySize)).apply {
             kits?.forEachIndexed { index, kit ->
-                item(Material.CHEST) {
+                item(Material.valueOf(kitConfig.getString("kit.$kit.show.DisplayItem.item") ?: "BARRIER")) {
                     name("<!italic>${kitConfig.getString("kit.$kit.show.DisplayName")}".asMini())
                     description(listOf((kitConfig.getString("kit.$kit.show.Lore"))?.asMini() ?: "".asMini()))
                     slots(index)
