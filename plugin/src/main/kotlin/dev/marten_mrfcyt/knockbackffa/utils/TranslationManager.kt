@@ -103,9 +103,24 @@ class TranslationManager(private val plugin: Plugin) {
             langFolder.mkdirs()
         }
 
-        val defaultLangFile = File(langFolder, "en.yml")
-        if (!defaultLangFile.exists()) {
-            plugin.saveResource("lang/en.yml", false)
+        val resourceLangFolder = plugin.javaClass.classLoader.getResource("lang")
+        if (resourceLangFolder != null) {
+            val resourcePath = resourceLangFolder.path
+            val jarPath = resourcePath.substring(0, resourcePath.indexOf("!")).replace("file:", "")
+            val jarFile = java.util.jar.JarFile(jarPath)
+            val entries = jarFile.entries()
+
+            while (entries.hasMoreElements()) {
+                val entry = entries.nextElement()
+                if (entry.name.startsWith("lang/") && entry.name.endsWith(".yml")) {
+                    val resourceFileName = entry.name.substringAfterLast("/")
+                    val langFile = File(langFolder, resourceFileName)
+                    if (!langFile.exists()) {
+                        plugin.saveResource(entry.name, false)
+                        plugin.logger.info("Created language file $resourceFileName")
+                    }
+                }
+            }
         }
     }
 
