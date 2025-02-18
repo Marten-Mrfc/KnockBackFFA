@@ -27,6 +27,7 @@ private val blockSuggestions: List<String> by lazy {
         .map { it.name }
         .toList()
 }
+internal val bypassMode = mutableMapOf<Player, Boolean>()
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
     requiresPermissions("kbffa.command")
@@ -51,6 +52,15 @@ fun debug(source: Player) {
 }
 
 private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
+    literal("bypass") {
+        requiresPermissions("kbffa.bypass")
+        executes {
+            val player = source as Player
+            val isBypassing = bypassMode.getOrDefault(player, false)
+            bypassMode[player] = !isBypassing
+            source.message("Bypass mode: ${if (!isBypassing) "enabled" else "disabled"}")
+        }
+    }
     literal("debug") {
         requiresPermissions("kbffa.debug")
         executes {
