@@ -3,13 +3,14 @@ package dev.marten_mrfcyt.knockbackffa.arena
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.utilities.*
+import org.bukkit.Material
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 import java.io.File
 
-fun Plugin.createArena(source: CommandSender, name: String, killBlock: String) {
+fun Plugin.createArena(source: CommandSender, name: String, killBlock: Material) {
     if (source !is Player) {
         source.message(translate("error.player_only"))
         return

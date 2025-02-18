@@ -24,7 +24,7 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
         logger.info("┃      🚀 KnockBackFFA Start      ┃")
         logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
-
+        saveDefaultConfig()
         super.onEnable()
         instance = this
         TranslationManager.init(this)
@@ -55,10 +55,10 @@ class KnockBackFFA : KotlinPlugin() {
 
         registerCommands()
         registerEvents(
-            PlayerJoinListener(ScoreboardHandler(this)),
-            PlayerQuitListener(ScoreboardHandler(this)),
+            PlayerJoinListener(ScoreboardHandler(this), BossBarHandler(this)),
+            PlayerQuitListener(ScoreboardHandler(this), BossBarHandler(this)),
             ScoreHandler(this),
-            DeathBlock(this),
+            DeathBlock(),
             PlayerHandler(this),
         )
 

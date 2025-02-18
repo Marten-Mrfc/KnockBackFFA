@@ -10,10 +10,9 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 import java.util.concurrent.CompletableFuture
 
-data class Arena(val name: String, val location: Location, val killBlock: String = Material.VOID_AIR.name)
-
+data class Arena(val name: String, val location: Location, val killBlock: Material = Material.VOID_AIR)
+var currentArena: Arena? = null
 class ArenaHandler(private val plugin: KnockBackFFA) {
-    private var currentArena: Arena? = null
     private val arenaConfig: YamlConfiguration
 
     init {
@@ -33,7 +32,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             arenaConfig.set("arenas.${arena.name}.location.z", arena.location.z)
             arenaConfig.set("arenas.${arena.name}.location.yaw", arena.location.yaw)
             arenaConfig.set("arenas.${arena.name}.location.pitch", arena.location.pitch)
-            arenaConfig.set("arenas.${arena.name}.killBlock", arena.killBlock)
+            arenaConfig.set("arenas.${arena.name}.killBlock", arena.killBlock.name)
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
         })
     }
@@ -75,13 +74,13 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         if (arenaSection != null && arenaSection.getKeys(false).isNotEmpty()) {
             val arenaName = arenaSection.getKeys(false).random()
             val location = locationFetcher(arenaName)
-
+            val killBlock = arenaConfig.getString("arenas.$arenaName.killBlock") ?: Material.VOID_AIR.name
             if (location != null) {
-                currentArena = Arena(arenaName, location)
+                currentArena = Arena(arenaName, location, Material.valueOf(killBlock))
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     Bukkit.getOnlinePlayers().forEach { player ->
                         player.teleport(location)
-                        player.message(translate("arena.switch.success", "arena_name" to arenaName))
+                        player.message(translate("arena.switch.success", "arena_name" to (currentArena?.name ?: "unknown")))
                     }
                     plugin.config.set("currentArena", arenaName)
                     plugin.config.set("currentLocation", location)
@@ -100,6 +99,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             plugin.config.set("currentArena", null)
             plugin.config.set("currentLocation", null)
         })
+        currentArena = null
     }
 
     internal fun locationFetcher(key: String): Location? {

@@ -29,7 +29,7 @@ object DelayModifier : ModifyObject(
         val slot = (args["slot"] as? Int) ?: return
         val kitName = (args["kit_name"] as? String) ?: return
         val delay = kitConfig.getInt("kit.$kitName.items.$slot.modifiers.amount", 20)
-        player.setCooldown(item.type, delay)
+        player.setCooldown(item.type, delay * 20)
     }
 
     @EventHandler

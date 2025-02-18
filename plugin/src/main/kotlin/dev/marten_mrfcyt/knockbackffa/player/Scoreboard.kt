@@ -1,7 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.asMini
+import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.scoreboard.Criteria
@@ -11,54 +13,64 @@ import org.bukkit.scoreboard.Scoreboard
 import java.util.*
 
 class ScoreboardHandler(private val plugin: KnockBackFFA) {
-    private val playerScoreboards: MutableMap<UUID, Scoreboard> = mutableMapOf()
+    private val playerScoreboards = mutableMapOf<UUID, PlayerBoard>()
 
-    private fun createScoreboard(source: Player) {
+    private data class PlayerBoard(
+        val scoreboard: Scoreboard,
+        val objective: Objective,
+        val lastLines: MutableList<Component> = mutableListOf()
+    )
+
+    private fun createScoreboard(player: Player): PlayerBoard {
         val scoreboard = Bukkit.getScoreboardManager().newScoreboard
+        val title = TranslationManager.translate("scoreboard.title").asMini()
 
-        // Get configuration values
-        val title = plugin.config.getString("scoreboard.title")?.asMini()
-        val lines = plugin.config.getStringList("scoreboard.lines")
-
-        // Create objective
-        val objective: Objective = scoreboard.registerNewObjective("test", Criteria.DUMMY, title)
+        val objective = scoreboard.registerNewObjective("kbffa", Criteria.DUMMY, title)
         objective.displaySlot = DisplaySlot.SIDEBAR
 
-        // Set scores
-        for ((index) in lines.withIndex()) {
-            val score = objective.getScore("KnockBackFFA_$index")
-            score.score = lines.size - index
+        return PlayerBoard(scoreboard, objective).also {
+            playerScoreboards[player.uniqueId] = it
+            player.scoreboard = scoreboard
         }
-
-        // Store the scoreboard for this player
-        playerScoreboards[source.uniqueId] = scoreboard
-
-        // Display the scoreboard to the player
-        source.scoreboard = scoreboard
     }
 
-    private fun updateScoreboard(source: Player) {
-        val scoreboard = playerScoreboards[source.uniqueId]
-        val objective = scoreboard?.getObjective(DisplaySlot.SIDEBAR)
-        val lines = plugin.config.getStringList("scoreboard.lines")
+    private fun updateScoreboard(player: Player) {
+        val board = playerScoreboards[player.uniqueId] ?: return
+        val lines = TranslationManager.getStringList("scoreboard.lines")
+            .map { it.asMini(player) }
 
-        // Update scores
         for ((index, line) in lines.withIndex()) {
-            val score = objective?.getScore("KnockBackFFA_$index")
-            score?.customName(line.asMini(source))
+            val score = "line_${15 - index}"
+
+            if (index >= board.lastLines.size || !board.lastLines[index].equals(line)) {
+                board.scoreboard.resetScores(score)
+
+                val obj = board.objective.getScore(score)
+                obj.score = 15 - index
+                obj.customName(line)
+            }
         }
+
+        if (lines.size < board.lastLines.size) {
+            for (i in lines.size until board.lastLines.size) {
+                board.scoreboard.resetScores("line_${15 - i}")
+            }
+        }
+
+        board.lastLines.clear()
+        board.lastLines.addAll(lines)
     }
 
-    fun startUpdatingScoreboard(source: Player) {
-        // Create the scoreboard
-        createScoreboard(source)
+    fun startUpdatingScoreboard(player: Player) {
+        if (!plugin.config.getBoolean("scoreboard.enabled", true)) return
+        createScoreboard(player)
         Bukkit.getScheduler().runTaskTimer(plugin, Runnable {
-            updateScoreboard(source)
+            updateScoreboard(player)
         }, 0L, 10L)
     }
 
-    fun stopUpdatingScoreboard(source: Player) {
-        // Remove the scoreboard from the map
-        playerScoreboards.remove(source.uniqueId)
+    fun stopUpdatingScoreboard(player: Player) {
+        playerScoreboards.remove(player.uniqueId)
+        player.scoreboard = Bukkit.getScoreboardManager().mainScoreboard
     }
 }
