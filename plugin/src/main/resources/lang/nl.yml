@@ -19,7 +19,6 @@ player:
     - "<white><player_name><gray> ontmoette zijn einde dankzij <white><killer_name><gray>'s knockback!"
     - "<white><player_name><gray> werd van het platform geslingerd door <white><killer_name><gray>!"
     - "<white><player_name><gray> kon de kracht van <white><killer_name><gray>'s aanval niet weerstaan en viel!"
-
 scoreboard:
   title: ''
   lines:
@@ -34,10 +33,8 @@ scoreboard:
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Munten: </white><green>%knockbackffa_coins%</green>'
     - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
-
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
-
 arena:
   switch:
     success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
