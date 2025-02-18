@@ -20,6 +20,7 @@ import java.util.logging.Logger
 import kotlin.reflect.full.findAnnotation
 import kotlin.reflect.full.primaryConstructor
 import kotlin.reflect.jvm.jvmName
+import kotlin.text.get
 
 abstract class ModifyObject(
     open val id: String,
@@ -158,9 +159,10 @@ class ModifyHandler {
     }
 
     fun handleEvent(player: Player, item: ItemStack?, args: Map<String, Any>, id: String) {
-        item?.let {
-            modify[id]?.takeIf { checkCustomValue(item.itemMeta ?: return, plugin, "modify", id) }
-                ?.handle(player, it, args)
+        item?.itemMeta?.let { meta ->
+            if (checkCustomValue(meta, plugin, "modify", id)) {
+                modify[id]?.handle(player, item, args)
+            }
         }
     }
 

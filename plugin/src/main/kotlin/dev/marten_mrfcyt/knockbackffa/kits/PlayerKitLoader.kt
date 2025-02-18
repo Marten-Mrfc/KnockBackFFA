@@ -24,8 +24,8 @@ fun loadKit(plugin: KnockBackFFA, source: Player) {
             EditKitItemSelector(plugin, source, kit).loadItemData(itemSection, kit, false)?.let { item ->
                 val itemMeta = item.itemMeta
                 val modifiers = itemSection.getConfigurationSection("modifiers")
-                for (modifier in modifiers?.getKeys(false) ?: emptySet()) {
-                    val modifiersList = modifiers?.getKeys(false)?.toList() ?: emptyList()
+                modifiers?.getKeys(false)?.let { keys ->
+                    val modifiersList = keys.toList()
                     setCustomValue(itemMeta, plugin, "modify", modifiersList)
                 }
                 setCustomValue(itemMeta, plugin, "kit_name", kit)

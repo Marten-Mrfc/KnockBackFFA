@@ -39,6 +39,7 @@ class KnockBackFFA : KotlinPlugin() {
 
         try {
             saveDefaultConfig()
+            saveConfig()
         } catch (ex: IllegalArgumentException) {
             logger.severe("❌ Config error: ${ex.message}")
         }

@@ -30,7 +30,7 @@ val centralDependencies = listOf(
 )
 
 dependencies {
-    compileOnly("io.papermc.paper:paper-api:1.21.1-R0.1-SNAPSHOT")
+    compileOnly("io.papermc.paper:paper-api:1.21.4-R0.1-SNAPSHOT")
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("me.clip:placeholderapi:2.11.6")
