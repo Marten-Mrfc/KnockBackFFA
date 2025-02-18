@@ -17,7 +17,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     internal val mysqlHandler = MySQLHandler(storageConfig, plugin)
 
     init {
-        plugin.logger.info("Storage type: ${storageConfig.storageType}")
+        plugin.logger.info("📃 Storage type: ${storageConfig.storageType}")
         if (storageConfig.storageType.lowercase() == "mysql") {
             mysqlHandler.connect()
             createPlayerDataTable()
@@ -132,5 +132,29 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                 instance ?: PlayerData(plugin).also { instance = it }
             }
         }
+    }
+
+    fun getTotalKills(): Int {
+        // get via file or mysql
+        var totalKills = 0
+        if (storageConfig.storageType.lowercase() == "mysql") {
+            val connection: Connection? = mysqlHandler.getConnection()
+            if (connection != null) {
+                val query = "SELECT SUM(kills) FROM player_data"
+                val statement: PreparedStatement = connection.prepareStatement(query)
+                val resultSet: ResultSet = statement.executeQuery()
+                if (resultSet.next()) {
+                    totalKills = resultSet.getInt(1)
+                }
+                resultSet.close()
+                statement.close()
+            }
+        } else {
+            playerDataDirectory.listFiles()?.forEach { file ->
+                val playerData = YamlConfiguration.loadConfiguration(file)
+                totalKills += playerData.getInt("kills")
+            }
+        }
+        return totalKills
     }
 }

@@ -1,7 +1,7 @@
 kit:
   default:
     show:
-      DisplayName: <dark_gray>Default</dark_gray>
+      DisplayName: <dark_gray>Default
       Lore: <white>The default kit</white>
       DisplayItem:
         item: STICK
@@ -31,7 +31,7 @@ kit:
           itemFlags: []
         modifiers:
           delay: true
-          amount: 10
+          amount: 15
       '2':
         name: <dark_gray>Ender Pearl
         item: ENDER_PEARL
@@ -56,8 +56,10 @@ kit:
           unbreakable: false
           itemFlags: []
         modifiers:
-          jumpPad: true
           onKill: true
+          jumpPad: true
+          velocity: 2
+          delay: 2
       '8':
         name: <yellow>Building Blocks
         lore:

@@ -1,11 +1,11 @@
-package dev.marten_mrfcyt.knockbackffa.modifiers
+package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
-import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
 import me.clip.placeholderapi.PlaceholderAPI
+import mlib.api.utilities.getCustomValue
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -41,8 +41,8 @@ object ExecuteCommandModifier : ModifyObject(
         for (item in source.inventory.contents) {
             if (item == null) continue
             val itemMeta = item.itemMeta ?: continue
-            val slot = getCustomValue(itemMeta, plugin, "slot") as? Int ?: continue
             val kitName = getCustomValue(itemMeta, plugin, "kit_name") as? String ?: continue
+            val slot = getCustomValue(itemMeta, plugin, "slot") as? Int ?: continue
             val args = mapOf(
                 "slot" to slot,
                 "kit_name" to kitName

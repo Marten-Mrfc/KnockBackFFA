@@ -24,7 +24,7 @@ class PlaceHolderAPI(private val knockBackFFA: KnockBackFFA) : PlaceholderExpans
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {
         if (player == null) return null
-        val playerData = knockBackFFA.playerData.getPlayerData(player.uniqueId)
+        val playerData = PlayerData.getInstance(knockBackFFA).getPlayerData(player.uniqueId)
         return when (params) {
             "deaths" -> {
                 playerData.getInt("deaths", 0).toString()

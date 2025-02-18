@@ -1,8 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.message
-import dev.marten_mrfcyt.knockbackffa.utils.sendMini
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
+import mlib.api.utilities.*
 import org.bukkit.command.CommandSender
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -15,16 +14,21 @@ fun Plugin.listArena(source: CommandSender) {
         val arenaConfig = YamlConfiguration.loadConfiguration(config)
         val arenas = arenaConfig.getConfigurationSection("arenas")?.getKeys(false)
         if (arenas.isNullOrEmpty()) {
-            source.error("No arenas found!")
+            source.message(translate("arena.list.none"))
             return
         }
-        source.message("<bold>Arenas:<reset>")
+        source.message(translate("arena.list.header"))
         arenas.forEach {
             val location = arenaConfig.getConfigurationSection("arenas.$it.location")
-            source.sendMini("<white><bold>*</bold> <green>$it<reset> <gray>at <white>${location?.getString("world")}<dark_gray> (<gray>${"%.1f".format(location?.getDouble("x"))}<white> <gray>${"%.1f".format(location?.getDouble("y"))}<white> <gray>${"%.1f".format(location?.getDouble("z"))}<dark_gray>)<reset>")
+            source.sendMini(translate("arena.list.entry",
+                "arena_name" to it,
+                "world" to (location?.getString("world") ?: "unknown"),
+                "x" to "%.1f".format(location?.getDouble("x")),
+                "y" to "%.1f".format(location?.getDouble("y")),
+                "z" to "%.1f".format(location?.getDouble("z"))
+            ))
         }
-    }
-    else {
-        source.error("You must be a player to list arenas!")
+    } else {
+        source.message(translate("error.player_only"))
     }
 }

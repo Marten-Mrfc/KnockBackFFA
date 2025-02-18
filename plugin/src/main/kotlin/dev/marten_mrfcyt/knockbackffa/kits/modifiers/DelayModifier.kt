@@ -1,10 +1,10 @@
-package dev.marten_mrfcyt.knockbackffa.modifiers
+package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
-import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -29,7 +29,7 @@ object DelayModifier : ModifyObject(
         val slot = (args["slot"] as? Int) ?: return
         val kitName = (args["kit_name"] as? String) ?: return
         val delay = kitConfig.getInt("kit.$kitName.items.$slot.modifiers.amount", 20)
-        player.setCooldown(item.type, delay)
+        player.setCooldown(item.type, delay * 20)
     }
 
     @EventHandler

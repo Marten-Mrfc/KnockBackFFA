@@ -2,32 +2,32 @@ package dev.marten_mrfcyt.knockbackffa
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.string
-import com.mojang.brigadier.suggestion.Suggestions
-import com.mojang.brigadier.suggestion.SuggestionsBuilder
 import dev.marten_mrfcyt.knockbackffa.arena.createArena
 import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
 import dev.marten_mrfcyt.knockbackffa.arena.listArena
-import dev.marten_mrfcyt.knockbackffa.handlers.ArenaHandler
-import dev.marten_mrfcyt.knockbackffa.kits.KitEditor
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.guis.editor.KitSelector
-import dev.marten_mrfcyt.knockbackffa.utils.asMini
-import dev.marten_mrfcyt.knockbackffa.utils.error
-import dev.marten_mrfcyt.knockbackffa.utils.message
-import dev.marten_mrfcyt.knockbackffa.utils.sendMini
-import lirand.api.dsl.command.builders.LiteralDSLBuilder
-import lirand.api.dsl.command.builders.command
+import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
+import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
+import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
+import dev.marten_mrfcyt.knockbackffa.kits.listKits
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
+import mlib.api.commands.builders.LiteralDSLBuilder
+import mlib.api.commands.builders.command
+import mlib.api.utilities.*
+import org.bukkit.Material
 import org.bukkit.Registry
+import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
-import java.util.concurrent.CompletableFuture
+import java.io.File
 
 private val blockSuggestions: List<String> by lazy {
     Registry.MATERIAL.stream()
         .filter { it.isBlock }
-        .map { it.key.toString() }
+        .map { it.name }
         .toList()
 }
+internal val bypassMode = mutableMapOf<Player, Boolean>()
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
     requiresPermissions("kbffa.command")
@@ -52,10 +52,26 @@ fun debug(source: Player) {
 }
 
 private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
+    literal("bypass") {
+        requiresPermissions("kbffa.bypass")
+        executes {
+            val player = source as Player
+            val isBypassing = bypassMode.getOrDefault(player, false)
+            bypassMode[player] = !isBypassing
+            source.message("Bypass mode: ${if (!isBypassing) "enabled" else "disabled"}")
+        }
+    }
     literal("debug") {
         requiresPermissions("kbffa.debug")
         executes {
             debug(source as Player)
+        }
+    }
+    literal("reload") {
+        requiresPermissions("kbffa.reload")
+        executes {
+            TranslationManager.reload(plugin)
+            source.message("<green>Successfully reloaded translations!")
         }
     }
     literal("arena") {
@@ -68,7 +84,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                         builder.build()
                     }
                     executes {
-                        plugin.createArena(source, getArgument("name"), getArgument("killBlock"))
+                        plugin.createArena(source, getArgument("name"), Material.valueOf(getArgument("killBlock")))
                     }
                 }
                 executes {
@@ -87,7 +103,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         literal("delete") {
             argument("name", string()) {
                 suggests { builder ->
-                    getArenaNamesSuggestions(builder, arenaHandler)
+                    arenaHandler.getArenaNames().forEach { builder.suggest(it) }
                 }
                 executes {
                     plugin.deleteArena(source, getArgument("name"))
@@ -117,11 +133,12 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                     executes {
                         val name = getArgument<String>("name")
                         val lore = getArgument<String>("lore")
-                        KitModifier(KnockBackFFA()).kitEditor(
-                            source,
+                        EditKit(KnockBackFFA()).kitEditor(
+                            source as Player,
                             name.asMini(),
                             lore.asMini(),
-                            name.replace(" ", "_")
+                            name,
+                            true
                         )
                     }
                 }
@@ -135,13 +152,29 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         }
         literal("edit") {
             executes {
-                KitEditor(KnockBackFFA()).openKitCreationGui(source)
+                EditKitSelector(KnockBackFFA(), source as Player)
             }
         }
         literal("delete") {
             argument("name", string()) {
+                suggests { builder ->
+                    listKits(KnockBackFFA.instance).forEach { builder.suggest(it) }
+                }
                 executes {
-                    KitModifier(KnockBackFFA()).deleteKit(source, getArgument("name"))
+                    val name = getArgument<String>("name")
+                    if (name == "default") {
+                        source.error("You can't delete the default kit!")
+                    } else {
+                        val config = File("${plugin.dataFolder}/kits.yml")
+                        val kitConfig = YamlConfiguration.loadConfiguration(config)
+                        if (kitConfig.contains("kit.$name")) {
+                            kitConfig.set("kit.$name", null)
+                            kitConfig.save(config)
+                            source.message("Successfully deleted kit $name")
+                        } else {
+                            source.error("Kit $name does not exist!")
+                        }
+                    }
                 }
             }
             executes {
@@ -149,22 +182,13 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
             }
         }
         executes {
-            KitEditor(KnockBackFFA()).openKitCreationGui(source)
+            EditKitSelector(KnockBackFFA(), source as Player)
         }
     }
 }
 
 fun Plugin.kitSelectorCommand() = command("kit") {
     executes {
-        KitSelector(KnockBackFFA()).kitSelector(source)
-    }
-}
-
-fun getArenaNamesSuggestions(builder: SuggestionsBuilder, arenaHandler: ArenaHandler): CompletableFuture<Suggestions> {
-    return arenaHandler.getArenaNames().thenApply { names ->
-        names.forEach { name ->
-            builder.suggest(name)
-        }
-        builder.build()
+        KitSelector(KnockBackFFA(), source as Player)
     }
 }

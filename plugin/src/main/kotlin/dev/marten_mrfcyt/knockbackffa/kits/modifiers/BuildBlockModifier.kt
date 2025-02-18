@@ -1,10 +1,11 @@
-package dev.marten_mrfcyt.knockbackffa.modifiers
+package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.annotations.Modify
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.handlers.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.Modify
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
 import org.bukkit.Material
+import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -23,7 +24,7 @@ object BuildBlockModifier : ModifyObject(
         val itemInHand = item.type.name
         val baseItem = itemInHand.removePrefix("WHITE_").takeIf { itemInHand.startsWith("WHITE_") } ?: return
         val colors = listOf("WHITE", "YELLOW", "ORANGE", "RED", "AIR")
-        val block = args["block"] as? org.bukkit.block.Block ?: return
+        val block = args["block"] as? Block ?: return
 
         object : BukkitRunnable() {
             var counter = 0

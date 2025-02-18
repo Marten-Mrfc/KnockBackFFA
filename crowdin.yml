@@ -1,0 +1,4 @@
+files:
+  - source: /plugin/src/main/resources/lang/en.yml
+    translation: /plugin/src/main/resources/lang/%two_letters_code%.yml
+    multilingual: 1
