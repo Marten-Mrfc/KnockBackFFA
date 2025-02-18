@@ -9,6 +9,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
+import dev.marten_mrfcyt.knockbackffa.kits.listKits
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
 import mlib.api.commands.builders.command
@@ -146,16 +147,23 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         }
         literal("delete") {
             argument("name", string()) {
+                suggests { builder ->
+                    listKits(KnockBackFFA.instance).forEach { builder.suggest(it) }
+                }
                 executes {
                     val name = getArgument<String>("name")
-                    val config = File("${plugin.dataFolder}/kits.yml")
-                    val kitConfig = YamlConfiguration.loadConfiguration(config)
-                    if (kitConfig.contains("kit.$name")) {
-                        kitConfig.set("kit.$name", null)
-                        kitConfig.save(config)
-                        source.message("Successfully deleted kit $name")
+                    if (name == "default") {
+                        source.error("You can't delete the default kit!")
                     } else {
-                        source.error("Kit $name does not exist!")
+                        val config = File("${plugin.dataFolder}/kits.yml")
+                        val kitConfig = YamlConfiguration.loadConfiguration(config)
+                        if (kitConfig.contains("kit.$name")) {
+                            kitConfig.set("kit.$name", null)
+                            kitConfig.save(config)
+                            source.message("Successfully deleted kit $name")
+                        } else {
+                            source.error("Kit $name does not exist!")
+                        }
                     }
                 }
             }

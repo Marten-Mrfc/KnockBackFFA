@@ -10,7 +10,7 @@ import java.io.File
 import java.util.logging.Level
 
 fun loadKit(plugin: KnockBackFFA, source: Player) {
-    val config = File(KnockBackFFA.instance.dataFolder, "kits.yml")
+    val config = File(plugin.dataFolder, "kits.yml")
     val kitConfig = YamlConfiguration.loadConfiguration(config)
     val playerData = PlayerData.getInstance(plugin).getPlayerData(source.uniqueId)
     val kit = playerData.getString("kit")
@@ -40,4 +40,10 @@ fun loadKit(plugin: KnockBackFFA, source: Player) {
         PlayerData.getInstance(plugin).savePlayerData(source.uniqueId, playerData)
         loadKit(plugin, source)
     }
+}
+
+fun listKits(plugin: KnockBackFFA): List<String> {
+    val config = File(plugin.dataFolder, "kits.yml")
+    val kitConfig = YamlConfiguration.loadConfiguration(config)
+    return kitConfig.getConfigurationSection("kit")?.getKeys(false)?.toList() ?: emptyList()
 }
