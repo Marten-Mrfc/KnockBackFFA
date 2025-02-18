@@ -3,7 +3,7 @@ version: '0.4.0'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 api-version: '1.21.4'
 authors: [Marten_Mrfcyt]
-description: The best KnockBackFFA plugin!
+description: A feature-rich KnockBack FFA (Free For All) plugin for Minecraft servers.
 dependencies:
   server:
     PlaceholderAPI:
