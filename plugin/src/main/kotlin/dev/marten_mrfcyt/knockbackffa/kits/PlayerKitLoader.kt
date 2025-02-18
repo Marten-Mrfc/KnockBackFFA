@@ -3,7 +3,7 @@ package dev.marten_mrfcyt.knockbackffa.kits
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitItemSelector
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
-import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
+import mlib.api.utilities.setCustomValue
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File

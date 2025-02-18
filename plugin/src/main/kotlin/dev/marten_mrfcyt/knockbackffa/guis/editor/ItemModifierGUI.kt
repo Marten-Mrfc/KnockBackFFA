@@ -2,7 +2,6 @@ package dev.marten_mrfcyt.knockbackffa.guis.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
 import mlib.api.gui.Gui
 import mlib.api.gui.GuiSize
 import mlib.api.utilities.*

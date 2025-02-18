@@ -4,8 +4,8 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.Modify
 import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
-import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
 import me.clip.placeholderapi.PlaceholderAPI
+import mlib.api.utilities.getCustomValue
 import org.bukkit.Bukkit
 import org.bukkit.Material
 import org.bukkit.entity.Player

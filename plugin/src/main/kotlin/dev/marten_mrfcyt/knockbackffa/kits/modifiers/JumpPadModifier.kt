@@ -4,8 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.Modify
 import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
 import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
-import dev.marten_mrfcyt.knockbackffa.utils.getCustomValue
-import dev.marten_mrfcyt.knockbackffa.utils.setCustomValue
+import mlib.api.utilities.getCustomValue
 import mlib.api.utilities.message
 import org.bukkit.Material
 import org.bukkit.block.Block
