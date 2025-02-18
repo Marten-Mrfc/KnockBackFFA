@@ -117,7 +117,7 @@ class TranslationManager(private val plugin: Plugin) {
                     val langFile = File(langFolder, resourceFileName)
                     if (!langFile.exists()) {
                         plugin.saveResource(entry.name, false)
-                        plugin.logger.info("Created language file $resourceFileName")
+                        plugin.logger.info("🏗️ Created language file $resourceFileName")
                     }
                 }
             }
@@ -138,9 +138,9 @@ class TranslationManager(private val plugin: Plugin) {
                         }
                     }
                 translations[locale] = loadedTranslations
-                plugin.logger.info("Loaded ${loadedTranslations.size} translations for locale '${locale.language}'")
+                plugin.logger.info("✔️ Loaded ${loadedTranslations.size} translations for locale '${locale.language}'")
             } catch (e: Exception) {
-                plugin.logger.warning("Failed to load language file ${file.name}: ${e.message}")
+                plugin.logger.warning("❌ Failed to load language file ${file.name}: ${e.message}")
             }
         }
     }

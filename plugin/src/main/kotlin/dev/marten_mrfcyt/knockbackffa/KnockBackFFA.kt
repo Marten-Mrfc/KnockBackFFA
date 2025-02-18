@@ -3,9 +3,11 @@ package dev.marten_mrfcyt.knockbackffa
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.DeathBlock
 import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
+import dev.marten_mrfcyt.knockbackffa.kits.listKits
 import dev.marten_mrfcyt.knockbackffa.player.*
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import mlib.api.architecture.KotlinPlugin
+import mlib.api.architecture.extensions.registerEvents
 import org.bukkit.Bukkit
 import org.bukkit.event.Listener
 import java.io.File
@@ -21,30 +23,18 @@ class KnockBackFFA : KotlinPlugin() {
 
     lateinit var arenaHandler: ArenaHandler
     override fun onEnable() {
+        super.onEnable()
+        instance = this
+
         logger.info("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
         logger.info("┃      🚀 KnockBackFFA Start      ┃")
         logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
-        saveDefaultConfig()
-        super.onEnable()
-        instance = this
-        TranslationManager.init(this)
-        if (isEnabled) {
-            arenaHandler = ArenaHandler(this)
-        }
-        val kitConfig = File(dataFolder, "kits.yml")
 
-        PlayerData.getInstance(this)
-
-        if (!dataFolder.exists() && !dataFolder.mkdir()) {
-            logger.severe("❌ Failed to create data folder!")
-            return
-        }
-
-        if (!kitConfig.exists()) {
-            logger.warning("⚠️ kits.yml not found, creating...")
-            saveResource("kits.yml", false)
-        } else {
-            logger.info("📁 kits.yml loaded")
+        if (!dataFolder.exists()) {
+            logger.info("1️⃣ First time setup: Extra logging of file creations!")
+            logger.warning("⚠️ Data folder not found, creating...")
+            dataFolder.mkdirs()
+            logger.info("📁 Data folder created")
         }
 
         try {
@@ -53,8 +43,19 @@ class KnockBackFFA : KotlinPlugin() {
             logger.severe("❌ Config error: ${ex.message}")
         }
 
+        TranslationManager.init(this)
+        if (isEnabled) { arenaHandler = ArenaHandler(this) }
+        PlayerData.getInstance(this)
+
+        val kitConfig = File(dataFolder, "kits.yml")
+        if (!kitConfig.exists()) {
+            logger.warning("⚠️ kits.yml not found, creating...")
+            saveResource("kits.yml", false)
+            logger.info("📁 kits.yml created")
+        }
+        logger.info("🦾 Loaded ${listKits(this).size} kits")
         registerCommands()
-        registerEvents(
+        registerEvent(
             PlayerJoinListener(ScoreboardHandler(this), BossBarHandler(this)),
             PlayerQuitListener(ScoreboardHandler(this), BossBarHandler(this)),
             ScoreHandler(this),
@@ -87,11 +88,9 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("✅ Commands ready")
     }
 
-    private fun registerEvents(vararg listeners: Listener) {
-        val pluginManager = Bukkit.getPluginManager()
-        listeners.forEach { listener ->
-            pluginManager.registerEvents(listener, this)
-        }
+    private fun registerEvent(vararg listeners: Listener) {
+        logger.info("🔧 Registering events...")
+        registerEvents(*listeners)
         logger.info("📌 ${listeners.size} events registered")
     }
 
