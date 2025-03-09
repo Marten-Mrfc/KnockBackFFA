@@ -43,7 +43,6 @@ class KnockBackFFA : KotlinPlugin() {
         } catch (ex: IllegalArgumentException) {
             logger.severe("❌ Config error: ${ex.message}")
         }
-
         TranslationManager.init(this)
         if (isEnabled) { arenaHandler = ArenaHandler(this) }
         PlayerData.getInstance(this)
@@ -55,6 +54,12 @@ class KnockBackFFA : KotlinPlugin() {
             logger.info("📁 kits.yml created")
         }
         logger.info("🦾 Loaded ${listKits(this).size} kits")
+        val shopConfig = File(dataFolder, "shop.yml")
+        if (!shopConfig.exists()) {
+            logger.warning("⚠️ shop.yml not found, creating...")
+            saveResource("shop.yml", false)
+            logger.info("📁 shop.yml created")
+        }
         registerCommands()
         registerEvent(
             PlayerJoinListener(ScoreboardHandler(this), BossBarHandler(this)),
@@ -86,6 +91,7 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("🔧 Setting up commands...")
         kbffaCommand(arenaHandler)
         kitSelectorCommand()
+        shopCommand()
         logger.info("✅ Commands ready")
     }
 

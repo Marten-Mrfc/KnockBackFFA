@@ -9,6 +9,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
+import dev.marten_mrfcyt.knockbackffa.guis.shop.ShopGUI
 import dev.marten_mrfcyt.knockbackffa.kits.listKits
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
@@ -190,5 +191,11 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
 fun Plugin.kitSelectorCommand() = command("kit") {
     executes {
         KitSelector(KnockBackFFA(), source as Player)
+    }
+}
+
+fun Plugin.shopCommand() = command("shop") {
+    executes {
+        ShopGUI(KnockBackFFA.instance, source as Player)
     }
 }

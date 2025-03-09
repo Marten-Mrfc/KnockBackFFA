@@ -67,3 +67,13 @@ arena:
     killblock_null: "Kill block is null for arena: <arena_name>"
 error:
   player_only: "<red>You must be a player to perform this action!"
+shop:
+  already_purchased: "<red>You already own this item!"
+  insufficient_funds: "<red>You don't have enough coins to purchase this item!"
+  purchase_success: "<green>You successfully purchased <gold>{item_name}</gold>!"
+  balance: "<yellow>Your Balance: {balance} coins"
+  refresh: "<gray>Click to refresh"
+  back_to_categories: "<gray>Back to Categories"
+  click_to_go_back: "<gray>Click to go back"
+  owned: "<green>✓ Owned"
+  click_to_purchase: "<yellow>Click to purchase"
