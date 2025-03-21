@@ -5,8 +5,6 @@ kit:
       Lore: <white>The default kit</white>
       DisplayItem:
         item: STICK
-        enchants:
-          KNOCKBACK: 2
     items:
       '0':
         name: <dark_gray>KnockBack Stick

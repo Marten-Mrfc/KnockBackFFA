@@ -10,7 +10,6 @@ import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.shop.ShopGUI
-import dev.marten_mrfcyt.knockbackffa.kits.listKits
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
 import mlib.api.commands.builders.command
@@ -159,7 +158,7 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         literal("delete") {
             argument("name", string()) {
                 suggests { builder ->
-                    listKits(KnockBackFFA.instance).forEach { builder.suggest(it) }
+                    KnockBackFFA.kitManager.getAllKitNames().forEach { builder.suggest(it) }
                 }
                 executes {
                     val name = getArgument<String>("name")

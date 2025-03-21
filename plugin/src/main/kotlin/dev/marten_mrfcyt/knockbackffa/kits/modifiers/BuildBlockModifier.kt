@@ -1,9 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
+import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.Modify
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -12,7 +12,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
-@Modify("buildBlock")
+@KitModifier("buildBlock")
 object BuildBlockModifier : ModifyObject(
     id = "buildBlock",
     name = "<white>Build Block Modifier",
@@ -42,7 +42,7 @@ object BuildBlockModifier : ModifyObject(
     @EventHandler
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
         val args = mapOf("block" to event.block)
-        ModifyHandler().handleEvent(event.player, event.itemInHand, args, id)
-        ModifyHandler().handleEvent(event.player, event.itemInHand, args, "infinite")
+        KnockBackFFA.instance.modifierManager.handleEvent(event.player, event.itemInHand, args, id)
+        KnockBackFFA.instance.modifierManager.handleEvent(event.player, event.itemInHand, args, "infinite")
     }
 }

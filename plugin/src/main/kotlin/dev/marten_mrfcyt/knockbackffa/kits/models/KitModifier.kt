@@ -1,4 +1,4 @@
-package dev.marten_mrfcyt.knockbackffa.kits
+package dev.marten_mrfcyt.knockbackffa.kits.models
 
 /**
  * Annotation to define a modifier for an item.
@@ -7,6 +7,6 @@ package dev.marten_mrfcyt.knockbackffa.kits
  */
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
 @Retention(AnnotationRetention.RUNTIME)
-annotation class Modify(
+annotation class KitModifier(
     val id: String,
 )

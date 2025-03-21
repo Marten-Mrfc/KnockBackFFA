@@ -2,8 +2,8 @@ package dev.marten_mrfcyt.knockbackffa
 
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.DeathBlock
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.listKits
+import dev.marten_mrfcyt.knockbackffa.kits.managers.KitManager
+import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import dev.marten_mrfcyt.knockbackffa.player.*
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import mlib.api.architecture.KotlinPlugin
@@ -17,10 +17,12 @@ class KnockBackFFA : KotlinPlugin() {
     companion object {
         lateinit var instance: KnockBackFFA
             private set
+        lateinit var kitManager: KitManager
+            private set
         var lastSwitchTime: Instant = Instant.now()
         var nextSwitchTime: Instant = Instant.now()
     }
-
+    lateinit var modifierManager: ModifierManager
     lateinit var arenaHandler: ArenaHandler
     override fun onEnable() {
         super.onEnable()
@@ -46,14 +48,7 @@ class KnockBackFFA : KotlinPlugin() {
         TranslationManager.init(this)
         if (isEnabled) { arenaHandler = ArenaHandler(this) }
         PlayerData.getInstance(this)
-
-        val kitConfig = File(dataFolder, "kits.yml")
-        if (!kitConfig.exists()) {
-            logger.warning("⚠️ kits.yml not found, creating...")
-            saveResource("kits.yml", false)
-            logger.info("📁 kits.yml created")
-        }
-        logger.info("🦾 Loaded ${listKits(this).size} kits")
+        startupKits()
         val shopConfig = File(dataFolder, "shop.yml")
         if (!shopConfig.exists()) {
             logger.warning("⚠️ shop.yml not found, creating...")
@@ -71,9 +66,9 @@ class KnockBackFFA : KotlinPlugin() {
 
         startArenaHandler(this.config.getInt("mapDuration", 60))
         setupPlaceholders()
-
-        ModifyHandler().registerEvents(this)
-        logger.info("⚙️ ${ModifyHandler().getModifyObjects().size} modify objects loaded")
+        modifierManager = ModifierManager()
+        modifierManager.registerEvents(this)
+        logger.info("⚙️ ${modifierManager.getModifyObjects().size} modify objects loaded")
 
         BStatsMetrics.registerMetrics()
 
@@ -86,7 +81,16 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("💤 KnockBackFFA disabled")
         PlayerData.getInstance(this).mysqlHandler.disconnect()
     }
-
+    private fun startupKits() {
+        val kitConfig = File(dataFolder, "kits.yml")
+        if (!kitConfig.exists()) {
+            logger.warning("⚠️ kits.yml not found, creating...")
+            saveResource("kits.yml", false)
+            logger.info("📁 kits.yml created")
+        }
+        kitManager = KitManager(this)
+        logger.info("🦾 Loaded ${kitManager.getAllKitNames().size} kits")
+    }
     private fun registerCommands() {
         logger.info("🔧 Setting up commands...")
         kbffaCommand(arenaHandler)

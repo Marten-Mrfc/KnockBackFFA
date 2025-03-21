@@ -1,121 +1,71 @@
+// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/editor/EditKitItemSelector.kt
 package dev.marten_mrfcyt.knockbackffa.guis.editor
 
+import KitItem
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import mlib.api.gui.Gui
-import dev.marten_mrfcyt.knockbackffa.utils.*
-import io.papermc.paper.registry.RegistryAccess
-import io.papermc.paper.registry.RegistryKey
-import io.papermc.paper.registry.TypedKey
-import mlib.api.gui.GuiSize
+import mlib.api.gui.types.StandardGui
+import mlib.api.gui.types.builder.StandardGuiBuilder
 import mlib.api.utilities.*
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.configuration.ConfigurationSection
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.inventory.ItemFlag
-import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.Damageable
-import org.bukkit.inventory.meta.ItemMeta
-import java.io.File
-import java.util.Locale
-import kotlin.text.set
-import kotlin.text.toInt
 
 class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: Player, private val kitName: String) {
-    private val config = File("${plugin.dataFolder}/kits.yml")
-    private val kitConfig = YamlConfiguration.loadConfiguration(config)
     private val inventoryTitle = "<!italic><gray>Editing kit:</gray><white> $kitName".asMini()
 
     fun initialize() {
-        val gui = Gui(inventoryTitle, GuiSize.ROW_TWO).apply {
-            item(Material.GRAY_STAINED_GLASS_PANE) {
-                name("<gray>Click to edit slot</gray>".asMini())
-                description(listOf("<dark_purple>Drag an item onto me".asMini(), "<dark_purple>to change me completely!".asMini()))
-                slots(0, 1, 2, 3, 4, 5, 6,7, 9, 10, 11, 12, 13, 14, 15, 16, 17)
-                onClick { event -> addNewItem(event, kitName) }
+        val gui = StandardGuiBuilder()
+            .title(inventoryTitle)
+            .size(mlib.api.gui.GuiSize.ROW_TWO)
+            .setup { standardGui ->
+                standardGui.item(Material.GRAY_STAINED_GLASS_PANE) {
+                    name("<gray>Click to edit slot</gray>".asMini())
+                    description(listOf("<dark_purple>Drag an item onto me".asMini(), "<dark_purple>to change me completely!".asMini()))
+                    slots(0, 1, 2, 3, 4, 5, 6, 7, 9, 10, 11, 12, 13, 14, 15, 16, 17)
+                    onClick { event -> addNewItem(event, kitName) }
+                }
+
+                loadKitItems(standardGui, kitName)
+
+                standardGui.item(Material.BARRIER) {
+                    name("<!italic><gray>Go Back".asMini())
+                    description(listOf("Go back to the previous menu".asMini()))
+                    slots(8)
+                    onClick { event -> onGoBackClick(event, kitName) }
+                }
             }
-            loadKitItems(this, kitName)
-            item(Material.BARRIER) {
-                name("<!italic><gray>Go Back".asMini())
-                description(listOf("Go back to the previous menu".asMini()))
-                slots(8)
-                onClick { event -> onGoBackClick(event, kitName) }
-            }
-        }
+            .build()
+
         gui.open(source)
     }
 
-    private fun loadKitItems(gui: Gui, kitName: String) {
-        val kitItemsSection = kitConfig.getConfigurationSection("kit.$kitName.items")
-        kitItemsSection?.getKeys(false)?.forEach { slot ->
-            val itemSection = kitItemsSection.getConfigurationSection(slot)
-            if (itemSection != null) {
-                val item = loadItemData(itemSection, kitName, true)
-                val itemMeta = item?.itemMeta
-                if (itemMeta != null) {
-                    setCustomValue(itemMeta, plugin, "type", "edit_kit_item")
-                    setCustomValue(itemMeta, plugin, "kit_name", kitName)
-                    setCustomValue(itemMeta, plugin, "slot", slot.toInt())
-                    item.itemMeta = itemMeta
+    private fun loadKitItems(gui: StandardGui, kitName: String) {
+        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
 
-                    val adjustedSlot = when (slot.toInt()) {
-                        in 9..18 -> slot.toInt() - 9
-                        in 0..8 -> slot.toInt() + 9
-                        else -> return@forEach
-                    }
-                    gui.item(item.type) {
-                        name(itemMeta.displayName() ?: "".asMini())
-                        description(itemMeta.lore()?.map { it } ?: listOf())
-                        amount(item.amount)
-                        slots(adjustedSlot)
-                        onClick { event -> onItemClick(event, kitName) }
-                        meta(itemMeta)
-                    }
-                }
+        kit.items.forEach { (slot, kitItem) ->
+            val item = kitItem.build(plugin)
+            val itemMeta = item.itemMeta
+
+            setCustomValue(itemMeta, plugin, "type", "edit_kit_item")
+            setCustomValue(itemMeta, plugin, "kit_name", kitName)
+            setCustomValue(itemMeta, plugin, "slot", slot)
+            item.itemMeta = itemMeta
+
+            val adjustedSlot = when (slot) {
+                in 9..18 -> slot - 9
+                in 0..8 -> slot + 9
+                else -> return@forEach
+            }
+
+            gui.item(item.type) {
+                name(itemMeta.displayName() ?: "".asMini())
+                description(itemMeta.lore()?.map { it } ?: listOf())
+                amount(item.amount)
+                slots(adjustedSlot)
+                onClick { event -> onItemClick(event, kitName) }
+                meta(itemMeta)
             }
         }
-    }
-
-    fun loadItemData(itemSelector: ConfigurationSection?, kitName: String, gui: Boolean): ItemStack? {
-        val itemName = "<!italic>${itemSelector?.getString("name")}".asMini()
-        val itemType = itemSelector?.getString("item")?.let { Material.getMaterial(it) }
-        val itemAmount = itemSelector?.getInt("amount")
-        val itemMetaModel = itemSelector?.getInt("meta.model")
-        val itemMetaDurability = itemSelector?.getInt("meta.durability")
-        val itemMetaUnbreakable = itemSelector?.getBoolean("meta.unbreakable")
-        val itemMetaItemFlags = itemSelector?.getStringList("meta.itemFlags")?.map { ItemFlag.valueOf(it) }
-        val enchantments = itemSelector?.getConfigurationSection("enchants")
-
-        val itemStack = itemType?.let { ItemStack(it, itemAmount ?: 0) }
-        val itemMeta: ItemMeta = itemStack?.itemMeta ?: return null
-        itemMeta.lore(
-            if (gui) {
-                val line = "<gray>------------------<reset>".asMini()
-                val toplore = "<dark_purple>Drag an item onto me".asMini()
-                val bottomlore = "<dark_purple>to change me completely!".asMini()
-                val lore = itemSelector.getStringList("lore").map { it.asMini() }
-                lore.plus(line).plus(toplore).plus(bottomlore)
-            } else {
-                itemSelector.getStringList("lore").map { it.asMini() }
-            })
-        itemMeta.displayName(itemName)
-        itemMeta.setCustomModelData(itemMetaModel)
-        if (itemMeta is Damageable) {
-            if (itemMetaDurability != null) {
-                itemMeta.damage = itemMetaDurability
-            }
-        }
-        if (itemMetaUnbreakable != null) {
-            itemMeta.isUnbreakable = itemMetaUnbreakable
-        }
-        itemMetaItemFlags?.forEach { itemMeta.addItemFlags(it) }
-        enchantments?.let { getEnchantments(it, itemMeta) }
-        setCustomValue(itemMeta, plugin, "kit_name", kitName)
-        itemStack.itemMeta = itemMeta
-
-        return itemStack
     }
 
     private fun onItemClick(event: InventoryClickEvent, kitName: String) {
@@ -126,55 +76,80 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
     }
 
     private fun onGoBackClick(event: InventoryClickEvent, kitName: String) {
-        val lore = kitConfig.getString("kit.$kitName.show.lore")
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
         (event.whoClicked as? Player)?.apply {
-            EditKit(plugin).kitEditor(this, kitName.asMini(), lore?.asMini() ?: "".asMini(), kitName, new = false)
+            EditKit(plugin).kitEditor(this, kit?.displayName?.asMini() ?: kitName.asMini(),
+                kit?.description?.asMini() ?: "".asMini(), kitName, new = false)
         }
     }
 
-    fun getEnchantments(enchantments: ConfigurationSection?, itemMeta: ItemMeta) {
-        val enchantmentRegistry = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT)
+private fun addNewItem(event: InventoryClickEvent, kitName: String) {
+    val player = event.whoClicked as? Player ?: return
+    val clickedItem = event.cursor
 
-        enchantments?.getKeys(false)?.forEach { enchantmentKey ->
-            val namespacedKey = NamespacedKey.minecraft(enchantmentKey.lowercase(Locale.getDefault()))
-
-            val enchantment = enchantmentRegistry.getOrThrow(TypedKey.create(RegistryKey.ENCHANTMENT, namespacedKey))
-            val level = enchantments.getInt(enchantmentKey)
-
-            itemMeta.addEnchant(enchantment, level, true)
-        }
+    if (clickedItem.type == Material.AIR) {
+        return
     }
 
-    private fun addNewItem(event: InventoryClickEvent, kitName: String) {
-        val player = event.whoClicked as? Player ?: return
-        val clickedItem = event.cursor
-        val slot = event.slot
+    val slot = event.slot
+    event.isCancelled = true
 
-        event.isCancelled = true
-
-        val adjustedSlot = when (slot.toInt()) {
-            in 9..18 -> slot.toInt() - 9
-            in 0..8 -> slot.toInt() + 9
-            else -> return
-        }
-
-        val itemSection = kitConfig.createSection("kit.$kitName.items.$adjustedSlot")
-        itemSection.set("name", clickedItem.itemMeta?.displayName()?.notMiniText())
-        itemSection.set("lore", clickedItem.itemMeta?.lore()?.map { it.notMiniText() })
-        itemSection.set("item", clickedItem.type.name)
-        itemSection.set("amount", clickedItem.amount)
-        itemSection.set("meta.durability", (clickedItem.itemMeta as? Damageable)?.damage)
-        itemSection.set("meta.unbreakable", clickedItem.itemMeta?.isUnbreakable)
-        itemSection.set("meta.itemFlags", clickedItem.itemMeta?.itemFlags?.map { it.name })
-        itemSection.set("meta.model", clickedItem.itemMeta?.customModelData)
-        val enchantmentsSection = itemSection.createSection("enchants")
-        clickedItem.itemMeta?.enchants?.forEach { (enchantment, level) ->
-            enchantmentsSection.set(enchantment.key.key, level)
-        }
-        kitConfig.save(config)
-
-        player.message("Item added to the kit in slot $slot.")
-
-        EditKitItemSelector(plugin, player, kitName).initialize()
+    val adjustedSlot = when (slot) {
+        in 9..18 -> slot - 9
+        in 0..8 -> slot + 9
+        else -> return
     }
+
+    val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+
+    // Get item metadata
+    val meta = clickedItem.itemMeta
+
+    // Properly extract name and lore as plain strings
+    val itemName = meta?.displayName()?.notMini() ?: ""
+    val itemLore = meta?.lore()?.map { it.notMini() } ?: listOf()
+
+    // Create KitItem with proper string representations
+    val kitItem = KitItem(
+        name = itemName,
+        material = clickedItem.type.name,
+        amount = clickedItem.amount,
+        lore = itemLore,
+        enchantments = meta?.enchants?.mapKeys { it.key.key.key } ?: emptyMap(),
+        metadata = extractMetadata(meta),
+        modifiers = emptyMap(),
+        kitName = kitName,
+        slot = adjustedSlot
+    )
+
+    kit.setItem(adjustedSlot, kitItem)
+    kit.save()
+
+    player.message("Item added to the kit in slot $adjustedSlot.")
+    initialize()
+}
+
+private fun extractMetadata(meta: org.bukkit.inventory.meta.ItemMeta?): Map<String, Any> {
+    val metadata = mutableMapOf<String, Any>()
+
+    if (meta == null) return metadata
+
+    if (meta.hasCustomModelData()) {
+        metadata["model"] = meta.customModelData
+    }
+
+    if (meta.isUnbreakable) {
+        metadata["unbreakable"] = true
+    }
+
+    if (meta is org.bukkit.inventory.meta.Damageable) {
+        metadata["durability"] = meta.damage
+    }
+
+    if (meta.itemFlags.isNotEmpty()) {
+        metadata["itemFlags"] = meta.itemFlags.map { it.name }
+    }
+
+    return metadata
+}
 }
