@@ -35,7 +35,7 @@ class KitManager(private val plugin: KnockBackFFA) {
         }
     }
 
-    fun getKit(kitName: String): Kit? {
+    fun getKit(kitName: String): Kit{
         return cachedKits[kitName] ?: try {
             val kit = Kit.load(kitName)
             if (kit != null) {
@@ -45,7 +45,7 @@ class KitManager(private val plugin: KnockBackFFA) {
         } catch (e: Exception) {
             plugin.logger.log(Level.WARNING, "Failed to load kit: $kitName", e)
             null
-        }
+        } ?: throw IllegalArgumentException("Kit not found: $kitName")
     }
 
     fun getAllKitNames(): List<String> {
@@ -85,5 +85,15 @@ class KitManager(private val plugin: KnockBackFFA) {
     // Method to update the cached kit (used internally)
     internal fun updateKitCache(kitName: String, kit: Kit) {
         cachedKits[kitName] = kit
+    }
+
+    // Add to KitManager.kt
+    fun reloadKits() {
+        cachedKits.clear()
+        if (!configFile.exists()) {
+            plugin.saveResource("kits.yml", false)
+        }
+        loadAllKits()
+        plugin.logger.info("Reloaded ${cachedKits.size} kits")
     }
 }

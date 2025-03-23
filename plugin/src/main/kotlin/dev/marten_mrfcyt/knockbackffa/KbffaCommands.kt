@@ -71,7 +71,12 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
         requiresPermissions("kbffa.reload")
         executes {
             TranslationManager.reload(plugin)
-            source.message("<green>Successfully reloaded translations!")
+
+            KnockBackFFA.kitManager.reloadKits()
+
+            KnockBackFFA.instance.modifierManager.reloadModifiers()
+
+            source.message("<green>Successfully reloaded translations, kits and modifiers!")
         }
     }
     literal("arena") {
