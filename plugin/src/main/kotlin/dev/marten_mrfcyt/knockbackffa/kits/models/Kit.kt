@@ -7,6 +7,7 @@ import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
+import kotlin.collections.set
 
 class Kit(
     val name: String,

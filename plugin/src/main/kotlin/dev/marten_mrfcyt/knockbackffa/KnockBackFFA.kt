@@ -66,7 +66,7 @@ class KnockBackFFA : KotlinPlugin() {
 
         startArenaHandler(this.config.getInt("mapDuration", 60))
         setupPlaceholders()
-        modifierManager = ModifierManager()
+        modifierManager = ModifierManager(this)
         modifierManager.registerEvents(this)
         logger.info("⚙️ ${modifierManager.getModifyObjects().size} modify objects loaded")
 
