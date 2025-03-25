@@ -9,7 +9,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKit
 import dev.marten_mrfcyt.knockbackffa.guis.editor.EditKitSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.KitSelector
-import dev.marten_mrfcyt.knockbackffa.guis.shop.ShopGUI
+import dev.marten_mrfcyt.knockbackffa.guis.shop.ShopCategorySelector
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
 import mlib.api.commands.builders.command
@@ -200,6 +200,6 @@ fun Plugin.kitSelectorCommand() = command("kit") {
 
 fun Plugin.shopCommand() = command("shop") {
     executes {
-        ShopGUI(KnockBackFFA.instance, source as Player)
+        ShopCategorySelector(KnockBackFFA.instance, source as Player)
     }
 }

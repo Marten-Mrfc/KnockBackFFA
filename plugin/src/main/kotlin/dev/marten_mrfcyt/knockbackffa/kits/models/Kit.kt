@@ -14,6 +14,7 @@ class Kit(
     var displayName: String,
     var description: String,
     var displayIcon: Material = Material.STICK,
+    var price: Int = 0,  // Add this line
     private val _items: MutableMap<Int, KitItem> = mutableMapOf()
 ) {
     // Read-only view of items
@@ -51,6 +52,7 @@ class Kit(
         kitConfig.set("kit.$name.show.DisplayName", displayName)
         kitConfig.set("kit.$name.show.Lore", description)
         kitConfig.set("kit.$name.show.DisplayItem.item", displayIcon.name)
+        kitConfig.set("kit.$name.show.Price", price)  // Add this line
 
         // Save all items
         _items.forEach { (slot, kitItem) ->
@@ -150,6 +152,7 @@ class Kit(
                 displayName = kitConfig.getString("kit.$kitName.show.DisplayName") ?: kitName,
                 description = kitConfig.getString("kit.$kitName.show.Lore") ?: "",
                 displayIcon = kitConfig.getString("kit.$kitName.show.DisplayItem.item")?.let { Material.matchMaterial(it) } ?: Material.STICK,
+                price = kitConfig.getInt("kit.$kitName.show.Price", 0),  // Add this line
                 _items = items
             )
         }
