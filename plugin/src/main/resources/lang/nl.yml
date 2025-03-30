@@ -1,6 +1,10 @@
-# lang/en.yml
+# ###############################
+#                              #
+#            Player            #
+#                              #
+# ###############################
 player:
-  kit_selected: "<green>Geselecteerde kit <white><kit_name>"
+  kit_applied: "<green>Selected kit <white><kit_name>"
   join_message:
     - "<white><player_name><gray> sprong in de arena!"
     - "<white><player_name><gray> is de arena binnengekomen!"
@@ -19,6 +23,11 @@ player:
     - "<white><player_name><gray> ontmoette zijn einde dankzij <white><killer_name><gray>'s knockback!"
     - "<white><player_name><gray> werd van het platform geslingerd door <white><killer_name><gray>!"
     - "<white><player_name><gray> kon de kracht van <white><killer_name><gray>'s aanval niet weerstaan en viel!"
+# ###############################
+#                              #
+#         Score Display        #
+#                              #
+# ###############################
 scoreboard:
   title: ''
   lines:
@@ -35,6 +44,11 @@ scoreboard:
     - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
+# ###############################
+#                              #
+#            Arenas            #
+#                              #
+# ###############################
 arena:
   switch:
     success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
@@ -62,15 +76,69 @@ arena:
     killblock_not_found: "Laden van arena <arena_name> mislukt: Kill block niet gevonden"
   deathblock:
     killblock_null: "Kill block is null voor arena: <arena_name>"
+# ###############################
+#                              #
+#        Global Errors         #
+#                              #
+# ###############################
 error:
   player_only: "<red>Je moet een speler zijn om deze actie uit te voeren!"
-shop:
-  already_purchased: "<red>You already own this item!"
-  insufficient_funds: "<red>You don't have enough coins to purchase this item!"
-  purchase_success: "<green>You successfully purchased <gold>{item_name}</gold>!"
-  balance: "<yellow>Your Balance: {balance} coins"
-  refresh: "<gray>Click to refresh"
-  back_to_categories: "<gray>Back to Categories"
-  click_to_go_back: "<gray>Click to go back"
-  owned: "<green>✓ Owned"
-  click_to_purchase: "<yellow>Click to purchase"
+# ###############################
+#                              #
+#           Commands           #
+#                              #
+# ###############################
+commands:
+  debug:
+    title: "Debug command"
+  bypass:
+    toggle: "Bypass mode: <status>"
+  reload:
+    success: "<green>Successfully reloaded translations, kits and modifiers!"
+  arena:
+    create:
+      missing_killblock: "Please insert a killblock for the arena!"
+      missing_name: "Please insert a name for the arena!"
+    delete:
+      missing_name: "Please insert a name for the arena!"
+    help: |
+      <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Command
+      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Create an arena
+      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>List all arenas
+      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Delete an arena
+  kit:
+    create:
+      missing_lore: "Please insert a lore for the kit!"
+      missing_name: "Please insert a name for the kit!"
+    delete:
+      default_kit: "You can't delete the default kit!"
+      success: "<green>Successfully deleted kit <name>!"
+      not_found: "Kit <name> does not exist!"
+      missing_name: "Please insert a name for the kit!"
+# ###############################
+#                              #
+#            Plugin            #
+#                              #
+# ###############################
+plugin:
+  disabled: "💤 KnockBackFFA disabled"
+  first_time_setup: "1️⃣ First time setup: Extra logging of file creations!"
+  data_folder_missing: "⚠️ Data folder not found, creating..."
+  data_folder_created: "📁 Data folder created"
+  config_error: "❌ Config error: <error>"
+  kits_file_missing: "⚠️ kits.yml not found, creating..."
+  kits_file_created: "📁 kits.yml created"
+  kits_loaded: "🦾 Loaded <count> kits"
+  boosts_file_missing: "⚠️ boosts.yml not found, creating..."
+  boosts_file_created: "📁 boosts.yml created"
+  boosts_loaded: "🚀 Loaded <count> boosts"
+  player_boost_manager_initialized: "☑️ Player Boost Manager initialized"
+  modifiers_loaded: "⚙️ <count> modify objects loaded"
+  setting_up_commands: "🔧 Setting up commands..."
+  commands_ready: "✅ Commands ready"
+  registering_events: "🔧 Registering events..."
+  events_registered: "📌 <count> events registered"
+  starting_arena_handler: "🎮 Starting arena handler..."
+  arena_handler_ready: "✅ Arena handler ready (<duration>s)"
+  placeholders_ready: "📎 Placeholders ready"
+  placeholderapi_missing: "⚠️ PlaceholderAPI missing!"
