@@ -1,5 +1,4 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/shop/KitPurchaseConfirmation.kt
-package dev.marten_mrfcyt.knockbackffa.guis.shop
+package dev.marten_mrfcyt.knockbackffa.guis.shop.kit
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.KitOwnership
@@ -16,14 +15,13 @@ class KitPurchaseConfirmation(
     private val player: Player,
     private val kitName: String
 ) {
-    fun getKit(): Kit = KnockBackFFA.kitManager.getKit(kitName)
+    fun getKit(): Kit = KnockBackFFA.Companion.kitManager.getKit(kitName)
     init {
         val kit = getKit()
-        val playerData = PlayerData.getInstance(plugin).getPlayerData(player.uniqueId)
+        val playerData = PlayerData.Companion.getInstance(plugin).getPlayerData(player.uniqueId)
         val coins = playerData.getInt("coins", 0)
         val canAfford = coins >= kit.price
-        var message = mutableListOf<Component>()
-        message = mutableListOf(
+        var message = mutableListOf(
             "<yellow>Purchase Kit: <gold>${kit.displayName}".asMini(),
             "<gray>Price: <gold>${kit.price} coins".asMini(),
             "".asMini(),
@@ -49,10 +47,9 @@ class KitPurchaseConfirmation(
                 if (KitOwnership.buyKit(p, kitName)) {
                     p.sendMessage("<green>You purchased the kit <gold>${kit.displayName}</gold>!".asMini())
 
-                    // Automatically select the purchased kit
-                    val data = PlayerData.getInstance(plugin).getPlayerData(p.uniqueId)
+                    val data = PlayerData.Companion.getInstance(plugin).getPlayerData(p.uniqueId)
                     data.set("kit", kitName)
-                    PlayerData.getInstance(plugin).savePlayerData(p.uniqueId, data)
+                    PlayerData.Companion.getInstance(plugin).savePlayerData(p.uniqueId, data)
 
                     p.closeInventory()
                 } else {

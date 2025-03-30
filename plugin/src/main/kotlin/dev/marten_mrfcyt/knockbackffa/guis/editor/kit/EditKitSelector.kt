@@ -1,5 +1,4 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/editor/EditKitSelector.kt
-package dev.marten_mrfcyt.knockbackffa.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor.kit
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import mlib.api.gui.GuiSize
@@ -45,7 +44,7 @@ class EditKitSelector(private val plugin: KnockBackFFA, source: CommandSender) {
     }
 
     private fun loadKitGUI(kitName: String): ItemStack {
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return ItemStack(Material.BARRIER)
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
 
         val item = ItemStack(kit.displayIcon)
         val meta = item.itemMeta ?: return ItemStack(Material.BARRIER)
@@ -62,7 +61,7 @@ class EditKitSelector(private val plugin: KnockBackFFA, source: CommandSender) {
         val item = event.currentItem ?: return
         val player = event.whoClicked as? Player ?: return
         val kitName = getCustomValue(item.itemMeta, plugin, "kit_name") as String
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
 
         EditKit(plugin).kitEditor(
             player,

@@ -1,9 +1,9 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/editor/EditKit.kt
-package dev.marten_mrfcyt.knockbackffa.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor.kit
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import mlib.api.forms.Form
 import mlib.api.forms.FormType
+import mlib.api.gui.GuiSize
 import mlib.api.gui.types.builder.StandardGuiBuilder
 import mlib.api.utilities.*
 import net.kyori.adventure.text.Component
@@ -16,12 +16,6 @@ class EditKit(private val plugin: KnockBackFFA) {
 
     fun kitEditor(source: Player, name: Component, lore: Component, kitName: String, new: Boolean = true) {
         if (new) {
-            // Create a new kit
-            if (KnockBackFFA.kitManager.getKit(kitName) != null) {
-                source.error("Kit with this name already exists!")
-                return
-            }
-
             KnockBackFFA.kitManager.createKit(
                 kitName = kitName,
                 displayName = name.notMini(),
@@ -29,12 +23,12 @@ class EditKit(private val plugin: KnockBackFFA) {
             )
         }
 
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
 
         val inventoryTitle = "<gray>Editing:</gray><white> ".asMini().append(name)
         val gui = StandardGuiBuilder()
             .title(inventoryTitle)
-            .size(mlib.api.gui.GuiSize.ROW_TWO)
+            .size(GuiSize.ROW_TWO)
             .setup { standardGui ->
                 standardGui.item(Material.GRAY_STAINED_GLASS_PANE) {
                     name(Component.text(""))
@@ -63,7 +57,19 @@ class EditKit(private val plugin: KnockBackFFA) {
                     slots(1)
                     onClick { event -> editLore(event, kitName) }
                 }
-
+                standardGui.item(Material.EXPERIENCE_BOTTLE) {
+                    name("<gray>Manage Kit Boosts".asMini())
+                    description(listOf(
+                        "<gray>Add or remove boosts".asMini(),
+                        "<gray>that are applied when".asMini(),
+                        "<gray>a player selects this kit".asMini()
+                    ))
+                    slots(3) // Choose an appropriate slot
+                    onClick { event ->
+                        event.isCancelled = true
+                        KitBoostManager(plugin, source, kitName).openBoostManager()
+                    }
+                }
                 standardGui.item(Material.BARRIER) {
                     name("<gray>Go Back".asMini())
                     description(listOf())
@@ -71,7 +77,6 @@ class EditKit(private val plugin: KnockBackFFA) {
                     onClick { event -> goBack(event) }
                 }
 
-                // Display the kit preview
                 val displayItemMaterial = kit.displayIcon
 
                 val modifiedKit = ItemStack(displayItemMaterial)
@@ -103,7 +108,7 @@ class EditKit(private val plugin: KnockBackFFA) {
 
     private fun editDisplayName(event: InventoryClickEvent, kitName: String) {
         val player = event.whoClicked as? Player ?: return
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
 
         val form = Form("Enter the new display name for kit $kitName", FormType.STRING, 30) { p, response ->
             val newName = response as String
@@ -118,7 +123,7 @@ class EditKit(private val plugin: KnockBackFFA) {
 
     private fun editLore(event: InventoryClickEvent, kitName: String) {
         val player = event.whoClicked as? Player ?: return
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
 
         val form = Form("Enter the new lore for kit $kitName", FormType.STRING, 30) { p, response ->
             val newLore = response as String
@@ -145,7 +150,7 @@ class EditKit(private val plugin: KnockBackFFA) {
             return
         }
 
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
         kit.displayIcon = item.type
         kit.save()
         player.message("Display item updated!")

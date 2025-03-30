@@ -1,10 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.kits.managers
 
-import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
-import kotlin.text.clear
 
-class ModifierRegistry(private val plugin: KnockBackFFA) {
+class ModifierRegistry() {
     private val modifiers = mutableMapOf<String, ModifyObject>()
 
     fun register(modifier: ModifyObject) {

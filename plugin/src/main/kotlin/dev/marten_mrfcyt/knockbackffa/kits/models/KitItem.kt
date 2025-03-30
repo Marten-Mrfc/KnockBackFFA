@@ -1,4 +1,6 @@
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import io.papermc.paper.registry.RegistryAccess
+import io.papermc.paper.registry.RegistryKey
 import mlib.api.utilities.asMini
 import mlib.api.utilities.setCustomValue
 import org.bukkit.Material
@@ -10,6 +12,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.inventory.meta.Damageable
 import kotlin.collections.component1
 import kotlin.collections.component2
+import kotlin.text.get
 
 data class KitItem(
     val name: String,
@@ -39,12 +42,12 @@ data class KitItem(
             }
         }
 
-        // Apply enchantments
         enchantments.forEach { (enchantName, level) ->
-            val enchant = Enchantment.getByKey(NamespacedKey.minecraft(enchantName.lowercase())) ?: return@forEach
+            val key = NamespacedKey.minecraft(enchantName.lowercase())
+            val enchant = RegistryAccess.registryAccess().getRegistry(RegistryKey.ENCHANTMENT).get(key)
+                ?: throw IllegalArgumentException("Invalid enchantment: $enchantName")
             meta.addEnchant(enchant, level, true)
         }
-
         // Apply metadata
         if (meta is Damageable && metadata.containsKey("durability")) {
             meta.damage = metadata["durability"] as Int

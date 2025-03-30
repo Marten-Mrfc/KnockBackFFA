@@ -3,9 +3,11 @@ package dev.marten_mrfcyt.knockbackffa.kits.managers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.models.Kit
+import mlib.api.utilities.message
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
+import java.util.UUID
 import java.util.logging.Level
 
 class KitManager(private val plugin: KnockBackFFA) {
@@ -52,9 +54,23 @@ class KitManager(private val plugin: KnockBackFFA) {
         val kitConfig = YamlConfiguration.loadConfiguration(configFile)
         return kitConfig.getConfigurationSection("kit")?.getKeys(false)?.toList() ?: emptyList()
     }
+    private val kitCooldowns = mutableMapOf<UUID, Long>()
+    private val kitCooldownSeconds = 30
+    fun applyKit(player: Player, kitName: String): Boolean {
+        val now = System.currentTimeMillis()
+        val playerId = player.uniqueId
 
-    fun applyKit(player: Player, kitName: String) {
-        getKit(kitName)?.applyTo(player)
+        val lastUse = kitCooldowns[playerId] ?: 0L
+        val remainingCooldown = ((lastUse + (kitCooldownSeconds * 1000) - now) / 1000).toInt()
+
+        if (remainingCooldown > 0) {
+            player.message("<red>You must wait $remainingCooldown seconds before changing kits again.")
+            return false
+        }
+
+        getKit(kitName).applyTo(player)
+        kitCooldowns[playerId] = now
+        return true
     }
 
     fun createKit(kitName: String, displayName: String, description: String): Kit {
@@ -64,30 +80,30 @@ class KitManager(private val plugin: KnockBackFFA) {
             description = description
         )
 
-        // Save the kit
         kit.save()
 
-        // Update the cache
         cachedKits[kitName] = kit
 
         return kit
     }
 
-    fun deleteKit(kitName: String) {
-        val kitConfig = YamlConfiguration.loadConfiguration(configFile)
-        kitConfig.set("kit.$kitName", null)
-        kitConfig.save(configFile)
-
-        // Remove from cache
-        cachedKits.remove(kitName)
+    fun deleteKit(kitName: String): Boolean {
+        try {
+            val kitConfig = YamlConfiguration.loadConfiguration(configFile)
+            kitConfig.set("kit.$kitName", null)
+            kitConfig.save(configFile)
+            cachedKits.remove(kitName)
+            return true
+        } catch (e: Exception) {
+            plugin.logger.severe("Failed to delete kit: $kitName, ${e.message}")
+            return false
+        }
     }
 
-    // Method to update the cached kit (used internally)
     internal fun updateKitCache(kitName: String, kit: Kit) {
         cachedKits[kitName] = kit
     }
 
-    // Add to KitManager.kt
     fun reloadKits() {
         cachedKits.clear()
         if (!configFile.exists()) {

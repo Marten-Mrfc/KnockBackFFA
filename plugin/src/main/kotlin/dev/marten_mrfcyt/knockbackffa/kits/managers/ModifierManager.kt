@@ -1,7 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.managers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.guis.editor.ItemModifierGUI
+import dev.marten_mrfcyt.knockbackffa.guis.editor.kit.ItemModifierGUI
 import dev.marten_mrfcyt.knockbackffa.kits.models.Kit
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
@@ -15,7 +15,7 @@ import org.bukkit.plugin.Plugin
 
 class ModifierManager(private val plugin: KnockBackFFA) {
     private val logger = plugin.logger
-    private val registry = ModifierRegistry(plugin)
+    private val registry = ModifierRegistry()
 
     init {
         registerAllModifiers()
@@ -23,11 +23,9 @@ class ModifierManager(private val plugin: KnockBackFFA) {
     fun reloadModifiers() {
         plugin.logger.info("Starting modifier system reload...")
 
-        // Store current count for comparison
         val previousCount = registry.getAllModifiers().size
 
         try {
-            // Unregister any existing modifier listeners
             var unregistered = 0
             registry.getAllModifiers().forEach { modifier ->
                 if (modifier is Listener) {
@@ -41,13 +39,10 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             }
             plugin.logger.info("Unregistered $unregistered modifier listeners")
 
-            // Clear the registry
             registry.clearModifiers()
 
-            // Register all modifiers again
             registerAllModifiers()
 
-            // Re-register event listeners for the newly loaded modifiers
             registerEvents(KnockBackFFA.instance)
 
             val newCount = registry.getAllModifiers().size
@@ -56,7 +51,6 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             plugin.logger.severe("Failed to reload modifiers: ${e.message}")
             e.printStackTrace()
 
-            // Attempt recovery by registering again if registry is empty
             if (registry.getAllModifiers().isEmpty()) {
                 plugin.logger.info("Attempting recovery...")
                 registerAllModifiers()
@@ -66,7 +60,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
     }
 
     private fun registerAllModifiers() {
-        logger.info("Registering modifiers automatically...")
+        logger.info("🤖 Registering modifiers automatically...")
 
         val modifiersPackage = "dev.marten_mrfcyt.knockbackffa.kits.modifiers"
         val classLoader = plugin.javaClass.classLoader
@@ -119,7 +113,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             }
 
             val modifierNames = registeredModifiers.joinToString(", ")
-            logger.info("Successfully found ${registeredModifiers.size} modifiers: $modifierNames")
+            logger.info("✅ Successfully found ${registeredModifiers.size} modifiers: $modifierNames")
         } catch (e: Exception) {
             logger.severe("Error loading modifiers: ${e.message}")
             e.printStackTrace()
@@ -153,11 +147,11 @@ class ModifierManager(private val plugin: KnockBackFFA) {
     fun getModifyObjects() = registry.getAllModifiers()
 
     fun handleModifier(player: Player, kitName: String, slot: Int, modifierId: String) {
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
         val modifyObject = registry.getModifier(modifierId) ?: return
 
         val item = kit.getItem(slot) ?: return
-        val currentValue = item.modifiers[modifierId] as? Boolean ?: false
+        val currentValue = item.modifiers[modifierId] as? Boolean == true
 
         if (modifyObject.args.isNotEmpty() && !currentValue) {
             handleModifierArgs(player, kit, slot, modifyObject)
@@ -218,6 +212,6 @@ class ModifierManager(private val plugin: KnockBackFFA) {
                 plugin.server.pluginManager.registerEvents(entry, plugin)
             }
         }
-        plugin.logger.info("Registered ${registry.getAllModifiers().count { it is Listener }} modifier listeners and ${registry.getAllModifiers().count { it !is Listener }} static modifiers")
+        plugin.logger.info("👂 Registered ${registry.getAllModifiers().count { it is Listener }} modifier listeners and ${registry.getAllModifiers().count { it !is Listener }} static modifiers")
     }
 }

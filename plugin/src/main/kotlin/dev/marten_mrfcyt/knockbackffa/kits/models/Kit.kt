@@ -3,11 +3,14 @@ package dev.marten_mrfcyt.knockbackffa.kits.models
 
 import KitItem
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import mlib.api.utilities.message
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
+import kotlin.apply
 import kotlin.collections.set
+import kotlin.text.clear
 
 class Kit(
     val name: String,
@@ -15,10 +18,12 @@ class Kit(
     var description: String,
     var displayIcon: Material = Material.STICK,
     var price: Int = 0,  // Add this line
-    private val _items: MutableMap<Int, KitItem> = mutableMapOf()
+    private val _items: MutableMap<Int, KitItem> = mutableMapOf(),
+    private val _boosts: MutableList<String> = mutableListOf()
 ) {
     // Read-only view of items
     val items: Map<Int, KitItem> get() = _items.toMap()
+    val boosts: List<String> get() = _boosts.toList()
 
     // Apply kit to player
     fun applyTo(player: Player) {
@@ -27,7 +32,11 @@ class Kit(
             val builtItem = kitItem.build(KnockBackFFA.instance)
             player.inventory.setItem(slot, builtItem)
         }
+
+        KnockBackFFA.instance.playerBoostManager.removeAllKitBoosts(player)
+        KnockBackFFA.instance.playerBoostManager.handleKitChange(player, name)
     }
+
 
     // Get item at slot
     fun getItem(slot: Int): KitItem? = _items[slot]
@@ -42,6 +51,38 @@ class Kit(
         _items.remove(slot)
     }
 
+    private fun removeBoosts(player: Player) {
+        _boosts.forEach { boostId ->
+            try {
+                val boost = KnockBackFFA.instance.boostManager.getBoost(boostId)
+                boost.remove(player)
+            } catch (e: Exception) {
+                KnockBackFFA.instance.logger.warning("Failed to remove boost $boostId from kit $name: ${e.message}")
+            }
+        }
+    }
+
+    private fun applyBoosts(player: Player) {
+        _boosts.forEach { boostId ->
+            try {
+                val boost = KnockBackFFA.instance.boostManager.getBoost(boostId)
+                boost.apply(player)
+            } catch (e: Exception) {
+                KnockBackFFA.instance.logger.warning("Failed to apply boost $boostId from kit $name: ${e.message}")
+            }
+        }
+    }
+    fun addBoost(boostId: String) {
+        if (!_boosts.contains(boostId)) {
+            _boosts.add(boostId)
+            save()
+        }
+    }
+
+    fun removeBoost(boostId: String) {
+        _boosts.remove(boostId)
+        save()
+    }
     // Save kit to disk
     fun save() {
         val plugin = KnockBackFFA.instance
@@ -58,6 +99,7 @@ class Kit(
         _items.forEach { (slot, kitItem) ->
             saveItemToConfig(kitConfig, slot, kitItem)
         }
+        kitConfig.set("kit.$name.boosts", _boosts)
 
         // Save file
         kitConfig.save(configFile)
@@ -135,6 +177,7 @@ class Kit(
             if (!kitConfig.contains("kit.$kitName")) {
                 return null
             }
+            val boostsList = kitConfig.getStringList("kit.$kitName.boosts").toMutableList()
 
             val items = mutableMapOf<Int, KitItem>()
             val itemsSection = kitConfig.getConfigurationSection("kit.$kitName.items")
@@ -153,7 +196,8 @@ class Kit(
                 description = kitConfig.getString("kit.$kitName.show.Lore") ?: "",
                 displayIcon = kitConfig.getString("kit.$kitName.show.DisplayItem.item")?.let { Material.matchMaterial(it) } ?: Material.STICK,
                 price = kitConfig.getInt("kit.$kitName.show.Price", 0),  // Add this line
-                _items = items
+                _items = items,
+                _boosts = boostsList
             )
         }
     }

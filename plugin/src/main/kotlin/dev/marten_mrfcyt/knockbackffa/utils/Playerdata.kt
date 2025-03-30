@@ -10,7 +10,6 @@ import java.sql.PreparedStatement
 import java.sql.ResultSet
 import java.util.*
 import kotlin.text.set
-import kotlin.toString
 
 class PlayerData private constructor(private val plugin: KnockBackFFA) {
     private val storageConfig = StorageConfig(plugin)
@@ -42,6 +41,8 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             max_killstreak INT DEFAULT 0,
             coins INT DEFAULT 0,
             kd_ratio DOUBLE DEFAULT 0.0,
+            owned_kits TEXT,
+            boosts TEXT,
             PRIMARY KEY (player_id)
         );
         """.trimIndent()
@@ -82,6 +83,8 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                 playerData.set("max-killstreak", resultSet.getInt("max_killstreak"))
                 playerData.set("coins", resultSet.getInt("coins"))
                 playerData.set("kd-ratio", resultSet.getDouble("kd_ratio"))
+                playerData.set("owned_kits", resultSet.getString("owned_kits").split(",").map { it.trim() })
+                playerData.set("boosts", resultSet.getString("boosts").split(",").map { it.trim() })
             }
             resultSet.close()
             statement.close()
@@ -106,8 +109,8 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
         val connection: Connection? = mysqlHandler.getConnection()
         if (connection != null) {
             val query = """
-        REPLACE INTO player_data (player_id, kit, deaths, kills, killstreak, max_killstreak, coins, kd_ratio)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        REPLACE INTO player_data (player_id, kit, deaths, kills, killstreak, max_killstreak, coins, kd_ratio, owned_kits, boosts)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
             val statement: PreparedStatement = connection.prepareStatement(query)
             statement.setString(1, playerId.toString())
@@ -118,6 +121,11 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             statement.setInt(6, playerData.getInt("max-killstreak"))
             statement.setInt(7, playerData.getInt("coins"))
             statement.setDouble(8, playerData.getDouble("kd-ratio"))
+            val ownedKits = playerData.getStringList("owned_kits")
+            statement.setString(9, ownedKits.joinToString(","))
+            val boosts = playerData.getStringList("boosts")
+            statement.setString(10, boosts.joinToString(","))
+
             statement.executeUpdate()
             statement.close()
         }

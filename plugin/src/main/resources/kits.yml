@@ -5,6 +5,9 @@ kit:
       Lore: <white>The default kit</white>
       DisplayItem:
         item: STICK
+        enchants:
+          KNOCKBACK: 2
+      Price: 0 # Free (default kit)
     items:
       '0':
         name: <dark_gray>KnockBack Stick
@@ -18,15 +21,14 @@ kit:
           itemFlags: []
           model: 0
       '1':
-        name: <dark_gray>Knock Bow
         item: BOW
+        name: <dark_gray>Knock Bow
         amount: 1
-        enchants:
-          PUNCH: 4
         meta:
-          durability: 0
           unbreakable: true
-          itemFlags: []
+          durability: 0
+        enchants:
+          punch: 4
         modifiers:
           delay: true
           amount: 15
@@ -84,3 +86,191 @@ kit:
           model: 0
         modifiers:
           infinite: true
+  Need For Speed:
+    show:
+      DisplayName: <dark_gray>Need For <red>Speed
+      Lore: <white>React Quick and Steady!
+      DisplayItem:
+        item: RABBIT_FOOT
+      Price: 50
+    boosts:
+      - speed_boost
+    items:
+      '0':
+        item: STICK
+        name: <dark_gray>KnockBack Stick
+        amount: 1
+        enchants:
+          knockback: 2
+        meta:
+          model: 0
+          durability: 0
+      '1':
+        item: BOW
+        name: <dark_gray>Knock Bow
+        amount: 1
+        enchants:
+          punch: 4
+        meta:
+          unbreakable: true
+          durability: 0
+        modifiers:
+          delay: true
+          amount: 20
+      '2':
+        item: ENDER_PEARL
+        name: <dark_gray>Ender Pearl
+        amount: 3
+        lore:
+          - Right-click to launch yourself forward
+          - Great for escaping or chasing
+        meta:
+          durability: 0
+        modifiers:
+          onKill: true
+      '7':
+        item: LIGHT_WEIGHTED_PRESSURE_PLATE
+        name: <yellow>Jump Pad
+        amount: 1
+        lore:
+          - <white>When placed acts as a Jump Pad
+          - <white>Disappears over time
+        meta:
+          durability: 0
+        modifiers:
+          jumpPad: true
+          velocity: 2
+          delay: 2
+          onKill: true
+      '8':
+        item: WHITE_WOOL
+        name: <yellow>Building Blocks
+        amount: 64
+        lore:
+          - <white>Used for building
+        meta:
+          durability: 0
+        modifiers:
+          infinite: true
+          buildBlock: true
+      '9':
+        item: ARROW
+        name: <dark_gray>Arrow
+        amount: 1
+        meta:
+          model: 0
+          durability: 0
+  Flying thrue the sky:
+    show:
+      DisplayName: <gradient:dark_gray:white>Flying Thrue the Sky!
+      Lore: <white>Have a lot of flying capabilities
+      DisplayItem:
+        item: ELYTRA
+      Price: 50
+    boosts:
+      - jump_boost
+      - leap
+    items:
+      '0':
+        item: STICK
+        name: <dark_gray>KnockBack Stick
+        amount: 1
+        enchants:
+          knockback: 2
+        meta:
+          model: 0
+          durability: 0
+      '1':
+        item: BOW
+        name: <dark_gray>Knock Bow
+        amount: 1
+        enchants:
+          punch: 4
+        meta:
+          unbreakable: true
+          durability: 0
+      '2':
+        item: ENDER_PEARL
+        name: <dark_gray>Ender Pearl
+        amount: 2
+        meta:
+          durability: 0
+        modifiers:
+          onKill: true
+      '7':
+        item: LIGHT_WEIGHTED_PRESSURE_PLATE
+        name: <yellow>Jump Pad
+        amount: 5
+        lore:
+          - <white>When placed acts as a Jump Pad
+          - <white>Disappears over time
+        meta:
+          durability: 0
+        modifiers:
+          jumpPad: true
+          velocity: 3
+          delay: 2
+          onKill: true
+      '8':
+        item: WHITE_WOOL
+        name: <yellow>Building Blocks
+        amount: 64
+        lore:
+          - <white>Used for building
+        meta:
+          durability: 0
+        modifiers:
+          buildBlock: true
+          infinite: true
+      '9':
+        item: ARROW
+        name: <dark_gray>Arrow
+        amount: 1
+        meta:
+          model: 0
+          durability: 0
+  Tank:
+    show:
+      DisplayName: <dark_gray>Tank
+      Lore: <white>Still standing still!
+      DisplayItem:
+        item: NETHERITE_CHESTPLATE
+      Price: 75
+    boosts:
+      - knockback_explosion
+      - knockback_resistance
+      - smoke_screen
+    items:
+      '0':
+        item: STICK
+        name: <dark_gray>KnockBack Stick
+        amount: 1
+        enchants:
+          knockback: 1
+        meta:
+          model: 0
+          durability: 0
+      '1':
+        item: BOW
+        name: <dark_gray>Knock Bow
+        amount: 1
+        enchants:
+          punch: 7
+        meta:
+          unbreakable: true
+          durability: 0
+      '8':
+        item: WHITE_WOOL
+        name: <yellow>Building Blocks
+        amount: 64
+        lore:
+          - <white>Used for building
+        meta:
+          durability: 0
+      '9':
+        item: ARROW
+        name: <dark_gray>Arrow
+        amount: 1
+        meta:
+          model: 0
+          durability: 0

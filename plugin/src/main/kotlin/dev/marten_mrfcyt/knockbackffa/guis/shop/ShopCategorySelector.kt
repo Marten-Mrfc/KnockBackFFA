@@ -2,6 +2,8 @@
 package dev.marten_mrfcyt.knockbackffa.guis.shop
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.guis.shop.boosts.BoostShop
+import dev.marten_mrfcyt.knockbackffa.guis.shop.kit.KitShop
 import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.utilities.asMini
@@ -17,10 +19,8 @@ class ShopCategorySelector(private val plugin: KnockBackFFA, private val player:
     }
 
     private fun setupGui() {
-        // Fill with glass panes
         gui.fill(Material.BLACK_STAINED_GLASS_PANE) {}
 
-        // Kits category
         gui.item(Material.DIAMOND_SWORD) {
             name("<yellow>Kits".asMini())
             description(listOf(
@@ -29,46 +29,28 @@ class ShopCategorySelector(private val plugin: KnockBackFFA, private val player:
                 "".asMini(),
                 "<white>Click to view!".asMini()
             ))
-            slots(11)
+            slots(12)
             onClick { event ->
                 event.isCancelled = true
                 KitShop(plugin, player)
             }
         }
 
-        // Cosmetics category (coming soon)
-        gui.item(Material.NETHER_STAR) {
-            name("<yellow>Cosmetics".asMini())
-            description(listOf(
-                "<gray>Customize your appearance".asMini(),
-                "<gray>with special effects.".asMini(),
-                "".asMini(),
-                "<red>Coming soon!".asMini()
-            ))
-            slots(13)
-            onClick { event ->
-                event.isCancelled = true
-                player.sendMessage("Coming soon!")
-            }
-        }
-
-        // Boosts category (coming soon)
         gui.item(Material.EXPERIENCE_BOTTLE) {
             name("<yellow>Boosts".asMini())
             description(listOf(
                 "<gray>Get temporary advantages".asMini(),
                 "<gray>and bonuses.".asMini(),
                 "".asMini(),
-                "<red>Coming soon!".asMini()
+                "<white>Click to view!".asMini()
             ))
-            slots(15)
+            slots(14)
             onClick { event ->
                 event.isCancelled = true
-                player.sendMessage("Coming soon!")
+                BoostShop(plugin, player)
             }
         }
 
-        // Back button
         gui.item(Material.BARRIER) {
             name("<red>Close".asMini())
             slots(22)

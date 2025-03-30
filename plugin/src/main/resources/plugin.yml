@@ -24,6 +24,9 @@ permissions:
   kbffa.kit:
     description: Allows managing kits
     default: op
+  kbffa.boosts:
+    description: Allows access to boosts management
+    default: op
   kbffa.*:
     description: Gives access to all admin commands
     default: op
@@ -47,3 +50,6 @@ commands:
   shop:
     description: Opens the shop GUI
     usage: /shop
+  boosts:
+    description: Opens the active boosts GUI
+    usage: /boosts

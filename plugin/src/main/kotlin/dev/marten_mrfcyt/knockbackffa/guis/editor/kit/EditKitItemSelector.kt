@@ -1,14 +1,16 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/editor/EditKitItemSelector.kt
-package dev.marten_mrfcyt.knockbackffa.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor.kit
 
 import KitItem
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.gui.types.builder.StandardGuiBuilder
 import mlib.api.utilities.*
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.inventory.meta.Damageable
+import org.bukkit.inventory.meta.ItemMeta
 
 class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: Player, private val kitName: String) {
     private val inventoryTitle = "<!italic><gray>Editing kit:</gray><white> $kitName".asMini()
@@ -16,7 +18,7 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
     fun initialize() {
         val gui = StandardGuiBuilder()
             .title(inventoryTitle)
-            .size(mlib.api.gui.GuiSize.ROW_TWO)
+            .size(GuiSize.ROW_TWO)
             .setup { standardGui ->
                 standardGui.item(Material.GRAY_STAINED_GLASS_PANE) {
                     name("<gray>Click to edit slot</gray>".asMini())
@@ -40,7 +42,7 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
     }
 
     private fun loadKitItems(gui: StandardGui, kitName: String) {
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
 
         kit.items.forEach { (slot, kitItem) ->
             val item = kitItem.build(plugin)
@@ -78,11 +80,10 @@ class EditKitItemSelector(private val plugin: KnockBackFFA, private val source: 
     private fun onGoBackClick(event: InventoryClickEvent, kitName: String) {
         val kit = KnockBackFFA.kitManager.getKit(kitName)
         (event.whoClicked as? Player)?.apply {
-            EditKit(plugin).kitEditor(this, kit?.displayName?.asMini() ?: kitName.asMini(),
-                kit?.description?.asMini() ?: "".asMini(), kitName, new = false)
+            EditKit(plugin).kitEditor(this, kit.displayName.asMini(),
+                kit.description.asMini(), kitName, new = false)
         }
     }
-
 private fun addNewItem(event: InventoryClickEvent, kitName: String) {
     val player = event.whoClicked as? Player ?: return
     val clickedItem = event.cursor
@@ -100,16 +101,13 @@ private fun addNewItem(event: InventoryClickEvent, kitName: String) {
         else -> return
     }
 
-    val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+    val kit = KnockBackFFA.kitManager.getKit(kitName)
 
-    // Get item metadata
     val meta = clickedItem.itemMeta
 
-    // Properly extract name and lore as plain strings
     val itemName = meta?.displayName()?.notMini() ?: ""
     val itemLore = meta?.lore()?.map { it.notMini() } ?: listOf()
 
-    // Create KitItem with proper string representations
     val kitItem = KitItem(
         name = itemName,
         material = clickedItem.type.name,
@@ -129,7 +127,7 @@ private fun addNewItem(event: InventoryClickEvent, kitName: String) {
     initialize()
 }
 
-private fun extractMetadata(meta: org.bukkit.inventory.meta.ItemMeta?): Map<String, Any> {
+private fun extractMetadata(meta: ItemMeta?): Map<String, Any> {
     val metadata = mutableMapOf<String, Any>()
 
     if (meta == null) return metadata
@@ -142,7 +140,7 @@ private fun extractMetadata(meta: org.bukkit.inventory.meta.ItemMeta?): Map<Stri
         metadata["unbreakable"] = true
     }
 
-    if (meta is org.bukkit.inventory.meta.Damageable) {
+    if (meta is Damageable) {
         metadata["durability"] = meta.damage
     }
 

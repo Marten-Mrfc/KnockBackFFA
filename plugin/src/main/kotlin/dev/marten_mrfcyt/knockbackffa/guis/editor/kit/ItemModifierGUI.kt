@@ -1,7 +1,7 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/editor/ItemModifierGUI.kt
-package dev.marten_mrfcyt.knockbackffa.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor.kit
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.gui.types.builder.StandardGuiBuilder
 import mlib.api.utilities.*
@@ -18,7 +18,7 @@ class ItemModifierGUI(val plugin: KnockBackFFA, val source: Player, kitName: Str
     init {
         val gui = StandardGuiBuilder()
             .title(inventoryTitle)
-            .size(mlib.api.gui.GuiSize.ROW_TWO)
+            .size(GuiSize.ROW_TWO)
             .setup { standardGui ->
                 standardGui.item(Material.GRAY_STAINED_GLASS_PANE) {
                     name(Component.text(""))
@@ -59,7 +59,7 @@ class ItemModifierGUI(val plugin: KnockBackFFA, val source: Player, kitName: Str
     }
 
     private fun loadKitItem(gui: StandardGui, kitName: String, slot: Int) {
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
         val kitItem = kit.getItem(slot) ?: return
 
         val item = kitItem.build(plugin)
@@ -93,7 +93,7 @@ class ItemModifierGUI(val plugin: KnockBackFFA, val source: Player, kitName: Str
 
     private fun handleDeleteItem(event: InventoryClickEvent, player: Player, kitName: String, slot: Int) {
         event.isCancelled = true
-        val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
         kit.removeItem(slot)
         kit.save()
         EditKitItemSelector(plugin, player, kitName).initialize()

@@ -1,7 +1,7 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/editor/KitSelector.kt
-package dev.marten_mrfcyt.knockbackffa.guis.editor
+package dev.marten_mrfcyt.knockbackffa.guis.editor.kit
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.KitOwnership
 import dev.marten_mrfcyt.knockbackffa.utils.*
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.gui.GuiSize
@@ -12,7 +12,7 @@ import org.bukkit.event.inventory.InventoryClickEvent
 import kotlin.math.ceil
 
 class KitSelector(private val plugin: KnockBackFFA, source: Player) {
-    private val kitNames = KnockBackFFA.kitManager.getAllKitNames()
+    private val kitNames = KitOwnership.getOwnedKits(source.uniqueId)
     private val kitCount = kitNames.size
     private val inventorySize = ceil((kitCount + 1) / 9.0).toInt() * 9
 
@@ -24,7 +24,7 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
             .size(guiSize)
             .setup { standardGui ->
                 kitNames.forEachIndexed { index, kitName ->
-                    val kit = KnockBackFFA.kitManager.getKit(kitName) ?: return@forEachIndexed
+                    val kit = KnockBackFFA.kitManager.getKit(kitName)
 
                     standardGui.item(kit.displayIcon) {
                         name("<!italic>${kit.displayName}".asMini())
@@ -45,13 +45,14 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
 
         val playerData = PlayerData.getInstance(plugin)
         val playerDataConfig = playerData.getPlayerData(player.uniqueId)
+
         playerDataConfig.set("kit", kitName)
         playerData.savePlayerData(player.uniqueId, playerDataConfig)
 
-        // Get and apply the kit
-        KnockBackFFA.kitManager.applyKit(player, kitName)
+        if (KnockBackFFA.kitManager.applyKit(player, kitName)) {
+            player.sendMessage(translate("player.kit_applied", "kit_name" to kitName))
+        }
 
         player.closeInventory()
-        player.message(translate("player.kit_selected", "kit_name" to kitName))
     }
 }
