@@ -26,7 +26,7 @@ class TranslationManager(private val plugin: Plugin) {
         }
 
         fun translate(key: String, vararg args: Pair<String, Any>): String {
-            val message = instance.get(key, args = args.toMap().mapValues { it.value.toString() })
+            val message = instance.get(key)
             return if (message is List<*>) {
                 message.firstOrNull()?.toString() ?: ""
             } else {
@@ -39,7 +39,7 @@ class TranslationManager(private val plugin: Plugin) {
         }
 
         fun getStringList(key: String, vararg args: Pair<String, Any>): List<String> {
-            val message = instance.get(key, args = args.toMap().mapValues { it.value.toString() })
+            val message = instance.get(key)
             return when (message) {
                 is List<*> -> message.mapNotNull { it?.toString() }.map { str ->
                     args.fold(str) { acc, (placeholder, value) ->
@@ -64,7 +64,7 @@ class TranslationManager(private val plugin: Plugin) {
         }
     }
 
-    private fun get(key: String, locale: Locale = configuredLocale, args: Map<String, String> = emptyMap()): Any {
+    private fun get(key: String, locale: Locale = configuredLocale): Any {
         val translation = translations[locale]?.get(key)
             ?: translations[defaultLocale]?.get(key)
             ?: key

@@ -28,7 +28,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         source.inventory.clear()
         try {
             val playerDataHandler = PlayerData.getInstance(plugin)
-            // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
             playerData.apply {
                 set("deaths", getInt("deaths", 0) + 1)
@@ -43,7 +42,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             }
             playerDataHandler.savePlayerData(source.uniqueId, playerData)
 
-            // Handle the killer player
             killer?.let {
                 val killerData = playerDataHandler.getPlayerData(it.uniqueId)
                 killerData.apply {
@@ -55,7 +53,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                     set("killstreak", currentKillstreak)
                     set("coins", getInt("coins", 0) + 1)
 
-                    // Update max-killstreak if the current killstreak is higher
                     if (currentKillstreak > currentMaxKillstreak) {
                         set("max-killstreak", currentKillstreak)
                     }
