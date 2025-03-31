@@ -4,16 +4,16 @@
 #                              #
 # ###############################
 
-language: "en"
-mapDuration: 60
-allowDropping: false
-allowPickUp: false
-allowCrafting: true
-allowBlockBreaking: false
-allowDamage: false
-bossbar:
+language: "en" # Language for the plugin.
+mapDuration: 60 # Duration between map changes in seconds.
+allowDropping: false # Allow players to drop items
+allowPickUp: false # Allow players to pick up items
+allowCrafting: true # Allow players to craft items
+allowBlockBreaking: false # Allow players to break blocks
+allowDamage: false # Allow players to damage each other
+bossbar: # Enable or disable the bossbar
   enabled: true
-scoreboard:
+scoreboard: # Enable or disable the scoreboard
   enabled: true
 
 
@@ -39,5 +39,5 @@ storage:
 #                              #
 # ###############################
 
-currentArena: ''
-currentLocation: ''
+currentArena: '' # Current arena name
+currentLocation: '' # Current location of the player
