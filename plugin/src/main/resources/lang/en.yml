@@ -1,6 +1,11 @@
-# lang/en.yml
+# ###############################
+#                              #
+#            Player            #
+#                              #
+# ###############################
+
 player:
-  kit_selected: "<green>Selected kit <white><kit_name>"
+  kit_applied: "<green>Selected kit <white><kit_name>"
   join_message:
     - "<white><player_name><gray> jumped into the arena!"
     - "<white><player_name><gray> has joined the arena!"
@@ -19,6 +24,12 @@ player:
     - "<white><player_name><gray> met their end, courtesy of <white><killer_name><gray>'s knockback!"
     - "<white><player_name><gray> was sent flying off the platform by <white><killer_name><gray>!"
     - "<white><player_name><gray> couldn't withstand the force of <white><killer_name><gray>'s attack and fell!"
+    -
+# ###############################
+#                              #
+#         Score Display        #
+#                              #
+# ###############################
 
 scoreboard:
   title: ''
@@ -34,9 +45,14 @@ scoreboard:
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
     - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
-
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
+
+# ###############################
+#                              #
+#            Arenas            #
+#                              #
+# ###############################
 
 arena:
   switch:
@@ -65,15 +81,238 @@ arena:
     killblock_not_found: "Failed to load arena <arena_name>: Kill block not found"
   deathblock:
     killblock_null: "Kill block is null for arena: <arena_name>"
+
+# ###############################
+#                              #
+#             Kits             #
+#                              #
+# ###############################
+
+kit:
+ loading_kit: "Loading kit..."
+ shop:
+   already_owned: "<red>You already own this kit!"
+   not_enough_coins: "<red>You don't have enough coins to buy this kit!"
+ load:
+   failed: "Failed to load kit: <name>. Error: <error>"
+ not_found: "Kit not found: <name>"
+ cooldown: "<red>You must wait <seconds> seconds before changing kits again."
+ delete:
+   failed: "Failed to delete kit: <name>, <error>"
+ reload:
+   success: "Reloaded <count> kits"
+ selector:
+    title: "<gray>Please select a kit</gray>"
+    item_name: "<!italic><name>"
+    item_description: "<description>"
+
+# ###############################
+#                              #
+#             Shop             #
+#                              #
+# ###############################
+
+shop:
+  common:
+    back: "<yellow>« Back"
+    your_coins: "<yellow>Your Coins: <gold><coins>"
+  categories:
+    title: "<dark_gray>Shop <gray>» <white>Categories"
+    close: "<red>Close"
+    kits:
+      name: "<yellow>Kits"
+      description:
+        - "<gray>Buy and select different kits"
+        - "<gray>to use in the game."
+        - ""
+        - "<white>Click to view!"
+    boosts:
+      name: "<yellow>Boosts"
+      description:
+        - "<gray>Get temporary advantages"
+        - "<gray>and bonuses."
+        - ""
+        - "<white>Click to view!"
+  kits:
+    title: "<dark_gray>Shop <gray>» <white>Kits"
+    owned: "<green>You own this kit"
+    click_to_select: "<yellow>Click to select!"
+    price: "<gray>Price: <gold><price> coins"
+    click_to_purchase: "<yellow>Click to purchase!"
+    not_enough_coins: "<red>You don't have enough coins!"
+    selected: "<green>You selected the kit <gold><kit_name></gold>!"
+    confirmation:
+      gui_title: "<dark_gray>Shop <gray>» <white>Confirm Purchase"
+      title: "<yellow>Purchase Kit: <gold><kit_name>"
+      price: "<gray>Price: <gold><price> coins"
+      balance_sufficient: "<gray>Your balance: <green><coins> coins"
+      balance_insufficient: "<gray>Your balance: <red><coins> coins"
+      confirm: "<green>Purchase for <price> coins"
+      cancel: "<red>Cancel"
+      success: "<green>You purchased the kit <gold><kit_name></gold>!"
+      failed: "<red>Failed to purchase the kit!"
+  boosts:
+    title: "<dark_gray>Shop <gray>» <white>Boosts"
+    description: "<gray><description>"
+    duration: "<gray>Duration: <white><duration>"
+    price: "<gray>Price: <gold><price> coins"
+    active: "<green>Active! <gray>Time left: <white><minutes>m <seconds>s"
+    click_to_purchase: "<yellow>Click to purchase!"
+    already_active: "<yellow>You already have this boost active!"
+    item_name: "<yellow><name>"
+    duration_format:
+      hours: "<hours>h <minutes>m"
+      minutes: "<minutes>m"
+    active_boosts:
+      name: "<yellow>Your Active Boosts"
+      description: "<gray>View your active boosts"
+      click: "<white>Click to view!"
+    not_enough_coins: "<red>You don't have enough coins to buy this boost!"
+    confirmation:
+      gui_title: "<dark_gray>Shop <gray>» <white>Confirm Purchase"
+      title: "<yellow>Purchase Boost: <gold><name>"
+      balance_sufficient: "<gray>Your balance: <green><coins> coins"
+      balance_insufficient: "<gray>Your balance: <red><coins> coins"
+      confirm: "<green>Purchase for <price> coins"
+      cancel: "<red>Cancel"
+      success: "<green>You purchased the <name> <green>boost!"
+    active_gui:
+      title: "<dark_gray>Boosts <gray>» <white>Active Boosts"
+      back: "<yellow>« Back to Shop"
+      no_boosts:
+        title: "<red>No Active Boosts"
+        description:
+          - "<gray>You don't have any active boosts."
+          - "<gray>Visit the shop to purchase boosts!"
+      boost_name: "<yellow><name>"
+      boost_description_line: "<gray><line>"
+      time_remaining: "<gray>Time remaining: <green><time>"
+      kit_boost: "<gray>KitBoost - Not Timed"
+      time_format:
+        hours: "<hours>h <minutes>m <seconds>s"
+        minutes: "<minutes>m <seconds>s"
+        seconds: "<seconds>s"
+
+# ###############################
+#                              #
+#            Boosts            #
+#                              #
+# ###############################
+
+boost:
+  expired: "<red>Your <name> has expired!"
+  error:
+    apply_kit_boost: "Failed to apply kit boost <boost_id>: <error>"
+    remove_kit_boost: "Failed to remove kit boost <boost_id>: <error>"
+    apply_player_boost: "Failed to apply boost <boost_id> to player <player>: <error>"
+    apply_kit_boosts: "Failed to apply kit boosts for kit <kit_name>: <error>"
+  manager:
+    not_found: "‼️ Boost with ID <id> not found"
+    config_apply_failed: "‼️ Failed to apply configuration to boost <boost_id>: <error>"
+    register_start: "🤖 Registering boosts automatically..."
+    register_success: "✅ Successfully found <count> boosts: <names>"
+    register_error: "‼️ Error loading boosts: <error>"
+    class_process_error: "‼️ Could not process potential boost class <class>: <error>"
+    listeners_registered: "👂 Registered <count> boost listeners"
+    reload:
+      start: "🔄 Starting boost system reload..."
+      unregistered: "❌ Unregistered <count> boost listeners"
+      complete: "✅ Boost reload complete: <count> boosts loaded (<change> change)"
+      error: "‼️ Failed to reload boosts: <error>"
+      recovery: "🔧 Attempting recovery..."
+# ###############################
+#                              #
+#        Global Errors         #
+#                              #
+# ###############################
+
 error:
   player_only: "<red>You must be a player to perform this action!"
-shop:
-  already_purchased: "<red>You already own this item!"
-  insufficient_funds: "<red>You don't have enough coins to purchase this item!"
-  purchase_success: "<green>You successfully purchased <gold>{item_name}</gold>!"
-  balance: "<yellow>Your Balance: {balance} coins"
-  refresh: "<gray>Click to refresh"
-  back_to_categories: "<gray>Back to Categories"
-  click_to_go_back: "<gray>Click to go back"
-  owned: "<green>✓ Owned"
-  click_to_purchase: "<yellow>Click to purchase"
+  data_save: "Failed to load or save player data: <error>"
+  data_save_admin: "<red>Failed to load or save player data! Please contact an administrator."
+
+# ###############################
+#                              #
+#           Commands           #
+#                              #
+# ###############################
+
+commands:
+  debug:
+    title: "Debug command"
+  bypass:
+    toggle: "Bypass mode: <status>"
+  reload:
+    success: "<green>Successfully reloaded translations, kits and modifiers!"
+  arena:
+    create:
+      missing_killblock: "Please insert a killblock for the arena!"
+      missing_name: "Please insert a name for the arena!"
+    delete:
+      missing_name: "Please insert a name for the arena!"
+    help: |
+      <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Command
+      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Create an arena
+      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>List all arenas
+      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Delete an arena
+  kit:
+    create:
+      missing_lore: "Please insert a lore for the kit!"
+      missing_name: "Please insert a name for the kit!"
+    delete:
+      default_kit: "You can't delete the default kit!"
+      success: "<green>Successfully deleted kit <name>!"
+      not_found: "Kit <name> does not exist!"
+      missing_name: "Please insert a name for the kit!"
+
+# ###############################
+#                              #
+#            Plugin            #
+#                              #
+# ###############################
+
+plugin:
+  disabled: "💤 KnockBackFFA disabled"
+  first_time_setup: "1️⃣ First time setup: Extra logging of file creations!"
+  data_folder_missing: "⚠️ Data folder not found, creating..."
+  data_folder_created: "📁 Data folder created"
+  config_error: "❌ Config error: <error>"
+  kits_file_missing: "⚠️ kits.yml not found, creating..."
+  kits_file_created: "📁 kits.yml created"
+  kits_loaded: "🦾 Loaded <count> kits"
+  boosts_file_missing: "⚠️ boosts.yml not found, creating..."
+  boosts_file_created: "📁 boosts.yml created"
+  boosts_loaded: "🚀 Loaded <count> boosts"
+  player_boost_manager_initialized: "☑️ Player Boost Manager initialized"
+  modifiers_loaded: "⚙️ <count> modify objects loaded"
+  setting_up_commands: "🔧 Setting up commands..."
+  commands_ready: "✅ Commands ready"
+  registering_events: "🔧 Registering events..."
+  events_registered: "📌 <count> events registered"
+  starting_arena_handler: "🎮 Starting arena handler..."
+  arena_handler_ready: "✅ Arena handler ready (<duration>s)"
+  placeholders_ready: "📎 Placeholders ready"
+  placeholderapi_missing: "⚠️ PlaceholderAPI missing!"
+
+# ###############################
+#                              #
+#          Modifiers           #
+#                              #
+# ###############################
+
+modifiers:
+  reload:
+    start: "🤖 Starting modifier system reload..."
+    unregistered: "❌ Unregistered <count> modifier listeners"
+    complete: "✅ Modifier reload complete: <count> modifiers loaded (<change> change)"
+    error: "‼️ Failed to reload modifiers: <error>"
+    recovery: "🔧 Attempting recovery..."
+  register:
+    start: "🤖 Registering modifiers automatically..."
+    success: "✅ Successfully found <count> modifiers: <names>"
+    error: "‼️ Error loading modifiers: <error>"
+    class_error: "‼️ Could not process potential modifier class <class>: <error>"
+  args:
+    prompt: "Enter value for <name>"
+  events:
+    registered: "👂 Registered <listeners> modifier listeners and <static> static modifiers"
