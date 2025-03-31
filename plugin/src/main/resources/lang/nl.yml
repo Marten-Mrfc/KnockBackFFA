@@ -3,8 +3,9 @@
 #            Player            #
 #                              #
 # ###############################
+
 player:
-  kit_applied: "<green>Selected kit <white><kit_name>"
+  kit_applied: "<green>Geselecteerde kit <white><kit_name>"
   join_message:
     - "<white><player_name><gray> sprong in de arena!"
     - "<white><player_name><gray> is de arena binnengekomen!"
@@ -24,11 +25,12 @@ player:
     - "<white><player_name><gray> werd van het platform geslingerd door <white><killer_name><gray>!"
     - "<white><player_name><gray> kon de kracht van <white><killer_name><gray>'s aanval niet weerstaan en viel!"
     -
-# ###############################
-#                              #
-#         Score Display        #
-#                              #
-# ###############################
+      # ###############################
+      #                              #
+      #         Score Display        #
+      #                              #
+      # ###############################
+
 scoreboard:
   title: ''
   lines:
@@ -42,14 +44,16 @@ scoreboard:
     - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Munten: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+    - '<gray><b>��</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
+
 # ###############################
 #                              #
 #            Arenas            #
 #                              #
 # ###############################
+
 arena:
   switch:
     success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
@@ -77,225 +81,239 @@ arena:
     killblock_not_found: "Laden van arena <arena_name> mislukt: Kill block niet gevonden"
   deathblock:
     killblock_null: "Kill block is null voor arena: <arena_name>"
+
 # ###############################
 #                              #
 #             Kits             #
 #                              #
 # ###############################
+
 kit:
- loading_kit: "Loading kit..."
- shop:
-   already_owned: "<red>You already own this kit!"
-   not_enough_coins: "<red>You don't have enough coins to buy this kit!"
- load:
-   failed: "Failed to load kit: <name>. Error: <error>"
- not_found: "Kit not found: <name>"
- cooldown: "<red>You must wait <seconds> seconds before changing kits again."
- delete:
-   failed: "Failed to delete kit: <name>, <error>"
- reload:
-   success: "Reloaded <count> kits"
- selector:
-    title: "<gray>Please select a kit</gray>"
+  loading_kit: "Kit aan het laden..."
+  shop:
+    already_owned: "<red>Je bezit deze kit al!"
+    not_enough_coins: "<red>Je hebt niet genoeg munten om deze kit te kopen!"
+  load:
+    failed: "Laden van kit mislukt: <name>. Fout: <error>"
+  not_found: "Kit niet gevonden: <name>"
+  cooldown: "<red>Je moet <seconds> seconden wachten voordat je weer van kit kunt wisselen."
+  delete:
+    failed: "Verwijderen van kit mislukt: <name>, <error>"
+  reload:
+    success: "<count> kits opnieuw geladen"
+  selector:
+    title: "<gray>Selecteer een kit</gray>"
     item_name: "<!italic><name>"
     item_description: "<description>"
+
 # ###############################
 #                              #
 #             Shop             #
 #                              #
 # ###############################
+
 shop:
   common:
-    back: "<yellow>« Back"
-    your_coins: "<yellow>Your Coins: <gold><coins>"
+    back: "<yellow>« Terug"
+    your_coins: "<yellow>Jouw Munten: <gold><coins>"
   categories:
-    title: "<dark_gray>Shop <gray>» <white>Categories"
-    close: "<red>Close"
+    title: "<dark_gray>Shop <gray>» <white>Categorieën"
+    close: "<red>Sluiten"
     kits:
       name: "<yellow>Kits"
       description:
-        - "<gray>Buy and select different kits"
-        - "<gray>to use in the game."
+        - "<gray>Koop en selecteer verschillende kits"
+        - "<gray>om in het spel te gebruiken."
         - ""
-        - "<white>Click to view!"
+        - "<white>Klik om te bekijken!"
     boosts:
       name: "<yellow>Boosts"
       description:
-        - "<gray>Get temporary advantages"
-        - "<gray>and bonuses."
+        - "<gray>Krijg tijdelijke voordelen"
+        - "<gray>en bonussen."
         - ""
-        - "<white>Click to view!"
+        - "<white>Klik om te bekijken!"
   kits:
     title: "<dark_gray>Shop <gray>» <white>Kits"
-    owned: "<green>You own this kit"
-    click_to_select: "<yellow>Click to select!"
-    price: "<gray>Price: <gold><price> coins"
-    click_to_purchase: "<yellow>Click to purchase!"
-    not_enough_coins: "<red>You don't have enough coins!"
-    selected: "<green>You selected the kit <gold><kit_name></gold>!"
+    owned: "<green>Je bezit deze kit"
+    click_to_select: "<yellow>Klik om te selecteren!"
+    price: "<gray>Prijs: <gold><price> munten"
+    click_to_purchase: "<yellow>Klik om te kopen!"
+    not_enough_coins: "<red>Je hebt niet genoeg munten!"
+    selected: "<green>Je hebt de kit <gold><kit_name></gold> geselecteerd!"
     confirmation:
-      gui_title: "<dark_gray>Shop <gray>» <white>Confirm Purchase"
-      title: "<yellow>Purchase Kit: <gold><kit_name>"
-      price: "<gray>Price: <gold><price> coins"
-      balance_sufficient: "<gray>Your balance: <green><coins> coins"
-      balance_insufficient: "<gray>Your balance: <red><coins> coins"
-      confirm: "<green>Purchase for <price> coins"
-      cancel: "<red>Cancel"
-      success: "<green>You purchased the kit <gold><kit_name></gold>!"
-      failed: "<red>Failed to purchase the kit!"
+      gui_title: "<dark_gray>Shop <gray>» <white>Aankoop Bevestigen"
+      title: "<yellow>Kit Kopen: <gold><kit_name>"
+      price: "<gray>Prijs: <gold><price> munten"
+      balance_sufficient: "<gray>Je saldo: <green><coins> munten"
+      balance_insufficient: "<gray>Je saldo: <red><coins> munten"
+      confirm: "<green>Kopen voor <price> munten"
+      cancel: "<red>Annuleren"
+      success: "<green>Je hebt de kit <gold><kit_name></gold> gekocht!"
+      failed: "<red>Aankoop van de kit mislukt!"
   boosts:
     title: "<dark_gray>Shop <gray>» <white>Boosts"
     description: "<gray><description>"
-    duration: "<gray>Duration: <white><duration>"
-    price: "<gray>Price: <gold><price> coins"
-    active: "<green>Active! <gray>Time left: <white><minutes>m <seconds>s"
-    click_to_purchase: "<yellow>Click to purchase!"
-    already_active: "<yellow>You already have this boost active!"
+    duration: "<gray>Duur: <white><duration>"
+    price: "<gray>Prijs: <gold><price> munten"
+    active: "<green>Actief! <gray>Tijd over: <white><minutes>m <seconds>s"
+    click_to_purchase: "<yellow>Klik om te kopen!"
+    already_active: "<yellow>Je hebt deze boost al actief!"
     item_name: "<yellow><name>"
     duration_format:
-      hours: "<hours>h <minutes>m"
+      hours: "<hours>u <minutes>m"
       minutes: "<minutes>m"
     active_boosts:
-      name: "<yellow>Your Active Boosts"
-      description: "<gray>View your active boosts"
-      click: "<white>Click to view!"
-    not_enough_coins: "<red>You don't have enough coins to buy this boost!"
+      name: "<yellow>Jouw Actieve Boosts"
+      description: "<gray>Bekijk je actieve boosts"
+      click: "<white>Klik om te bekijken!"
+    not_enough_coins: "<red>Je hebt niet genoeg munten om deze boost te kopen!"
     confirmation:
-      gui_title: "<dark_gray>Shop <gray>» <white>Confirm Purchase"
-      title: "<yellow>Purchase Boost: <gold><name>"
-      balance_sufficient: "<gray>Your balance: <green><coins> coins"
-      balance_insufficient: "<gray>Your balance: <red><coins> coins"
-      confirm: "<green>Purchase for <price> coins"
-      cancel: "<red>Cancel"
-      success: "<green>You purchased the <name> <green>boost!"
+      gui_title: "<dark_gray>Shop <gray>» <white>Aankoop Bevestigen"
+      title: "<yellow>Boost Kopen: <gold><name>"
+      balance_sufficient: "<gray>Je saldo: <green><coins> munten"
+      balance_insufficient: "<gray>Je saldo: <red><coins> munten"
+      confirm: "<green>Kopen voor <price> munten"
+      cancel: "<red>Annuleren"
+      success: "<green>Je hebt de <name> <green>boost gekocht!"
     active_gui:
-      title: "<dark_gray>Boosts <gray>» <white>Active Boosts"
-      back: "<yellow>« Back to Shop"
+      title: "<dark_gray>Boosts <gray>» <white>Actieve Boosts"
+      back: "<yellow>« Terug naar Shop"
       no_boosts:
-        title: "<red>No Active Boosts"
+        title: "<red>Geen Actieve Boosts"
         description:
-          - "<gray>You don't have any active boosts."
-          - "<gray>Visit the shop to purchase boosts!"
+          - "<gray>Je hebt geen actieve boosts."
+          - "<gray>Bezoek de shop om boosts te kopen!"
       boost_name: "<yellow><name>"
       boost_description_line: "<gray><line>"
-      time_remaining: "<gray>Time remaining: <green><time>"
-      kit_boost: "<gray>KitBoost - Not Timed"
+      time_remaining: "<gray>Resterende tijd: <green><time>"
+      kit_boost: "<gray>KitBoost - Niet Tijdgebonden"
       time_format:
-        hours: "<hours>h <minutes>m <seconds>s"
+        hours: "<hours>u <minutes>m <seconds>s"
         minutes: "<minutes>m <seconds>s"
         seconds: "<seconds>s"
+
 # ###############################
 #                              #
 #            Boosts            #
 #                              #
 # ###############################
+
 boost:
-  expired: "<red>Your <name> has expired!"
+  expired: "<red>Je <name> is verlopen!"
   error:
-    apply_kit_boost: "Failed to apply kit boost <boost_id>: <error>"
-    remove_kit_boost: "Failed to remove kit boost <boost_id>: <error>"
-    apply_player_boost: "Failed to apply boost <boost_id> to player <player>: <error>"
-    apply_kit_boosts: "Failed to apply kit boosts for kit <kit_name>: <error>"
+    apply_kit_boost: "Toepassen van kit boost <boost_id> mislukt: <error>"
+    remove_kit_boost: "Verwijderen van kit boost <boost_id> mislukt: <error>"
+    apply_player_boost: "Toepassen van boost <boost_id> op speler <player> mislukt: <error>"
+    apply_kit_boosts: "Toepassen van kit boosts voor kit <kit_name> mislukt: <error>"
   manager:
-    not_found: "‼️ Boost with ID <id> not found"
-    config_apply_failed: "‼️ Failed to apply configuration to boost <boost_id>: <error>"
-    register_start: "🤖 Registering boosts automatically..."
-    register_success: "✅ Successfully found <count> boosts: <names>"
-    register_error: "‼️ Error loading boosts: <error>"
-    class_process_error: "‼️ Could not process potential boost class <class>: <error>"
-    listeners_registered: "👂 Registered <count> boost listeners"
+    not_found: "‼️ Boost met ID <id> niet gevonden"
+    config_apply_failed: "‼️ Toepassen van configuratie op boost <boost_id> mislukt: <error>"
+    register_start: "🤖 Automatisch registreren van boosts..."
+    register_success: "✅ Succesvol <count> boosts gevonden: <names>"
+    register_error: "‼️ Fout bij het laden van boosts: <error>"
+    class_process_error: "‼️ Kon potentiële boost class <class> niet verwerken: <error>"
+    listeners_registered: "👂 <count> boost listeners geregistreerd"
     reload:
-      start: "🔄 Starting boost system reload..."
-      unregistered: "❌ Unregistered <count> boost listeners"
-      complete: "✅ Boost reload complete: <count> boosts loaded (<change> change)"
-      error: "‼️ Failed to reload boosts: <error>"
-      recovery: "🔧 Attempting recovery..."
+      start: "🔄 Boost systeem wordt opnieuw geladen..."
+      unregistered: "❌ <count> boost listeners uitgeschreven"
+      complete: "✅ Boost reload voltooid: <count> boosts geladen (<change> wijziging)"
+      error: "‼️ Opnieuw laden van boosts mislukt: <error>"
+      recovery: "🔧 Bezig met herstel..."
+
 # ###############################
 #                              #
 #        Global Errors         #
 #                              #
 # ###############################
+
 error:
   player_only: "<red>Je moet een speler zijn om deze actie uit te voeren!"
-  data_save: "Failed to load or save player data: <error>"
-  data_save_admin: "<red>Failed to load or save player data! Please contact an administrator."
+  data_save: "Laden of opslaan van spelersdata mislukt: <error>"
+  data_save_admin: "<red>Laden of opslaan van spelersdata mislukt! Neem contact op met een beheerder."
+
 # ###############################
 #                              #
 #           Commands           #
 #                              #
 # ###############################
+
 commands:
   debug:
-    title: "Debug command"
+    title: "Debug commando"
   bypass:
-    toggle: "Bypass mode: <status>"
+    toggle: "Bypass modus: <status>"
   reload:
-    success: "<green>Successfully reloaded translations, kits and modifiers!"
+    success: "<green>Vertalingen, kits en modifiers succesvol opnieuw geladen!"
   arena:
     create:
-      missing_killblock: "Please insert a killblock for the arena!"
-      missing_name: "Please insert a name for the arena!"
+      missing_killblock: "Voer een killblock in voor de arena!"
+      missing_name: "Voer een naam in voor de arena!"
     delete:
-      missing_name: "Please insert a name for the arena!"
+      missing_name: "Voer een naam in voor de arena!"
     help: |
-      <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Command
-      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Create an arena
-      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>List all arenas
-      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Delete an arena
+      <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Commando
+      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Maak een arena
+      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>Toon alle arena's
+      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Verwijder een arena
   kit:
     create:
-      missing_lore: "Please insert a lore for the kit!"
-      missing_name: "Please insert a name for the kit!"
+      missing_lore: "Voer een beschrijving in voor de kit!"
+      missing_name: "Voer een naam in voor de kit!"
     delete:
-      default_kit: "You can't delete the default kit!"
-      success: "<green>Successfully deleted kit <name>!"
-      not_found: "Kit <name> does not exist!"
-      missing_name: "Please insert a name for the kit!"
+      default_kit: "Je kunt de standaard kit niet verwijderen!"
+      success: "<green>Kit <name> succesvol verwijderd!"
+      not_found: "Kit <name> bestaat niet!"
+      missing_name: "Voer een naam in voor de kit!"
+
 # ###############################
 #                              #
 #            Plugin            #
 #                              #
 # ###############################
+
 plugin:
-  disabled: "💤 KnockBackFFA disabled"
-  first_time_setup: "1️⃣ First time setup: Extra logging of file creations!"
-  data_folder_missing: "⚠️ Data folder not found, creating..."
-  data_folder_created: "📁 Data folder created"
-  config_error: "❌ Config error: <error>"
-  kits_file_missing: "⚠️ kits.yml not found, creating..."
-  kits_file_created: "📁 kits.yml created"
-  kits_loaded: "🦾 Loaded <count> kits"
-  boosts_file_missing: "⚠️ boosts.yml not found, creating..."
-  boosts_file_created: "📁 boosts.yml created"
-  boosts_loaded: "🚀 Loaded <count> boosts"
-  player_boost_manager_initialized: "☑️ Player Boost Manager initialized"
-  modifiers_loaded: "⚙️ <count> modify objects loaded"
-  setting_up_commands: "🔧 Setting up commands..."
-  commands_ready: "✅ Commands ready"
-  registering_events: "🔧 Registering events..."
-  events_registered: "📌 <count> events registered"
-  starting_arena_handler: "🎮 Starting arena handler..."
-  arena_handler_ready: "✅ Arena handler ready (<duration>s)"
-  placeholders_ready: "📎 Placeholders ready"
-  placeholderapi_missing: "⚠️ PlaceholderAPI missing!"
+  disabled: "💤 KnockBackFFA uitgeschakeld"
+  first_time_setup: "1️⃣ Eerste keer opstarten: Extra logging van bestandscreaties!"
+  data_folder_missing: "⚠️ Data map niet gevonden, wordt aangemaakt..."
+  data_folder_created: "📁 Data map aangemaakt"
+  config_error: "❌ Configuratie fout: <error>"
+  kits_file_missing: "⚠️ kits.yml niet gevonden, wordt aangemaakt..."
+  kits_file_created: "📁 kits.yml aangemaakt"
+  kits_loaded: "🦾 <count> kits geladen"
+  boosts_file_missing: "⚠️ boosts.yml niet gevonden, wordt aangemaakt..."
+  boosts_file_created: "📁 boosts.yml aangemaakt"
+  boosts_loaded: "🚀 <count> boosts geladen"
+  player_boost_manager_initialized: "☑️ Speler Boost Manager geïnitialiseerd"
+  modifiers_loaded: "⚙️ <count> modifier objecten geladen"
+  setting_up_commands: "🔧 Commando's instellen..."
+  commands_ready: "✅ Commando's gereed"
+  registering_events: "🔧 Events registreren..."
+  events_registered: "📌 <count> events geregistreerd"
+  starting_arena_handler: "🎮 Arena handler starten..."
+  arena_handler_ready: "✅ Arena handler gereed (<duration>s)"
+  placeholders_ready: "📎 Placeholders gereed"
+  placeholderapi_missing: "⚠️ PlaceholderAPI ontbreekt!"
+
 # ###############################
 #                              #
 #          Modifiers           #
 #                              #
 # ###############################
+
 modifiers:
   reload:
-    start: "🤖 Starting modifier system reload..."
-    unregistered: "❌ Unregistered <count> modifier listeners"
-    complete: "✅ Modifier reload complete: <count> modifiers loaded (<change> change)"
-    error: "‼️ Failed to reload modifiers: <error>"
-    recovery: "🔧 Attempting recovery..."
+    start: "?? Modifier systeem wordt opnieuw geladen..."
+    unregistered: "❌ <count> modifier listeners uitgeschreven"
+    complete: "✅ Modifier reload voltooid: <count> modifiers geladen (<change> wijziging)"
+    error: "‼️ Opnieuw laden van modifiers mislukt: <error>"
+    recovery: "🔧 Bezig met herstel..."
   register:
-    start: "🤖 Registering modifiers automatically..."
-    success: "✅ Successfully found <count> modifiers: <names>"
-    error: "‼️ Error loading modifiers: <error>"
-    class_error: "‼️ Could not process potential modifier class <class>: <error>"
+    start: "🤖 Automatisch registreren van modifiers..."
+    success: "✅ Succesvol <count> modifiers gevonden: <names>"
+    error: "‼️ Fout bij het laden van modifiers: <error>"
+    class_error: "‼️ Kon potentiële modifier class <class> niet verwerken: <error>"
   args:
-    prompt: "Enter value for <name>"
+    prompt: "Voer waarde in voor <name>"
   events:
-    registered: "👂 Registered <listeners> modifier listeners and <static> static modifiers"
+    registered: "👂 <listeners> modifier listeners en <static> statische modifiers geregistreerd"
