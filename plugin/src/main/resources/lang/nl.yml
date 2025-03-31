@@ -303,7 +303,7 @@ plugin:
 
 modifiers:
   reload:
-    start: "?? Modifier systeem wordt opnieuw geladen..."
+    start: "🔁 Modifier systeem wordt opnieuw geladen..."
     unregistered: "❌ <count> modifier listeners uitgeschreven"
     complete: "✅ Modifier reload voltooid: <count> modifiers geladen (<change> wijziging)"
     error: "‼️ Opnieuw laden van modifiers mislukt: <error>"
