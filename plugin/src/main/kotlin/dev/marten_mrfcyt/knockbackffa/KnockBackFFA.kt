@@ -37,10 +37,9 @@ class KnockBackFFA : KotlinPlugin() {
         instance = this
 
         printStartupHeader()
+        TranslationManager.init(this)
         setupDataFolder()
         setupConfig()
-
-        TranslationManager.init(this)
 
         if (isEnabled) {
             arenaHandler = ArenaHandler(this)
@@ -88,8 +87,11 @@ class KnockBackFFA : KotlinPlugin() {
 
     private fun setupConfig() {
         try {
+            if (!File(dataFolder, "config.yml").exists()) {
+                saveResource("config.yml", false)
+            }
+            reloadConfig()
             saveDefaultConfig()
-            saveConfig()
         } catch (ex: IllegalArgumentException) {
             logger.severe(TranslationManager.translate("plugin.config_error", "error" to ex.message.toString()))
         }
