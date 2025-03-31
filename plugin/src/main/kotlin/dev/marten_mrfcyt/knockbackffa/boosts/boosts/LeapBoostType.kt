@@ -41,6 +41,9 @@ object LeapBoostType : ItemBoost(
     @ConfigurableProperty(configKey = "soundPitch", defaultValue = "1.0")
     private var soundPitch = 1.0f
 
+    @ConfigurableProperty(configKey = "message_cooldown", defaultValue = "<red>You must wait <seconds>s before using this again!")
+    private var cooldownMessage = "<red>You must wait <seconds>s before using this again!"
+
     private val cooldowns = ConcurrentHashMap<UUID, Long>()
 
     @EventHandler
@@ -55,7 +58,7 @@ object LeapBoostType : ItemBoost(
 
         if (currentTime - lastUse < cooldown) {
             val remaining = cooldown - (currentTime - lastUse)
-            player.message("<red>You must wait ${remaining}s before using this again!")
+            player.message(cooldownMessage.replace("<seconds>", remaining.toString()))
             return
         }
 

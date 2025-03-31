@@ -3,10 +3,12 @@ package dev.marten_mrfcyt.knockbackffa.boosts.managers
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.boosts.models.Boost
 import dev.marten_mrfcyt.knockbackffa.boosts.models.BoostType
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
 import java.util.logging.Level
+import kotlin.text.compareTo
 
 class BoostManager(private val plugin: KnockBackFFA) {
     private val boostRegistry = BoostRegistry(plugin)
@@ -19,7 +21,9 @@ class BoostManager(private val plugin: KnockBackFFA) {
     }
 
     fun getBoost(id: String): Boost {
-        return boostRegistry.getBoost(id) ?: throw IllegalArgumentException("Boost with ID $id not found")
+        return boostRegistry.getBoost(id) ?: throw IllegalArgumentException(
+            TranslationManager.translate("boost.manager.not_found", "id" to id)
+        )
     }
 
     fun getAllBoosts(): Collection<Boost> {
@@ -27,21 +31,43 @@ class BoostManager(private val plugin: KnockBackFFA) {
     }
 
     fun reloadBoosts() {
+        plugin.logger.info(TranslationManager.translate("boost.manager.reload.start"))
+
+        val unregisteredCount = boostRegistry.getAllBoosts().count { it is Listener }
         boostRegistry.getAllBoosts().forEach { boost ->
             if (boost is Listener) {
                 HandlerList.unregisterAll(boost)
             }
         }
+        plugin.logger.info(TranslationManager.translate("boost.manager.reload.unregistered",
+            "count" to unregisteredCount))
 
+        val oldCount = boostRegistry.getAllBoosts().size
         boostRegistry.clearBoosts()
 
         configHandler.loadConfig()
 
-        registerAllBoosts()
+        try {
+            registerAllBoosts()
+            applyConfigsToAllBoosts()
+            registerEvents(plugin)
+            val newCount = boostRegistry.getAllBoosts().size
+            val changeText = when {
+                newCount > oldCount -> "+${newCount - oldCount}"
+                newCount < oldCount -> "-${oldCount - newCount}"
+                else -> "no"
+            }
 
-        applyConfigsToAllBoosts()
+            plugin.logger.info(TranslationManager.translate("boost.manager.reload.complete",
+                "count" to newCount, "change" to changeText))
 
-        KnockBackFFA.instance.playerBoostManager.reloadAllPlayerBoosts()
+            KnockBackFFA.instance.playerBoostManager.reloadAllPlayerBoosts()
+        } catch (e: Exception) {
+            plugin.logger.severe(TranslationManager.translate("boost.manager.reload.error",
+                "error" to e.message.toString()))
+            plugin.logger.info(TranslationManager.translate("boost.manager.reload.recovery"))
+            e.printStackTrace()
+        }
     }
 
     private fun applyConfigsToAllBoosts() {
@@ -49,13 +75,14 @@ class BoostManager(private val plugin: KnockBackFFA) {
             try {
                 configHandler.applyConfigToBoost(boost)
             } catch (e: Exception) {
-                plugin.logger.warning("Failed to apply configuration to boost ${boost.id}: ${e.message}")
+                plugin.logger.warning(TranslationManager.translate("boost.manager.config_apply_failed",
+                    "boost_id" to boost.id, "error" to e.message.toString()))
             }
         }
     }
 
     private fun registerAllBoosts() {
-        plugin.logger.info("🤖 Registering boosts automatically...")
+        plugin.logger.info(TranslationManager.translate("boost.manager.register_start"))
 
         val boostsPackage = "dev.marten_mrfcyt.knockbackffa.boosts.boosts"
         val classLoader = plugin.javaClass.classLoader
@@ -77,9 +104,11 @@ class BoostManager(private val plugin: KnockBackFFA) {
             }
 
             val boostNames = registeredBoosts.joinToString(", ")
-            plugin.logger.info("✅ Successfully found ${registeredBoosts.size} boosts: $boostNames")
+            plugin.logger.info(TranslationManager.translate("boost.manager.register_success",
+                "count" to registeredBoosts.size, "names" to boostNames))
         } catch (e: Exception) {
-            plugin.logger.severe("Error loading boosts: ${e.message}")
+            plugin.logger.severe(TranslationManager.translate("boost.manager.register_error",
+                "error" to e.message.toString()))
             e.printStackTrace()
         }
     }
@@ -138,7 +167,8 @@ class BoostManager(private val plugin: KnockBackFFA) {
                 return boost.id
             }
         } catch (e: Exception) {
-            plugin.logger.log(Level.WARNING, "Could not process potential boost class $className", e)
+            plugin.logger.log(Level.WARNING, TranslationManager.translate("boost.manager.class_process_error",
+                "class" to className, "error" to e.message.toString()), e)
         }
         return null
     }
@@ -155,6 +185,7 @@ class BoostManager(private val plugin: KnockBackFFA) {
                 plugin.server.pluginManager.registerEvents(boost, plugin)
             }
         }
-        plugin.logger.info("👂 Registered ${boostRegistry.getAllBoosts().count { it is Listener }} boost listeners")
+        plugin.logger.info(TranslationManager.translate("boost.manager.listeners_registered",
+            "count" to boostRegistry.getAllBoosts().count { it is Listener }))
     }
 }

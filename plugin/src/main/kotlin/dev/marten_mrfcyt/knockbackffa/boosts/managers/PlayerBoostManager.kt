@@ -7,6 +7,7 @@ import dev.marten_mrfcyt.knockbackffa.boosts.models.Boost
 import dev.marten_mrfcyt.knockbackffa.boosts.models.EffectBoost
 import dev.marten_mrfcyt.knockbackffa.boosts.models.PlayerBoost
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.message
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -78,7 +79,8 @@ class PlayerBoostManager(private val plugin: KnockBackFFA) {
             val boost = plugin.boostManager.getBoost(boostId)
             boost.apply(player)
         } catch (e: Exception) {
-            plugin.logger.warning("Failed to apply kit boost $boostId: ${e.message}")
+            plugin.logger.warning(TranslationManager.translate("boost.error.apply_kit_boost",
+                "boost_id" to boostId, "error" to e.message.toString()))
         }
     }
 
@@ -90,7 +92,8 @@ class PlayerBoostManager(private val plugin: KnockBackFFA) {
                 val boost = plugin.boostManager.getBoost(boostId)
                 boost.remove(player)
             } catch (e: Exception) {
-                plugin.logger.warning("Failed to remove kit boost $boostId: ${e.message}")
+                plugin.logger.warning(TranslationManager.translate("boost.error.remove_kit_boost",
+                    "boost_id" to boostId, "error" to e.message.toString()))
             }
         }
     }
@@ -123,7 +126,7 @@ class PlayerBoostManager(private val plugin: KnockBackFFA) {
             val boostType = plugin.boostManager.getBoost(boostId)
             if (player.isOnline && boostType is EffectBoost) {
                 boostType.remove(player)
-                player.message("<red>Your ${boostType.name} has expired!")
+                player.message(TranslationManager.translate("boost.expired", "name" to boostType.name))
 
                 Bukkit.getPluginManager().callEvent(BoostExpiredEvent(player, boostType))
             }
@@ -232,7 +235,8 @@ class PlayerBoostManager(private val plugin: KnockBackFFA) {
                     val boostType = plugin.boostManager.getBoost(boost.boostId)
                     boostType.apply(player)
                 } catch (e: Exception) {
-                    plugin.logger.warning("Failed to apply boost ${boost.boostId} to player ${player.name}: ${e.message}")
+                    plugin.logger.warning(TranslationManager.translate("boost.error.apply_player_boost",
+                        "boost_id" to boost.boostId, "player" to player.name, "error" to e.message.toString()))
                 }
             } else {
                 removeBoost(playerId, boost.boostId)
@@ -289,7 +293,8 @@ class PlayerBoostManager(private val plugin: KnockBackFFA) {
                     addKitBoost(player, boostId)
                 }
             } catch (e: Exception) {
-                plugin.logger.warning("Failed to apply kit boosts for kit $newKitName: ${e.message}")
+                plugin.logger.warning(TranslationManager.translate("boost.error.apply_kit_boosts",
+                    "kit_name" to newKitName, "error" to e.message.toString()))
             }
         }
     }

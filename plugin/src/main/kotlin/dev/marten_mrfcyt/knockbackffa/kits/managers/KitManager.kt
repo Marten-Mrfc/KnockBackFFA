@@ -1,8 +1,8 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/kits/managers/KitManager.kt
 package dev.marten_mrfcyt.knockbackffa.kits.managers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.models.Kit
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.message
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
@@ -32,7 +32,7 @@ class KitManager(private val plugin: KnockBackFFA) {
                     cachedKits[kitName] = kit
                 }
             } catch (e: Exception) {
-                plugin.logger.log(Level.SEVERE, "Failed to load kit: $kitName", e)
+                plugin.logger.log(Level.SEVERE, TranslationManager.translate("kit.load.failed", "name" to kitName, "error" to e.message.toString()), e)
             }
         }
     }
@@ -45,17 +45,19 @@ class KitManager(private val plugin: KnockBackFFA) {
             }
             kit
         } catch (e: Exception) {
-            plugin.logger.log(Level.WARNING, "Failed to load kit: $kitName", e)
+            plugin.logger.log(Level.WARNING, TranslationManager.translate("kit.load.failed", "name" to kitName, "error" to e.message.toString()), e)
             null
-        } ?: throw IllegalArgumentException("Kit not found: $kitName")
+        } ?: throw IllegalArgumentException(TranslationManager.translate("kit.not_found", "name" to kitName))
     }
 
     fun getAllKitNames(): List<String> {
         val kitConfig = YamlConfiguration.loadConfiguration(configFile)
         return kitConfig.getConfigurationSection("kit")?.getKeys(false)?.toList() ?: emptyList()
     }
+
     private val kitCooldowns = mutableMapOf<UUID, Long>()
     private val kitCooldownSeconds = 30
+
     fun applyKit(player: Player, kitName: String): Boolean {
         val now = System.currentTimeMillis()
         val playerId = player.uniqueId
@@ -64,7 +66,7 @@ class KitManager(private val plugin: KnockBackFFA) {
         val remainingCooldown = ((lastUse + (kitCooldownSeconds * 1000) - now) / 1000).toInt()
 
         if (remainingCooldown > 0) {
-            player.message("<red>You must wait $remainingCooldown seconds before changing kits again.")
+            player.message(TranslationManager.translate("kit.cooldown", "seconds" to remainingCooldown))
             return false
         }
 
@@ -95,7 +97,7 @@ class KitManager(private val plugin: KnockBackFFA) {
             cachedKits.remove(kitName)
             return true
         } catch (e: Exception) {
-            plugin.logger.severe("Failed to delete kit: $kitName, ${e.message}")
+            plugin.logger.severe(TranslationManager.translate("kit.delete.failed", "name" to kitName, "error" to e.message.toString()))
             return false
         }
     }
@@ -110,6 +112,6 @@ class KitManager(private val plugin: KnockBackFFA) {
             plugin.saveResource("kits.yml", false)
         }
         loadAllKits()
-        plugin.logger.info("Reloaded ${cachedKits.size} kits")
+        plugin.logger.info(TranslationManager.translate("kit.reload.success", "count" to cachedKits.size))
     }
 }

@@ -52,6 +52,12 @@ object KnockBackExplosionBoostType : ItemBoost(
     @ConfigurableProperty(configKey = "upwardKnockback", defaultValue = "0.3")
     private var upwardKnockback = 0.3
 
+    @ConfigurableProperty(configKey = "message_cooldown", defaultValue = "<red>KnockBack Explosion is on cooldown! (<seconds> seconds left)")
+    private var cooldownMessage = "<red>KnockBack Explosion is on cooldown! (<seconds> seconds left)"
+
+    @ConfigurableProperty(configKey = "message_knockback", defaultValue = "<red>You were knocked back by an explosion!")
+    private var knockbackMessage = "<red>You were knocked back by an explosion!"
+
     private val cooldowns = ConcurrentHashMap<UUID, Long>()
     private const val METADATA_KEY = "knockback_explosion_owner"
     private val pendingLaunches = mutableSetOf<UUID>()
@@ -109,7 +115,7 @@ object KnockBackExplosionBoostType : ItemBoost(
 
         if (timeRemaining > 0) {
             if (showMessage) {
-                player.message("<red>KnockBack Explosion is on cooldown! ($timeRemaining seconds left)")
+                player.message(cooldownMessage.replace("<seconds>", timeRemaining.toString()))
             }
             return false
         }
@@ -167,7 +173,7 @@ object KnockBackExplosionBoostType : ItemBoost(
                     direction.normalize()
                     val knockback = direction.multiply(knockbackStrength).setY(upwardKnockback)
                     entity.velocity = entity.velocity.add(knockback)
-                    entity.message("<red>You were knocked back by an explosion!")
+                    entity.message(knockbackMessage)
                 }
             }
     }

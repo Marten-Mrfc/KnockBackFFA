@@ -5,6 +5,7 @@ import dev.marten_mrfcyt.knockbackffa.guis.editor.kit.ItemModifierGUI
 import dev.marten_mrfcyt.knockbackffa.kits.models.Kit
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.forms.Form
 import mlib.api.forms.FormType
 import mlib.api.utilities.*
@@ -21,7 +22,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
         registerAllModifiers()
     }
     fun reloadModifiers() {
-        plugin.logger.info("Starting modifier system reload...")
+        plugin.logger.info(TranslationManager.translate("modifiers.reload.start"))
 
         val previousCount = registry.getAllModifiers().size
 
@@ -37,7 +38,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
                     }
                 }
             }
-            plugin.logger.info("Unregistered $unregistered modifier listeners")
+            plugin.logger.info(TranslationManager.translate("modifiers.reload.unregistered", "count" to unregistered))
 
             registry.clearModifiers()
 
@@ -46,13 +47,15 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             registerEvents(KnockBackFFA.instance)
 
             val newCount = registry.getAllModifiers().size
-            plugin.logger.info("Modifier reload complete: $newCount modifiers loaded (${if (newCount > previousCount) "+${newCount - previousCount}" else "${newCount - previousCount}"} change)")
+            val change = newCount - previousCount
+            val changeText = if (change > 0) "+$change" else "$change"
+            plugin.logger.info(TranslationManager.translate("modifiers.reload.complete", "count" to newCount, "change" to changeText))
         } catch (e: Exception) {
-            plugin.logger.severe("Failed to reload modifiers: ${e.message}")
+            plugin.logger.severe(TranslationManager.translate("modifiers.reload.error", "error" to e.message.toString()))
             e.printStackTrace()
 
             if (registry.getAllModifiers().isEmpty()) {
-                plugin.logger.info("Attempting recovery...")
+                plugin.logger.info(TranslationManager.translate("modifiers.reload.recovery"))
                 registerAllModifiers()
                 registerEvents(plugin)
             }
@@ -60,7 +63,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
     }
 
     private fun registerAllModifiers() {
-        logger.info("🤖 Registering modifiers automatically...")
+        logger.info(TranslationManager.translate("modifiers.register.start"))
 
         val modifiersPackage = "dev.marten_mrfcyt.knockbackffa.kits.modifiers"
         val classLoader = plugin.javaClass.classLoader
@@ -113,9 +116,9 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             }
 
             val modifierNames = registeredModifiers.joinToString(", ")
-            logger.info("✅ Successfully found ${registeredModifiers.size} modifiers: $modifierNames")
+            logger.info(TranslationManager.translate("modifiers.register.success", "count" to registeredModifiers.size, "names" to modifierNames))
         } catch (e: Exception) {
-            logger.severe("Error loading modifiers: ${e.message}")
+            logger.severe(TranslationManager.translate("modifiers.register.error", "error" to e.message.toString()))
             e.printStackTrace()
         }
     }
@@ -139,7 +142,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
                 return modifier.id
             }
         } catch (e: Exception) {
-            logger.warning("Could not process potential modifier class $className: ${e.message}")
+            logger.warning(TranslationManager.translate("modifiers.register.class_error", "class" to className, "error" to e.message.toString()))
         }
         return null
     }
@@ -186,7 +189,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
                 else -> FormType.STRING
             }
 
-            val form = Form("Enter value for $argName", formType, 30) { _, response ->
+            val form = Form(TranslationManager.translate("modifiers.args.prompt", "name" to argName), formType, 30) { _, response ->
                 args[argName] = response
                 currentArgIndex++
                 processNextArg()
@@ -212,6 +215,8 @@ class ModifierManager(private val plugin: KnockBackFFA) {
                 plugin.server.pluginManager.registerEvents(entry, plugin)
             }
         }
-        plugin.logger.info("👂 Registered ${registry.getAllModifiers().count { it is Listener }} modifier listeners and ${registry.getAllModifiers().count { it !is Listener }} static modifiers")
+        val listenerCount = registry.getAllModifiers().count { it is Listener }
+        val staticCount = registry.getAllModifiers().count { it !is Listener }
+        plugin.logger.info(TranslationManager.translate("modifiers.events.registered", "listeners" to listenerCount, "static" to staticCount))
     }
 }

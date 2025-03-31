@@ -66,6 +66,12 @@ object SmokeScreenBoostType : ItemBoost(
     @ConfigurableProperty(configKey = "particleYVelocityMultiplier", defaultValue = "0.1")
     private var particleYVelocityMultiplier = 0.1
 
+    @ConfigurableProperty(configKey = "message_cooldown", defaultValue = "<red>Smoke Screen is on cooldown! (<seconds> seconds left)")
+    private var cooldownMessage = "<red>Smoke Screen is on cooldown! (<seconds> seconds left)"
+
+    @ConfigurableProperty(configKey = "message_blinded", defaultValue = "<red>You've been blinded by a smoke screen!")
+    private var blindedMessage = "<red>You've been blinded by a smoke screen!"
+
     private val cooldowns = ConcurrentHashMap<UUID, Long>()
 
     @EventHandler
@@ -82,7 +88,7 @@ object SmokeScreenBoostType : ItemBoost(
 
         if (currentTime - lastUse < cooldown) {
             val remaining = cooldown - (currentTime - lastUse)
-            player.message("<red>Smoke Screen is on cooldown! ($remaining seconds left)")
+            player.message(cooldownMessage.replace("<seconds>", remaining.toString()))
             return
         }
 
@@ -100,7 +106,7 @@ object SmokeScreenBoostType : ItemBoost(
                     false,
                     true
                 ))
-                entity.message("<red>You've been blinded by a smoke screen!")
+                entity.message(blindedMessage)
             }
         }
 

@@ -23,7 +23,6 @@ class BoostConfigHandler(private val plugin: KnockBackFFA) {
         boostConfig.set(configPath, value)
         try {
             boostConfig.save(boostConfigFile)
-            plugin.logger.info("Updated configuration for boost ${boost.id}: $key = $value")
         } catch (e: Exception) {
             plugin.logger.severe("Failed to save boost configuration: ${e.message}")
         }

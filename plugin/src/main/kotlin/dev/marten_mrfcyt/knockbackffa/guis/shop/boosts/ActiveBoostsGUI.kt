@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.guis.shop.boosts
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.utilities.asMini
@@ -9,7 +10,7 @@ import org.bukkit.entity.Player
 import java.time.Duration
 
 class ActiveBoostsGUI(private val plugin: KnockBackFFA, private val player: Player) {
-    private val gui: StandardGui = StandardGui("<dark_gray>Boosts <gray>» <white>Active Boosts".asMini(), GuiSize.ROW_THREE)
+    private val gui: StandardGui = StandardGui(TranslationManager.translate("shop.boosts.active_gui.title").asMini(), GuiSize.ROW_THREE)
 
     init {
         setupGui()
@@ -23,11 +24,8 @@ class ActiveBoostsGUI(private val plugin: KnockBackFFA, private val player: Play
         val activeKitBoosts = plugin.playerBoostManager.getActiveKitBoosts(player.uniqueId)
         if (activeBoosts.isEmpty() && activeKitBoosts.isEmpty()) {
             gui.item(Material.BARRIER) {
-                name("<red>No Active Boosts".asMini())
-                description(listOf(
-                    "<gray>You don't have any active boosts.".asMini(),
-                    "<gray>Visit the shop to purchase boosts!".asMini()
-                ))
+                name(TranslationManager.translate("shop.boosts.active_gui.no_boosts.title").asMini())
+                description(TranslationManager.getStringList("shop.boosts.active_gui.no_boosts.description").map { it.asMini() })
                 slots(13)
             }
         } else {
@@ -43,21 +41,24 @@ class ActiveBoostsGUI(private val plugin: KnockBackFFA, private val player: Play
                 val seconds = remainingTime.seconds % 60
 
                 val timeStr = if (hours > 0) {
-                    "${hours}h ${minutes}m ${seconds}s"
+                    TranslationManager.translate("shop.boosts.active_gui.time_format.hours",
+                        "hours" to hours, "minutes" to minutes, "seconds" to seconds)
                 } else if (minutes > 0) {
-                    "${minutes}m ${seconds}s"
+                    TranslationManager.translate("shop.boosts.active_gui.time_format.minutes",
+                        "minutes" to minutes, "seconds" to seconds)
                 } else {
-                    "${seconds}s"
+                    TranslationManager.translate("shop.boosts.active_gui.time_format.seconds",
+                        "seconds" to seconds)
                 }
 
                 gui.item(boost.icon) {
-                    name("<yellow>${boost.name}".asMini())
+                    name(TranslationManager.translate("shop.boosts.active_gui.boost_name", "name" to boost.name).asMini())
                     description(buildList {
                         boost.description.forEach { line ->
-                            add("<gray>$line".asMini())
+                            add(TranslationManager.translate("shop.boosts.active_gui.boost_description_line", "line" to line).asMini())
                         }
                         add("".asMini())
-                        add("<gray>Time remaining: <green>$timeStr".asMini())
+                        add(TranslationManager.translate("shop.boosts.active_gui.time_remaining", "time" to timeStr).asMini())
                     })
                     slots(slot)
                 }
@@ -68,13 +69,13 @@ class ActiveBoostsGUI(private val plugin: KnockBackFFA, private val player: Play
             }
             activeKitBoosts.forEach { playerBoost ->
                 gui.item(playerBoost.icon) {
-                    name("<yellow>${playerBoost.name}".asMini())
+                    name(TranslationManager.translate("shop.boosts.active_gui.boost_name", "name" to playerBoost.name).asMini())
                     description(buildList {
                         playerBoost.description.forEach { line ->
-                            add("<gray>$line".asMini())
+                            add(TranslationManager.translate("shop.boosts.active_gui.boost_description_line", "line" to line).asMini())
                         }
                         add("".asMini())
-                        add("<gray>KitBoost - Not Timed".asMini())
+                        add(TranslationManager.translate("shop.boosts.active_gui.kit_boost").asMini())
                     })
                     slots(slot)
                 }
@@ -86,7 +87,7 @@ class ActiveBoostsGUI(private val plugin: KnockBackFFA, private val player: Play
         }
 
         gui.item(Material.ARROW) {
-            name("<yellow>« Back to Shop".asMini())
+            name(TranslationManager.translate("shop.boosts.active_gui.back").asMini())
             slots(22)
             onClick { event ->
                 event.isCancelled = true

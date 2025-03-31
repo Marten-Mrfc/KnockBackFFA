@@ -20,15 +20,15 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
         val guiSize = GuiSize.fromRows(inventorySize / 9)
 
         val gui = StandardGuiBuilder()
-            .title("<gray>Please select a kit</gray>".asMini())
+            .title(translate("kit.selector.title").asMini())
             .size(guiSize)
             .setup { standardGui ->
                 kitNames.forEachIndexed { index, kitName ->
                     val kit = KnockBackFFA.kitManager.getKit(kitName)
 
                     standardGui.item(kit.displayIcon) {
-                        name("<!italic>${kit.displayName}".asMini())
-                        description(listOf(kit.description.asMini()))
+                        name(translate("kit.selector.item_name", "name" to kit.displayName).asMini())
+                        description(listOf(translate("kit.selector.item_description", "description" to kit.description).asMini()))
                         slots(index)
                         onClick { event -> openKit(event, kitName) }
                     }
@@ -50,7 +50,7 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
         playerData.savePlayerData(player.uniqueId, playerDataConfig)
 
         if (KnockBackFFA.kitManager.applyKit(player, kitName)) {
-            player.sendMessage(translate("player.kit_applied", "kit_name" to kitName))
+            player.message(translate("player.kit_applied", "kit_name" to kitName))
         }
 
         player.closeInventory()

@@ -44,6 +44,9 @@ object GrapplingHookBoostType : ItemBoost(
     @ConfigurableProperty(configKey = "soundPitch", defaultValue = "1.2")
     private var soundPitch = 1.2f
 
+    @ConfigurableProperty(configKey = "message_cooldown", defaultValue = "<red>Grappling Hook is on cooldown! (<seconds> seconds left)")
+    private var cooldownMessage = "<red>Grappling Hook is on cooldown! (<seconds> seconds left)"
+
     private val cooldowns = ConcurrentHashMap<UUID, Long>()
 
     @EventHandler
@@ -59,34 +62,26 @@ object GrapplingHookBoostType : ItemBoost(
 
             if (currentTime - lastUse < cooldown) {
                 val remaining = cooldown - (currentTime - lastUse)
-                player.message("<red>Grappling Hook is on cooldown! ($remaining seconds left)")
+                player.message(cooldownMessage.replace("<seconds>", remaining.toString()))
                 return
             }
 
-            // Get hook and player locations
             val hookLoc = event.hook.location
             val playerLoc = player.location
 
-            // Calculate vector between player and hook
             val vector = hookLoc.toVector().subtract(playerLoc.toVector())
 
-            // Normalize and scale the vector for desired pull strength
             val velocity = vector.normalize().multiply(pullStrength)
 
-            // Set a reasonable maximum y velocity to prevent extreme vertical movement
             if (velocity.y > maxYVelocity) velocity.y = maxYVelocity
 
-            // Apply velocity to player
             player.velocity = velocity
 
-            // Add a small upward boost to help with movement
             player.velocity = player.velocity.add(Vector(0.0, upwardBoost, 0.0))
 
-            // Play sound and add cooldown
             player.world.playSound(player.location, hookSound, soundVolume, soundPitch)
             cooldowns[player.uniqueId] = currentTime
 
-            // Prevent item damage
             event.hook.remove()
             event.isCancelled = true
         }

@@ -1,9 +1,9 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/guis/shop/ShopCategorySelector.kt
 package dev.marten_mrfcyt.knockbackffa.guis.shop
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.guis.shop.boosts.BoostShop
 import dev.marten_mrfcyt.knockbackffa.guis.shop.kit.KitShop
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.utilities.asMini
@@ -11,7 +11,7 @@ import org.bukkit.Material
 import org.bukkit.entity.Player
 
 class ShopCategorySelector(private val plugin: KnockBackFFA, private val player: Player) {
-    private val gui: StandardGui = StandardGui("<dark_gray>Shop <gray>» <white>Categories".asMini(), GuiSize.ROW_THREE)
+    private val gui: StandardGui = StandardGui(TranslationManager.translate("shop.categories.title").asMini(), GuiSize.ROW_THREE)
 
     init {
         setupGui()
@@ -22,13 +22,8 @@ class ShopCategorySelector(private val plugin: KnockBackFFA, private val player:
         gui.fill(Material.BLACK_STAINED_GLASS_PANE) {}
 
         gui.item(Material.DIAMOND_SWORD) {
-            name("<yellow>Kits".asMini())
-            description(listOf(
-                "<gray>Buy and select different kits".asMini(),
-                "<gray>to use in the game.".asMini(),
-                "".asMini(),
-                "<white>Click to view!".asMini()
-            ))
+            name(TranslationManager.translate("shop.categories.kits.name").asMini())
+            description(TranslationManager.getStringList("shop.categories.kits.description").map { it.asMini() })
             slots(12)
             onClick { event ->
                 event.isCancelled = true
@@ -37,13 +32,8 @@ class ShopCategorySelector(private val plugin: KnockBackFFA, private val player:
         }
 
         gui.item(Material.EXPERIENCE_BOTTLE) {
-            name("<yellow>Boosts".asMini())
-            description(listOf(
-                "<gray>Get temporary advantages".asMini(),
-                "<gray>and bonuses.".asMini(),
-                "".asMini(),
-                "<white>Click to view!".asMini()
-            ))
+            name(TranslationManager.translate("shop.categories.boosts.name").asMini())
+            description(TranslationManager.getStringList("shop.categories.boosts.description").map { it.asMini() })
             slots(14)
             onClick { event ->
                 event.isCancelled = true
@@ -52,7 +42,7 @@ class ShopCategorySelector(private val plugin: KnockBackFFA, private val player:
         }
 
         gui.item(Material.BARRIER) {
-            name("<red>Close".asMini())
+            name(TranslationManager.translate("shop.categories.close").asMini())
             slots(22)
             onClick { event ->
                 event.isCancelled = true

@@ -7,14 +7,9 @@ import mlib.api.utilities.message
 import org.bukkit.Material
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
-import org.bukkit.event.EventHandler
-import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
-import org.bukkit.event.entity.EntityDamageByEntityEvent
-import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.potion.PotionEffect
 import org.bukkit.potion.PotionEffectType
-import org.bukkit.util.Vector
 import java.time.Duration
 import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
@@ -42,6 +37,12 @@ object KnockbackResistanceBoostType : EffectBoost(
     @ConfigurableProperty(configKey = "glowEffect", defaultValue = "true")
     private var glowEffect = true
 
+    @ConfigurableProperty(configKey = "message_activated", defaultValue = "<green>You now have Knockback Resistance!")
+    private var activationMessage = "<green>You now have Knockback Resistance!"
+
+    @ConfigurableProperty(configKey = "message_expired", defaultValue = "<red>Your Knockback Resistance has expired!")
+    private var expirationMessage = "<red>Your Knockback Resistance has expired!"
+
     // Store players who have the boost active
     private val activeBoosts = ConcurrentHashMap<UUID, Boolean>()
 
@@ -59,18 +60,18 @@ object KnockbackResistanceBoostType : EffectBoost(
         // Add to our tracking map
         activeBoosts[player.uniqueId] = true
         player.getAttribute(Attribute.KNOCKBACK_RESISTANCE)?.baseValue = resistancePercentage / 100.0
-            if (glowEffect) {
-                player.addPotionEffect(PotionEffect(
-                    PotionEffectType.GLOWING,
-                    Int.MAX_VALUE,
-                    0,
-                    ambient,
-                    false,
-                    true
-                ))
+        if (glowEffect) {
+            player.addPotionEffect(PotionEffect(
+                PotionEffectType.GLOWING,
+                Int.MAX_VALUE,
+                0,
+                ambient,
+                false,
+                true
+            ))
         }
 
-        player.message("<green>You now have Knockback Resistance!")
+        player.message(activationMessage)
         return true
     }
 
@@ -84,6 +85,6 @@ object KnockbackResistanceBoostType : EffectBoost(
             player.removePotionEffect(PotionEffectType.GLOWING)
         }
 
-        player.message("<red>Your Knockback Resistance has expired!")
+        player.message(expirationMessage)
     }
 }
