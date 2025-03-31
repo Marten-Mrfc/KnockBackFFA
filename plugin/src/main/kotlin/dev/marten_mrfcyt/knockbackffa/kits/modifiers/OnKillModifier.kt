@@ -1,9 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.Modify
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
+import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
@@ -14,7 +14,7 @@ import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.inventory.ItemStack
 import java.io.File
 
-@Modify("onKill")
+@KitModifier("onKill")
 object OnKillModifier : ModifyObject(
     id = "onKill",
     name = "<white>On Kill Modifier",
@@ -44,7 +44,7 @@ object OnKillModifier : ModifyObject(
                 "slot" to slot,
                 "kit_name" to kitName
             )
-            ModifyHandler().handleEvent(source, item, args, id)
+            KnockBackFFA.instance.modifierManager.handleEvent(source, item, args, id)
         }
     }
 }

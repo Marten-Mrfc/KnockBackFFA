@@ -1,14 +1,10 @@
 name: KnockBackFFA
-version: '0.4.0'
+version: '0.5.0'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 api-version: '1.21.4'
 authors: [Marten_Mrfcyt]
 description: A feature-rich KnockBack FFA (Free For All) plugin for Minecraft servers.
-dependencies:
-  server:
-    PlaceholderAPI:
-      load: OMIT
-      required: true
+depend: [PlaceholderAPI]
 permissions:
   kbffa.command:
     description: Allows access to the main KnockBackFFA command
@@ -42,3 +38,18 @@ permissions:
       kbffa.arena: true
       kbffa.kit: true
       kbffa.boosts: true
+
+commands:
+  kbffa:
+    description: Main command for KnockBackFFA
+    usage: /kbffa <subcommand>
+    aliases: [knockbackffa, knbffa]
+  kit:
+    description: Opens the kit selector GUI
+    usage: /kit
+  shop:
+    description: Opens the shop GUI
+    usage: /shop
+  boosts:
+    description: Opens the active boosts GUI
+    usage: /boosts

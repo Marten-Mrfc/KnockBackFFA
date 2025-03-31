@@ -44,7 +44,7 @@ scoreboard:
     - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Munten: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+    - '<gray><b>��</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
 
@@ -303,7 +303,7 @@ plugin:
 
 modifiers:
   reload:
-    start: "?? Modifier systeem wordt opnieuw geladen..."
+    start: "🔁 Modifier systeem wordt opnieuw geladen..."
     unregistered: "❌ <count> modifier listeners uitgeschreven"
     complete: "✅ Modifier reload voltooid: <count> modifiers geladen (<change> wijziging)"
     error: "‼️ Opnieuw laden van modifiers mislukt: <error>"

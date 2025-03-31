@@ -1,9 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.Modify
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
+import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import mlib.api.utilities.message
 import org.bukkit.Material
@@ -21,7 +21,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.event.block.Action
 import java.io.File
 
-@Modify("jumpPad")
+@KitModifier("jumpPad")
 object JumpPadModifier : ModifyObject(
     id = "jumpPad",
     name = "<white>Jump Pad Modifier",
@@ -55,7 +55,7 @@ object JumpPadModifier : ModifyObject(
     fun placePressurePlateEvent(event: BlockPlaceEvent) {
         val item = event.itemInHand
         val args = mapOf("block" to event.block)
-        ModifyHandler().handleEvent(event.player, item, args, id)
+        KnockBackFFA.instance.modifierManager.handleEvent(event.player, item, args, id)
     }
 
     @EventHandler

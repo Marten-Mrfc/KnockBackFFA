@@ -28,7 +28,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         source.inventory.clear()
         try {
             val playerDataHandler = PlayerData.getInstance(plugin)
-            // Handle the killed player
             val playerData = playerDataHandler.getPlayerData(source.uniqueId)
             playerData.apply {
                 set("deaths", getInt("deaths", 0) + 1)
@@ -43,7 +42,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             }
             playerDataHandler.savePlayerData(source.uniqueId, playerData)
 
-            // Handle the killer player
             killer?.let {
                 val killerData = playerDataHandler.getPlayerData(it.uniqueId)
                 killerData.apply {
@@ -55,7 +53,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                     set("killstreak", currentKillstreak)
                     set("coins", getInt("coins", 0) + 1)
 
-                    // Update max-killstreak if the current killstreak is higher
                     if (currentKillstreak > currentMaxKillstreak) {
                         set("max-killstreak", currentKillstreak)
                     }
@@ -72,9 +69,11 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                 playerDataHandler.savePlayerData(it.uniqueId, killerData)
             }
         } catch (e: Exception) {
-            plugin.logger.severe("Failed to load or save player data: ${e.message}")
+            plugin.logger.severe(TranslationManager.translate("error.data_save", "error" to e.message.toString()))
             e.printStackTrace()
-            plugin.server.onlinePlayers.forEach { it.error("Failed to load or save player data! Please contact an administrator.") }
+            plugin.server.onlinePlayers.forEach {
+                it.error(TranslationManager.translate("error.data_save_admin"))
+            }
         }
     }
 
@@ -82,7 +81,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
     fun respawn(event: PlayerRespawnEvent) {
         val source = event.player
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
-        source.message("Loading kit...")
+        source.message(TranslationManager.translate("kit.loading_kit"))
         loadKit(KnockBackFFA.instance, source)
         if (currentArena != null) {
             event.respawnLocation = currentArena

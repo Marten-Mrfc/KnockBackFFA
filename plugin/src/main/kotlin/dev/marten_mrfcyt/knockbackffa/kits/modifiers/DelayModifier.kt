@@ -1,9 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.Modify
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
+import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -14,7 +14,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
-@Modify("delay")
+@KitModifier("delay")
 object DelayModifier : ModifyObject(
     id = "delay",
     name = "<white>Delay Modifier",
@@ -42,7 +42,7 @@ object DelayModifier : ModifyObject(
             "slot" to slot,
             "kit_name" to kitName
         )
-        ModifyHandler().handleEvent(player, item, args, id)
-        ModifyHandler().handleEvent(player, event.consumable, args, "infinite")
+        KnockBackFFA.instance.modifierManager.handleEvent(player, item, args, id)
+        KnockBackFFA.instance.modifierManager.handleEvent(player, event.consumable, args, "infinite")
     }
 }
