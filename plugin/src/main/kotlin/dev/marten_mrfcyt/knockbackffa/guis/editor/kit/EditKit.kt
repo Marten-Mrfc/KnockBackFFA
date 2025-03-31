@@ -24,68 +24,73 @@ class EditKit(private val plugin: KnockBackFFA) {
         }
 
         val kit = KnockBackFFA.kitManager.getKit(kitName)
-
         val inventoryTitle = "<gray>Editing:</gray><white> ".asMini().append(name)
+
         val gui = StandardGuiBuilder()
             .title(inventoryTitle)
             .size(GuiSize.ROW_TWO)
             .setup { standardGui ->
-                standardGui.item(Material.GRAY_STAINED_GLASS_PANE) {
-                    name(Component.text(""))
-                    description(listOf(Component.text("")))
-                    slots(9, 10, 11, 12, 14, 15, 16, 17)
-                    onClick { event -> event.isCancelled = true }
-                }
-
-                standardGui.item(Material.CHEST) {
-                    name("<gray>Edit Items".asMini())
-                    description(listOf())
-                    slots(2)
-                    onClick { event -> editItems(event, kitName) }
-                }
-
+                standardGui.fill(Material.BLACK_STAINED_GLASS_PANE)
                 standardGui.item(Material.NAME_TAG) {
                     name("<gray>Edit Display Name".asMini())
-                    description(listOf())
+                    description(listOf("<gray>Current: <yellow>${kit.displayName}".asMini()))
                     slots(0)
                     onClick { event -> editDisplayName(event, kitName) }
                 }
 
                 standardGui.item(Material.BOOK) {
                     name("<gray>Edit Lore".asMini())
-                    description(listOf())
+                    description(listOf("<gray>Current: <yellow>${kit.description}".asMini()))
                     slots(1)
                     onClick { event -> editLore(event, kitName) }
                 }
+
+                standardGui.item(Material.CHEST) {
+                    name("<gray>Edit Items".asMini())
+                    description(listOf("<gray>Change the kit's inventory items".asMini()))
+                    slots(2)
+                    onClick { event -> editItems(event, kitName) }
+                }
+
                 standardGui.item(Material.EXPERIENCE_BOTTLE) {
                     name("<gray>Manage Kit Boosts".asMini())
                     description(listOf(
                         "<gray>Add or remove boosts".asMini(),
                         "<gray>that are applied when".asMini(),
-                        "<gray>a player selects this kit".asMini()
+                        "<gray>a player selects this kit".asMini(),
+                        "<gray>Active boosts: <yellow>${kit.boosts.size}".asMini()
                     ))
-                    slots(3) // Choose an appropriate slot
+                    slots(3)
                     onClick { event ->
                         event.isCancelled = true
                         KitBoostManager(plugin, source, kitName).openBoostManager()
                     }
                 }
-                standardGui.item(Material.BARRIER) {
-                    name("<gray>Go Back".asMini())
-                    description(listOf())
-                    slots(8)
-                    onClick { event -> goBack(event) }
+                if( kit.name != "default" ) {
+                    standardGui.item(Material.GOLD_INGOT) {
+                        name("<gray>Edit Price".asMini())
+                        description(
+                            listOf(
+                                "<gray>Current price: <yellow>${kit.price} coins".asMini(),
+                                "".asMini(),
+                                "<gray>Click to change the".asMini(),
+                                "<gray>purchase price of this kit".asMini()
+                            )
+                        )
+                        slots(4)
+                        onClick { event -> editPrice(event, kitName) }
+                    }
                 }
 
                 val displayItemMaterial = kit.displayIcon
-
                 val modifiedKit = ItemStack(displayItemMaterial)
                 val modifiedKitMeta = modifiedKit.itemMeta
                 modifiedKitMeta.displayName(kit.displayName.asMini())
-                modifiedKitMeta.lore(listOf(kit.description.asMini(),
+                modifiedKitMeta.lore(listOf(
+                    kit.description.asMini(),
                     "<gray>------------------<reset>".asMini(),
                     "<dark_purple>Drag an item onto me".asMini(),
-                    "<dark_purple>To change my DisplayIcon!".asMini()
+                    "<dark_purple>to change my DisplayIcon!".asMini()
                 ))
                 modifiedKit.itemMeta = modifiedKitMeta
 
@@ -94,6 +99,14 @@ class EditKit(private val plugin: KnockBackFFA) {
                     description(modifiedKitMeta.lore()?.map { it } ?: listOf())
                     slots(13)
                     onClick { event -> editDisplayItem(event, kitName) }
+                }
+
+                // Back button
+                standardGui.item(Material.BARRIER) {
+                    name("<gray>Go Back".asMini())
+                    description(listOf("<gray>Return to kit selection".asMini()))
+                    slots(17)
+                    onClick { event -> goBack(event) }
                 }
             }
             .build()
@@ -136,6 +149,26 @@ class EditKit(private val plugin: KnockBackFFA) {
         form.show(player)
     }
 
+    private fun editPrice(event: InventoryClickEvent, kitName: String) {
+        val player = event.whoClicked as? Player ?: return
+        val kit = KnockBackFFA.kitManager.getKit(kitName)
+
+        val form = Form("Enter the new price for kit $kitName", FormType.INTEGER, 30) { p, response ->
+            val newPrice = response as Int
+            if (newPrice < 0) {
+                p.error("Price cannot be negative!")
+                return@Form
+            }
+
+            kit.price = newPrice
+            kit.save()
+
+            p.message("Kit price updated to $newPrice coins!")
+            kitEditor(p, kit.displayName.asMini(), kit.description.asMini(), kitName, false)
+        }
+        form.show(player)
+    }
+
     private fun goBack(event: InventoryClickEvent) {
         val player = event.whoClicked as? Player ?: return
         EditKitSelector(plugin, player)
@@ -153,6 +186,7 @@ class EditKit(private val plugin: KnockBackFFA) {
         val kit = KnockBackFFA.kitManager.getKit(kitName)
         kit.displayIcon = item.type
         kit.save()
+
         player.message("Display item updated!")
         kitEditor(player, kit.displayName.asMini(), kit.description.asMini(), kitName, false)
     }

@@ -89,6 +89,13 @@ class KitShop(private val plugin: KnockBackFFA, private val player: Player) {
         }
 
         builder.customizeGui { gui ->
+            gui.item(Material.GOLD_INGOT) {
+                name(TranslationManager.translate("shop.common.your_coins", "coins" to coins).asMini())
+                slots(49)
+                onClick {  event ->
+                    event.isCancelled = true
+                }
+            }
             gui.item(Material.ARROW) {
                 name(TranslationManager.translate("shop.common.back").asMini())
                 slots(45)
@@ -96,11 +103,6 @@ class KitShop(private val plugin: KnockBackFFA, private val player: Player) {
                     event.isCancelled = true
                     ShopCategorySelector(plugin, player)
                 }
-            }
-
-            gui.item(Material.GOLD_INGOT) {
-                name(TranslationManager.translate("shop.common.your_coins", "coins" to coins).asMini())
-                slots(49)
             }
         }
 

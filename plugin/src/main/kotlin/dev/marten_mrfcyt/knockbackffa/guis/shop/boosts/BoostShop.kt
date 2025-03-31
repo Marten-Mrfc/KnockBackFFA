@@ -9,6 +9,7 @@ import mlib.api.gui.types.PaginatedGui
 import mlib.api.gui.types.builder.PaginatedGuiBuilder
 import mlib.api.utilities.asMini
 import mlib.api.utilities.message
+import net.kyori.adventure.text.Component
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import java.time.Duration
@@ -32,12 +33,14 @@ class BoostShop(private val plugin: KnockBackFFA, private val player: Player) {
         val boostItems = mutableListOf<PaginatedGui.PaginatedItem>()
         plugin.boostManager.getAllBoosts().forEach { boost ->
             val canAfford = coins >= boost.price
-
-            val desc = mutableListOf(
-                TranslationManager.translate("shop.boosts.description", "description" to boost.description.joinToString(" ")).asMini(),
-                "".asMini()
-            )
-
+            val desc = mutableListOf<Component>()
+            boost.description.forEach { line ->
+                desc.add(
+                    TranslationManager.translate("shop.boosts.description", "description" to line)
+                        .asMini()
+                )
+            }
+            desc.add("".asMini())
             if (boost.getDuration() != null) {
                 desc.add(TranslationManager.translate("shop.boosts.duration", "duration" to formatDuration(boost.getDuration()!!)).asMini())
             } else {
@@ -87,7 +90,7 @@ class BoostShop(private val plugin: KnockBackFFA, private val player: Player) {
         builder.customizeGui { gui ->
             gui.item(Material.ARROW) {
                 name(TranslationManager.translate("shop.common.back").asMini())
-                slots(45) // Bottom left corner
+                slots(45)
                 onClick { event ->
                     event.isCancelled = true
                     ShopCategorySelector(plugin, player)
@@ -96,7 +99,10 @@ class BoostShop(private val plugin: KnockBackFFA, private val player: Player) {
 
             gui.item(Material.GOLD_INGOT) {
                 name(TranslationManager.translate("shop.common.your_coins", "coins" to coins).asMini())
-                slots(49) // Bottom middle
+                slots(49)
+                onClick {  event ->
+                    event.isCancelled = true
+                }
             }
 
             gui.item(Material.EXPERIENCE_BOTTLE) {
