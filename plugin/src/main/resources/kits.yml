@@ -7,7 +7,7 @@ kit:
         item: STICK
         enchants:
           KNOCKBACK: 2
-      Price: 0 # Free (default kit)
+      Price: 0 # DO NOT CHANGE!
     items:
       '0':
         name: <dark_gray>KnockBack Stick
