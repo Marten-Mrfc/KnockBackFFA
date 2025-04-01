@@ -40,6 +40,7 @@ class KnockBackFFA : KotlinPlugin() {
         setupDataFolder()
         TranslationManager.init(this)
         setupConfig()
+        setupUpdateTracker()
 
         if (isEnabled) {
             arenaHandler = ArenaHandler(this)
@@ -106,6 +107,10 @@ class KnockBackFFA : KotlinPlugin() {
         }
         kitManager = KitManager(this)
         logger.info(TranslationManager.translate("plugin.kits_loaded", "count" to kitManager.getAllKitNames().size))
+    }
+
+    private fun setupUpdateTracker() {
+        UpdateTracker.init(this)
     }
 
     fun loadBoosts() {
