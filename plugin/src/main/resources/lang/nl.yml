@@ -274,9 +274,6 @@ commands:
 
 plugin:
   disabled: "💤 KnockBackFFA uitgeschakeld"
-  first_time_setup: "1️⃣ Eerste keer opstarten: Extra logging van bestandscreaties!"
-  data_folder_missing: "⚠️ Data map niet gevonden, wordt aangemaakt..."
-  data_folder_created: "📁 Data map aangemaakt"
   config_error: "❌ Configuratie fout: <error>"
   kits_file_missing: "⚠️ kits.yml niet gevonden, wordt aangemaakt..."
   kits_file_created: "📁 kits.yml aangemaakt"

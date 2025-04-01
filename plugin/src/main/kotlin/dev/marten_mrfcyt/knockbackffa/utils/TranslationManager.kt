@@ -1,5 +1,6 @@
 package dev.marten_mrfcyt.knockbackffa.utils
 
+import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.File
@@ -126,6 +127,9 @@ class TranslationManager(private val plugin: Plugin) {
 
     private fun loadTranslations() {
         val langFolder = File(plugin.dataFolder, "lang")
+        val loadedLocales = mutableListOf<String>()
+        var totalTranslations = 0
+
         langFolder.listFiles { file -> file.extension == "yml" }?.forEach { file ->
             try {
                 val locale = Locale.forLanguageTag(file.nameWithoutExtension)
@@ -137,11 +141,15 @@ class TranslationManager(private val plugin: Plugin) {
                             else -> value.toString()
                         }
                     }
+
                 translations[locale] = loadedTranslations
-                plugin.logger.info("✔️ Loaded ${loadedTranslations.size} translations for locale '${locale.language}'")
+                loadedLocales.add("${locale.language}(${loadedTranslations.size})")
+                totalTranslations += loadedTranslations.size
             } catch (e: Exception) {
                 plugin.logger.warning("❌ Failed to load language file ${file.name}: ${e.message}")
             }
         }
+
+        plugin.logger.info("✔️ Loaded $totalTranslations translations across ${loadedLocales.size} locales: ${loadedLocales.joinToString(", ")}")
     }
 }

@@ -37,8 +37,8 @@ class KnockBackFFA : KotlinPlugin() {
         instance = this
 
         printStartupHeader()
-        TranslationManager.init(this)
         setupDataFolder()
+        TranslationManager.init(this)
         setupConfig()
 
         if (isEnabled) {
@@ -76,12 +76,12 @@ class KnockBackFFA : KotlinPlugin() {
         logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
     }
 
-    private fun setupDataFolder() {
+    fun setupDataFolder() {
         if (!dataFolder.exists()) {
-            logger.info(TranslationManager.translate("plugin.first_time_setup"))
-            logger.warning(TranslationManager.translate("plugin.data_folder_missing"))
+            logger.info("1️⃣ First time setup: Extra logging of file creations!")
+            logger.warning("⚠️ Data folder not found, creating...")
             dataFolder.mkdirs()
-            logger.info(TranslationManager.translate("plugin.data_folder_created"))
+            logger.info("📁 Data folder created")
         }
     }
 

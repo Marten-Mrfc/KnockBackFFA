@@ -258,9 +258,6 @@ commands:
 # ###############################
 plugin:
   disabled: "💤 KnockBackFFA kikapcsolva"
-  first_time_setup: "1️⃣ Első indítás: Extra fájl készítési naplózás!"
-  data_folder_missing: "⚠️ Nem létezik Data mappa, készítés folyamatban..."
-  data_folder_created: "📁 Data mappa elkészült"
   config_error: "❌ Config hiba: <error>"
   kits_file_missing: "⚠️ Nem létezik kits.yml fájl, készítés folyamatban..."
   kits_file_created: "📁 kits.yml fájl elkészült!"

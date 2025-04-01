@@ -273,9 +273,6 @@ commands:
 
 plugin:
   disabled: "💤 KnockBackFFA disabled"
-  first_time_setup: "1️⃣ First time setup: Extra logging of file creations!"
-  data_folder_missing: "⚠️ Data folder not found, creating..."
-  data_folder_created: "📁 Data folder created"
   config_error: "❌ Config error: <error>"
   kits_file_missing: "⚠️ kits.yml not found, creating..."
   kits_file_created: "📁 kits.yml created"
