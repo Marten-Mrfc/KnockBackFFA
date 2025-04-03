@@ -1,6 +1,104 @@
-# Messages
-Some of the messages can be editted via the messages.yml file these are:
-- Join messages
-- Leave messages
-- Death with killer messages
-- Death message
+# MultiLanguage
+
+This guide will walk you through how the translation system works in KnockbackFFA, showing you how to add new languages or customize existing translations.
+
+## How Translations Work
+
+KnockbackFFA uses YAML files to store translations organized by language. The system loads these files at startup and manages language selection based on your server configuration.
+
+### Translation File Structure
+
+Translation files are stored in the `lang` folder within the plugin's data directory:
+
+```
+plugins/KnockbackFFA/lang/
+├── en.yml    # English (default)
+├── nl.yml    # Dutch
+└── ...       # Other languages
+```
+
+Each language file follows the same structure with nested keys organizing different categories of messages:
+
+- Player messages
+- Scoreboard text
+- Arena-related messages
+- Kit messages
+- Shop text
+- Boost messages
+- Error messages
+- Command responses
+
+## Setting the Language
+
+To change the language used by the plugin:
+
+1. Open the main `config.yml` file
+2. Find the `language` setting
+3. Set it to your preferred language code (e.g., `en` for English, `nl` for Dutch)
+4. Reload the plugin using `/kbffa reload`
+
+```yaml
+# Example config.yml
+language: en  # Change to your preferred language code
+```
+
+## Adding a New Language
+
+To create a new language file:
+
+1. Copy the `en.yml` file as a template
+2. Rename it to your language code (e.g., `fr.yml` for French)
+3. Translate all messages in the file
+4. Reload the plugin with `/kbffa reload`
+
+The plugin will automatically detect your new language file on reload.
+
+## Understanding Placeholders
+
+Translations use placeholders that get replaced with dynamic content. Placeholders are surrounded by angle brackets, like `<player_name>` or `<arena_name>`.
+
+Example:
+```yaml
+arena:
+  switch:
+    success: "<green>Teleported to arena <white><arena_name><green>!"
+```
+
+In this example, `<arena_name>` will be replaced with the actual arena name when the message is displayed.
+
+## Color and Formatting
+
+Messages support [MiniMessage](https://docs.advntr.dev/minimessage/format.html) format for colors and styling:
+
+- `<color>text</color>` - Apply colors like `<green>`, `<red>`, `<white>`
+- `<b>text</b>` - Bold text
+- `<i>text</i>` - Italic text
+
+Example:
+```yaml
+player:
+  kit_applied: "<green>Selected kit <white><kit_name>"
+```
+
+## Translation Fallbacks
+
+If a translation is missing in the selected language, the system will automatically fall back to English. This ensures players always see messages even if some translations are incomplete.
+
+## Reloading Translations
+
+After making changes to any language file, use the command:
+
+```
+/kbffa reload
+```
+
+This will refresh all translations without requiring a server restart.
+
+## Tips for Translators
+
+1. Maintain all placeholders when translating
+2. Keep formatting tags like colors and styling
+3. Test your translations in-game after reloading
+4. Consider the context of each message for accurate translation
+
+By following this guide, you can fully customize the language experience for your players or contribute new language files to the project.

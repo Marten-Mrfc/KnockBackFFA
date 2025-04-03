@@ -1,6 +1,5 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
-import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener

@@ -1,17 +1,102 @@
 # Arenas
 
-Arenas are a big part of KnockBackFFA. They are the places where players will fight each other. In this guide, we will show you how to create and manage arenas.
+Arenas are the dynamic battlegrounds where players engage in knockback combat. This guide covers everything you need to know about creating, managing, and optimizing arenas in KnockBackFFA.
 
-:::info[config]
-Everything shown here can also be editted in the arenas.yml file.
-:::
+## Arena System Overview
 
-## Creating an arena
-To create an arena, use the command:
-`/kbffa arena create (name) (killblock)`
+Arenas in KnockBackFFA rotate automatically based on your configuration settings. The plugin manages:
+- Random arena selection at defined intervals
+- Player teleportation between arenas
+- Death detection via custom kill blocks
+- Arena persistence between server restarts
 
-Replace `(name)` with the name you want for the arena and `(killblock)` with the block that will kill players upon contact. For example, if you want the void to be the killblock, use minecraft:structure_void and place these blocks at the bottom of your map.
+## Creating Arenas
 
-## Deleting arenas
-To delete an arena, use the command:
-`/kbffa arena delete (name)`
+To create a new arena, use the command:
+
+```
+/kbffa arena create <name> <killblock>
+```
+
+Where:
+- `<name>` is a unique identifier for your arena
+- `<killblock>` is the material that will trigger player death (e.g., `WATER`, `LAVA`, `STRUCTURE_VOID`)
+
+Example:
+```
+/kbffa arena create CoalMine COAL_BLOCK
+```
+
+This creates an arena named "CoalMine" at your current location, with `COAL_BLOCK` as the kill block.
+
+## Managing Arenas
+
+### Listing All Arenas
+
+To see all available arenas:
+
+```
+/kbffa arena list
+```
+
+This displays all registered arenas with their locations and settings.
+
+### Deleting Arenas
+
+To remove an arena:
+
+```
+/kbffa arena delete <name>
+```
+
+Example:
+```
+/kbffa arena delete CoalMine
+```
+
+## Arena Configuration
+
+Arenas are stored in `arena.yml` in your plugin directory. Each arena entry contains:
+
+```yaml
+arenas:
+  CoalMine:
+    location:
+      world: world
+      x: 100.5
+      y: 64.0
+      z: 200.5
+      yaw: 90.0
+      pitch: 0.0
+    killBlock: COAL_BLOCK
+```
+
+## Arena Rotation Settings
+
+The arena rotation interval is configured in `config.yml`:
+
+```yaml
+# Time in seconds before switching to another arena
+mapDuration: 60
+```
+
+## Advanced Usage
+
+### Kill Blocks
+
+Kill blocks are special blocks that instantly kill players when they make contact.
+
+### Best Practices
+
+1. **Place spawn points strategically** - Ensure players spawn away from edges and kill blocks
+2. **Design with knockback in mind** - Create platforms with adequate space for knockback mechanics
+3. **Consider visibility** - Make kill zones clearly visible to prevent confusion
+4. **Test thoroughly** - Check spawn points and kill block placement before going live
+
+## Troubleshooting
+
+- **Missing arenas**: Ensure `arena.yml` exists and contains valid arena data
+- **Kill blocks not working**: Verify the block type exists in your Minecraft version
+- **Players not teleporting**: Check world permissions and ensure PvP is enabled
+
+If you you still have problems join our [Discord server](https://discord.gg/9Fb94BhP5C) and ask for help in the support channel. We are happy to help you out!

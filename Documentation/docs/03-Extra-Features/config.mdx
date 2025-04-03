@@ -9,34 +9,17 @@ The config also contains some configurations you can change.
 #                              #
 # ###############################
 
-mapDuration: 60
-allowDropping: false
-allowPickUp: false
-allowCrafting: true
-allowBlockBreaking: false
-allowDamage: false
-
-
-# ###############################
-#                              #
-#          Scoreboard          #
-#                              #
-# ###############################
-
-scoreboard:
-  title: ''
-  lines:
-    - '<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>'
-    - '<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>'
-    - '<gray><b>└</b></gray><white>Current map:</white> <green>%knockbackffa_map%</green>'
-    - ''
-    - '<gray><b>┌─</b></gray><gold><b>STATS</b></gold>'
-    - '<gray><b>├</b></gray><white>Your ping: </white><green>%player_ping%</green>'
-    - '<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_kills%</green>'
-    - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
-    - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
-    - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+language: "en" # Language for the plugin.
+mapDuration: 60 # Duration between map changes in seconds.
+allowDropping: false # Allow players to drop items
+allowPickUp: false # Allow players to pick up items
+allowCrafting: true # Allow players to craft items
+allowBlockBreaking: false # Allow players to break blocks
+allowDamage: false # Allow players to damage each other
+bossbar: # Enable or disable the bossbar
+  enabled: true
+scoreboard: # Enable or disable the scoreboard
+  enabled: true
 
 
 # ###############################
@@ -53,6 +36,16 @@ storage:
     database: knockbackffa # The database name
     user: root # Username for MySQL
     password: '' # MySQL password
+
+
+# ###############################
+#                              #
+#         DO NOT EDIT!         #
+#                              #
+# ###############################
+
+currentArena: '' # Current arena name
+currentLocation: '' # Current location of the player
 ```
 
 ## currentArena & currentLocation

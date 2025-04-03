@@ -1,0 +1,119 @@
+boosts:
+  # Grappling Hook Boost
+  grappling_hook:
+    enabled: true
+    name: Grappling Hook
+    description:
+      - Cast your hook and pull yourself
+      - towards any surface or block
+    icon: FISHING_ROD
+    price: 10
+    cooldown: 8
+    pullStrength: 2.0
+    maxYVelocity: 0.8
+    upwardBoost: 0.2
+    sound: ENTITY_BAT_TAKEOFF
+    soundVolume: 1.0
+    soundPitch: 1.2
+  
+  # Leap Boost
+  leap:
+    enabled: true
+    name: Leap Boost
+    description:
+      - Right-click to launch yourself forward
+      - Great for escaping or chasing
+    icon: FEATHER
+    price: 1
+    leapStrength: 1.5
+    cooldown: 10
+    verticalBoost: 0.2
+    sound: ENTITY_FIREWORK_ROCKET_LAUNCH
+    soundVolume: 1.0
+    soundPitch: 1.0
+  
+  # Smoke Screen Boost
+  smoke_screen:
+    enabled: true
+    name: Smoke Screen
+    description:
+      - Creates a dense smoke cloud around you
+      - Blinds nearby enemies
+    icon: CAMPFIRE
+    price: 3
+    smokeRadius: 5.0
+    smokeDuration: 5
+    blindnessDuration: 100
+    cooldown: 30
+    particleCount: 350
+    particleType: CAMPFIRE_COSY_SMOKE
+    sound: ENTITY_DRAGON_FIREBALL_EXPLODE
+    soundVolume: 1.0
+    soundPitch: 1.0
+    blindnessAmplifier: 0
+    maxCloudHeight: 2.0
+    particleVelocityMultiplier: 0.05
+    particleYVelocityMultiplier: 0.1
+  
+  # Speed Boost
+  speed_boost:
+    enabled: true
+    name: Speed Boost
+    description:
+      - Move faster around the arena
+      - Gain a significant speed advantage
+    icon: RABBIT_FOOT
+    price: 30
+    speedAmplifier: 1
+    particles: false
+    ambient: true
+    effectDuration: 20
+  
+  # Jump Boost
+  jump_boost:
+    enabled: true
+    name: Jump Boost
+    description:
+      - Jump higher than normal
+      - Perfect for reaching platforms
+    icon: SLIME_BLOCK
+    price: 20
+    jumpAmplifier: 1
+    particles: false
+    ambient: true
+    effectDuration: 15
+  
+  # Knockback Resistance Boost
+  knockback_resistance:
+    enabled: true
+    name: Knockback Resistance
+    description:
+      - Resist knockback from attacks
+      - Stay grounded during fights
+    icon: NETHERITE_BOOTS
+    price: 25
+    resistancePercentage: 50
+    particles: false
+    ambient: true
+    glowEffect: true
+    effectDuration: 10
+  
+  # Knockback Explosion Boost
+  knockback_explosion:
+    enabled: true
+    name: KnockBack Explosion
+    description:
+      - Throw to stick to surfaces
+      - Explodes to knock back nearby players
+    icon: MAGMA_CREAM
+    price: 5
+    knockbackRadius: 8.0
+    knockbackStrength: 3.0
+    fuseTime: 3
+    cooldown: 15
+    particleCount: 50
+    explosionSound: ENTITY_GENERIC_EXPLODE
+    throwSound: ENTITY_WIND_CHARGE_THROW
+    explosionParticle: EXPLOSION
+    warningParticle: FLAME
+    upwardKnockback: 0.3

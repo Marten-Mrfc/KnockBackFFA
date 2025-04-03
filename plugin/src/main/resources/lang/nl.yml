@@ -1,6 +1,11 @@
-# lang/nl.yml
+# ###############################
+#                              #
+#            Player            #
+#                              #
+# ###############################
+
 player:
-  kit_selected: "<green>Geselecteerde kit <white><kit_name>"
+  kit_applied: "<green>Geselecteerde kit <white><kit_name>"
   join_message:
     - "<white><player_name><gray> sprong in de arena!"
     - "<white><player_name><gray> is de arena binnengekomen!"
@@ -19,6 +24,13 @@ player:
     - "<white><player_name><gray> ontmoette zijn einde dankzij <white><killer_name><gray>'s knockback!"
     - "<white><player_name><gray> werd van het platform geslingerd door <white><killer_name><gray>!"
     - "<white><player_name><gray> kon de kracht van <white><killer_name><gray>'s aanval niet weerstaan en viel!"
+    -
+      # ###############################
+      #                              #
+      #         Score Display        #
+      #                              #
+      # ###############################
+
 scoreboard:
   title: ''
   lines:
@@ -32,9 +44,16 @@ scoreboard:
     - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
     - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
     - '<gray><b>├</b></gray><white>Munten: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+    - '<gray><b>��</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
+
+# ###############################
+#                              #
+#            Arenas            #
+#                              #
+# ###############################
+
 arena:
   switch:
     success: "<green>Geteleporteerd naar arena <white><arena_name><green>!"
@@ -62,5 +81,236 @@ arena:
     killblock_not_found: "Laden van arena <arena_name> mislukt: Kill block niet gevonden"
   deathblock:
     killblock_null: "Kill block is null voor arena: <arena_name>"
+
+# ###############################
+#                              #
+#             Kits             #
+#                              #
+# ###############################
+
+kit:
+  loading_kit: "Kit aan het laden..."
+  shop:
+    already_owned: "<red>Je bezit deze kit al!"
+    not_enough_coins: "<red>Je hebt niet genoeg munten om deze kit te kopen!"
+  load:
+    failed: "Laden van kit mislukt: <name>. Fout: <error>"
+  not_found: "Kit niet gevonden: <name>"
+  cooldown: "<red>Je moet <seconds> seconden wachten voordat je weer van kit kunt wisselen."
+  delete:
+    failed: "Verwijderen van kit mislukt: <name>, <error>"
+  reload:
+    success: "<count> kits opnieuw geladen"
+  selector:
+    title: "<gray>Selecteer een kit</gray>"
+    item_name: "<!italic><name>"
+    item_description: "<description>"
+
+# ###############################
+#                              #
+#             Shop             #
+#                              #
+# ###############################
+
+shop:
+  common:
+    back: "<yellow>« Terug"
+    your_coins: "<yellow>Jouw Munten: <gold><coins>"
+  categories:
+    title: "<dark_gray>Shop <gray>» <white>Categorieën"
+    close: "<red>Sluiten"
+    kits:
+      name: "<yellow>Kits"
+      description:
+        - "<gray>Koop en selecteer verschillende kits"
+        - "<gray>om in het spel te gebruiken."
+        - ""
+        - "<white>Klik om te bekijken!"
+    boosts:
+      name: "<yellow>Boosts"
+      description:
+        - "<gray>Krijg tijdelijke voordelen"
+        - "<gray>en bonussen."
+        - ""
+        - "<white>Klik om te bekijken!"
+  kits:
+    title: "<dark_gray>Shop <gray>» <white>Kits"
+    owned: "<green>Je bezit deze kit"
+    click_to_select: "<yellow>Klik om te selecteren!"
+    price: "<gray>Prijs: <gold><price> munten"
+    click_to_purchase: "<yellow>Klik om te kopen!"
+    not_enough_coins: "<red>Je hebt niet genoeg munten!"
+    selected: "<green>Je hebt de kit <gold><kit_name></gold> geselecteerd!"
+    confirmation:
+      gui_title: "<dark_gray>Shop <gray>» <white>Aankoop Bevestigen"
+      title: "<yellow>Kit Kopen: <gold><kit_name>"
+      price: "<gray>Prijs: <gold><price> munten"
+      balance_sufficient: "<gray>Je saldo: <green><coins> munten"
+      balance_insufficient: "<gray>Je saldo: <red><coins> munten"
+      confirm: "<green>Kopen voor <price> munten"
+      cancel: "<red>Annuleren"
+      success: "<green>Je hebt de kit <gold><kit_name></gold> gekocht!"
+      failed: "<red>Aankoop van de kit mislukt!"
+  boosts:
+    title: "<dark_gray>Shop <gray>» <white>Boosts"
+    description: "<gray><description>"
+    duration: "<gray>Duur: <white><duration>"
+    price: "<gray>Prijs: <gold><price> munten"
+    active: "<green>Actief! <gray>Tijd over: <white><minutes>m <seconds>s"
+    click_to_purchase: "<yellow>Klik om te kopen!"
+    already_active: "<yellow>Je hebt deze boost al actief!"
+    item_name: "<yellow><name>"
+    duration_format:
+      hours: "<hours>u <minutes>m"
+      minutes: "<minutes>m"
+    active_boosts:
+      name: "<yellow>Jouw Actieve Boosts"
+      description: "<gray>Bekijk je actieve boosts"
+      click: "<white>Klik om te bekijken!"
+    not_enough_coins: "<red>Je hebt niet genoeg munten om deze boost te kopen!"
+    confirmation:
+      gui_title: "<dark_gray>Shop <gray>» <white>Aankoop Bevestigen"
+      title: "<yellow>Boost Kopen: <gold><name>"
+      balance_sufficient: "<gray>Je saldo: <green><coins> munten"
+      balance_insufficient: "<gray>Je saldo: <red><coins> munten"
+      confirm: "<green>Kopen voor <price> munten"
+      cancel: "<red>Annuleren"
+      success: "<green>Je hebt de <name> <green>boost gekocht!"
+    active_gui:
+      title: "<dark_gray>Boosts <gray>» <white>Actieve Boosts"
+      back: "<yellow>« Terug naar Shop"
+      no_boosts:
+        title: "<red>Geen Actieve Boosts"
+        description:
+          - "<gray>Je hebt geen actieve boosts."
+          - "<gray>Bezoek de shop om boosts te kopen!"
+      boost_name: "<yellow><name>"
+      boost_description_line: "<gray><line>"
+      time_remaining: "<gray>Resterende tijd: <green><time>"
+      kit_boost: "<gray>KitBoost - Niet Tijdgebonden"
+      time_format:
+        hours: "<hours>u <minutes>m <seconds>s"
+        minutes: "<minutes>m <seconds>s"
+        seconds: "<seconds>s"
+
+# ###############################
+#                              #
+#            Boosts            #
+#                              #
+# ###############################
+
+boost:
+  expired: "<red>Je <name> is verlopen!"
+  error:
+    apply_kit_boost: "Toepassen van kit boost <boost_id> mislukt: <error>"
+    remove_kit_boost: "Verwijderen van kit boost <boost_id> mislukt: <error>"
+    apply_player_boost: "Toepassen van boost <boost_id> op speler <player> mislukt: <error>"
+    apply_kit_boosts: "Toepassen van kit boosts voor kit <kit_name> mislukt: <error>"
+  manager:
+    not_found: "‼️ Boost met ID <id> niet gevonden"
+    config_apply_failed: "‼️ Toepassen van configuratie op boost <boost_id> mislukt: <error>"
+    register_start: "🤖 Automatisch registreren van boosts..."
+    register_success: "✅ Succesvol <count> boosts gevonden: <names>"
+    register_error: "‼️ Fout bij het laden van boosts: <error>"
+    class_process_error: "‼️ Kon potentiële boost class <class> niet verwerken: <error>"
+    listeners_registered: "👂 <count> boost listeners geregistreerd"
+    reload:
+      start: "🔄 Boost systeem wordt opnieuw geladen..."
+      unregistered: "❌ <count> boost listeners uitgeschreven"
+      complete: "✅ Boost reload voltooid: <count> boosts geladen (<change> wijziging)"
+      error: "‼️ Opnieuw laden van boosts mislukt: <error>"
+      recovery: "🔧 Bezig met herstel..."
+
+# ###############################
+#                              #
+#        Global Errors         #
+#                              #
+# ###############################
+
 error:
   player_only: "<red>Je moet een speler zijn om deze actie uit te voeren!"
+  data_save: "Laden of opslaan van spelersdata mislukt: <error>"
+  data_save_admin: "<red>Laden of opslaan van spelersdata mislukt! Neem contact op met een beheerder."
+
+# ###############################
+#                              #
+#           Commands           #
+#                              #
+# ###############################
+
+commands:
+  debug:
+    title: "Debug commando"
+  bypass:
+    toggle: "Bypass modus: <status>"
+  reload:
+    success: "<green>Vertalingen, kits en modifiers succesvol opnieuw geladen!"
+  arena:
+    create:
+      missing_killblock: "Voer een killblock in voor de arena!"
+      missing_name: "Voer een naam in voor de arena!"
+    delete:
+      missing_name: "Voer een naam in voor de arena!"
+    help: |
+      <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Commando
+      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Maak een arena
+      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>Toon alle arena's
+      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Verwijder een arena
+  kit:
+    create:
+      missing_lore: "Voer een beschrijving in voor de kit!"
+      missing_name: "Voer een naam in voor de kit!"
+    delete:
+      default_kit: "Je kunt de standaard kit niet verwijderen!"
+      success: "<green>Kit <name> succesvol verwijderd!"
+      not_found: "Kit <name> bestaat niet!"
+      missing_name: "Voer een naam in voor de kit!"
+
+# ###############################
+#                              #
+#            Plugin            #
+#                              #
+# ###############################
+
+plugin:
+  disabled: "💤 KnockBackFFA uitgeschakeld"
+  config_error: "❌ Configuratie fout: <error>"
+  kits_file_missing: "⚠️ kits.yml niet gevonden, wordt aangemaakt..."
+  kits_file_created: "📁 kits.yml aangemaakt"
+  kits_loaded: "🦾 <count> kits geladen"
+  boosts_file_missing: "⚠️ boosts.yml niet gevonden, wordt aangemaakt..."
+  boosts_file_created: "📁 boosts.yml aangemaakt"
+  boosts_loaded: "🚀 <count> boosts geladen"
+  player_boost_manager_initialized: "☑️ Speler Boost Manager geïnitialiseerd"
+  modifiers_loaded: "⚙️ <count> modifier objecten geladen"
+  setting_up_commands: "🔧 Commando's instellen..."
+  commands_ready: "✅ Commando's gereed"
+  registering_events: "🔧 Events registreren..."
+  events_registered: "📌 <count> events geregistreerd"
+  starting_arena_handler: "🎮 Arena handler starten..."
+  arena_handler_ready: "✅ Arena handler gereed (<duration>s)"
+  placeholders_ready: "📎 Placeholders gereed"
+  placeholderapi_missing: "⚠️ PlaceholderAPI ontbreekt!"
+
+# ###############################
+#                              #
+#          Modifiers           #
+#                              #
+# ###############################
+
+modifiers:
+  reload:
+    start: "🔁 Modifier systeem wordt opnieuw geladen..."
+    unregistered: "❌ <count> modifier listeners uitgeschreven"
+    complete: "✅ Modifier reload voltooid: <count> modifiers geladen (<change> wijziging)"
+    error: "‼️ Opnieuw laden van modifiers mislukt: <error>"
+    recovery: "🔧 Bezig met herstel..."
+  register:
+    start: "🤖 Automatisch registreren van modifiers..."
+    success: "✅ Succesvol <count> modifiers gevonden: <names>"
+    error: "‼️ Fout bij het laden van modifiers: <error>"
+    class_error: "‼️ Kon potentiële modifier class <class> niet verwerken: <error>"
+  args:
+    prompt: "Voer waarde in voor <name>"
+  events:
+    registered: "👂 <listeners> modifier listeners en <static> statische modifiers geregistreerd"

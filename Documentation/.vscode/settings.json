@@ -1,4 +1,11 @@
 {
   "cSpell.ignoreWords": ["docusaurus"],
-  "cSpell.words": ["acccent", "apos", "clsx", "dagrejs", "horiz"]
+  "cSpell.words": [
+    "acccent",
+    "apos",
+    "clsx",
+    "dagrejs",
+    "horiz"
+  ],
+  "workbench.colorCustomizations": {}
 }

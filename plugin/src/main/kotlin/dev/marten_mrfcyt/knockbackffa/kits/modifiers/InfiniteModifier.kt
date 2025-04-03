@@ -1,8 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.Modify
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
@@ -10,7 +10,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 import java.io.File
 
-@Modify("infinite")
+@KitModifier("infinite")
 object InfiniteModifier : ModifyObject(
     id = "infinite",
     name = "<white>Infinite Modifier",

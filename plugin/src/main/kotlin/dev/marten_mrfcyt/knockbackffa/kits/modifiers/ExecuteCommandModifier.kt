@@ -1,9 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import dev.marten_mrfcyt.knockbackffa.kits.Modify
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyHandler
-import dev.marten_mrfcyt.knockbackffa.kits.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
+import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
+import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import me.clip.placeholderapi.PlaceholderAPI
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Bukkit
@@ -16,7 +16,7 @@ import org.bukkit.inventory.ItemStack
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
 
-@Modify("executeCommand")
+@KitModifier("executeCommand")
 object ExecuteCommandModifier : ModifyObject(
     id = "executeCommand",
     name = "<white>Execute Command Modifier",
@@ -47,7 +47,7 @@ object ExecuteCommandModifier : ModifyObject(
                 "slot" to slot,
                 "kit_name" to kitName
             )
-            ModifyHandler().handleEvent(source, item, args, id)
+            KnockBackFFA.instance.modifierManager.handleEvent(source, item, args, id)
         }
     }
 }

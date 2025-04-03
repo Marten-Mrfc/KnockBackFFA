@@ -1,5 +1,5 @@
 name: KnockBackFFA
-version: '0.4.0'
+version: '0.5.0'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 api-version: '1.21.4'
 authors: [Marten_Mrfcyt]
@@ -9,3 +9,36 @@ dependencies:
     PlaceholderAPI:
       load: OMIT
       required: true
+permissions:
+  kbffa.command:
+    description: Allows access to the main KnockBackFFA command
+    default: op
+  kbffa.bypass:
+    description: Allows bypassing certain restrictions
+    default: op
+  kbffa.debug:
+    description: Allows access to debug commands
+    default: op
+  kbffa.reload:
+    description: Allows reloading the plugin
+    default: op
+  kbffa.arena:
+    description: Allows managing arenas
+    default: op
+  kbffa.kit:
+    description: Allows managing kits
+    default: op
+  kbffa.boosts:
+    description: Allows access to boosts management
+    default: op
+  kbffa.*:
+    description: Gives access to all admin commands
+    default: op
+    children:
+      kbffa.command: true
+      kbffa.bypass: true
+      kbffa.debug: true
+      kbffa.reload: true
+      kbffa.arena: true
+      kbffa.kit: true
+      kbffa.boosts: true

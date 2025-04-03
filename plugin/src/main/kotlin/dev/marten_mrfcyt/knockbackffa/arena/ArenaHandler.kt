@@ -8,7 +8,6 @@ import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import java.io.File
-import java.util.concurrent.CompletableFuture
 
 data class Arena(val name: String, val location: Location, val killBlock: Material = Material.VOID_AIR)
 var currentArena: Arena? = null
