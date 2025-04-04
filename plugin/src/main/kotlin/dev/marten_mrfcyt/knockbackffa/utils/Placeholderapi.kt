@@ -10,6 +10,7 @@ import java.time.Instant
 @Suppress("UnstableApiUsage")
 class PlaceHolderAPI(private val knockBackFFA: KnockBackFFA) : PlaceholderExpansion() {
     private val plugin: Plugin = knockBackFFA
+
     override fun getAuthor(): String {
         return plugin.pluginMeta.authors[0]
     }
@@ -20,6 +21,14 @@ class PlaceHolderAPI(private val knockBackFFA: KnockBackFFA) : PlaceholderExpans
 
     override fun getVersion(): String {
         return plugin.pluginMeta.version
+    }
+
+    override fun persist(): Boolean {
+        return true // This prevents PlaceholderAPI from unregistering the expansion on reload
+    }
+
+    override fun canRegister(): Boolean {
+        return true // Explicitly confirm that this expansion can register
     }
 
     override fun onRequest(player: OfflinePlayer?, params: String): String? {

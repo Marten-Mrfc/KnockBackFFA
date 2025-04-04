@@ -169,9 +169,13 @@ class KnockBackFFA : KotlinPlugin() {
 
     private fun setupPlaceholders() {
         val placeholderAPI = Bukkit.getPluginManager().getPlugin("PlaceholderAPI")
-        if (placeholderAPI != null) {
-            PlaceHolderAPI(this).register()
-            logger.info(TranslationManager.translate("plugin.placeholders_ready"))
+        if (placeholderAPI != null && placeholderAPI.isEnabled) {
+            val expansion = PlaceHolderAPI(this)
+            if (expansion.register()) {
+                logger.info(TranslationManager.translate("plugin.placeholders_ready"))
+            } else {
+                logger.warning(TranslationManager.translate("plugin.placeholders_failed_registration"))
+            }
         } else {
             logger.warning(TranslationManager.translate("plugin.placeholderapi_missing"))
             Bukkit.getPluginManager().disablePlugin(this)
