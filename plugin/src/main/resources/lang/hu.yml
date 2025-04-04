@@ -274,6 +274,7 @@ plugin:
   starting_arena_handler: "🎮 Aréna kezelő indítása..."
   arena_handler_ready: "✅ Aréna kezelő elindult (<duration>s)"
   placeholders_ready: "📎 Placeholderek regisztrálva"
+  placeholders_failed_registration: "⚠️ Failed to register placeholders"
   placeholderapi_missing: "⚠️ Nem található PlaceholderAPI!"
 # ###############################
 #                              #
