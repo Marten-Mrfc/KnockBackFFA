@@ -114,4 +114,20 @@ class KitManager(private val plugin: KnockBackFFA) {
         loadAllKits()
         plugin.logger.info(TranslationManager.translate("kit.reload.success", "count" to cachedKits.size))
     }
+
+    fun reloadKit(kitName: String): Boolean {
+        try {
+            val kit = Kit.load(kitName)
+            if (kit != null) {
+                cachedKits[kitName] = kit
+                plugin.logger.info(TranslationManager.translate("kit.reload.single.success", "name" to kitName))
+                return true
+            }
+            return false
+        } catch (e: Exception) {
+            plugin.logger.log(Level.WARNING, TranslationManager.translate("kit.load.failed",
+                "name" to kitName, "error" to e.message.toString()), e)
+            return false
+        }
+    }
 }
