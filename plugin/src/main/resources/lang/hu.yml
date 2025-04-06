@@ -99,6 +99,8 @@ kit:
     title: "<gray>Válassz egy felszerelést!</gray>"
     item_name: "<!italic><name>"
     item_description: "<description>"
+layout:
+    changed: "<green>Saved new layout<gray> (<white><slot> <gray>→ <white><new_slot>)"
 # ###############################
 #                              #
 #             Shop             #
