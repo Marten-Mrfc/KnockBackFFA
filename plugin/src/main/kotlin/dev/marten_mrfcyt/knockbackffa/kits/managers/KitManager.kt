@@ -58,14 +58,13 @@ class KitManager(private val plugin: KnockBackFFA) {
     private val kitCooldowns = mutableMapOf<UUID, Long>()
     private val kitCooldownSeconds = 30
 
-    fun applyKit(player: Player, kitName: String): Boolean {
+    fun applyKit(player: Player, kitName: String, force: Boolean): Boolean {
         val now = System.currentTimeMillis()
         val playerId = player.uniqueId
-
         val lastUse = kitCooldowns[playerId] ?: 0L
         val remainingCooldown = ((lastUse + (kitCooldownSeconds * 1000) - now) / 1000).toInt()
 
-        if (remainingCooldown > 0) {
+        if (remainingCooldown > 0 && !force) {
             player.message(TranslationManager.translate("kit.cooldown", "seconds" to remainingCooldown))
             return false
         }

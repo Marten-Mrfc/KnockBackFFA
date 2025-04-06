@@ -49,7 +49,7 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
         playerDataConfig.set("kit", kitName)
         playerData.savePlayerData(player.uniqueId, playerDataConfig)
 
-        if (KnockBackFFA.kitManager.applyKit(player, kitName)) {
+        if (KnockBackFFA.kitManager.applyKit(player, kitName, false)) {
             player.message(translate("player.kit_applied", "kit_name" to kitName))
         }
 
