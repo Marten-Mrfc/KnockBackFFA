@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-
 class PlayerJoinListener(
     private val scoreboardHandler: ScoreboardHandler,
     private val bossBarHandler: BossBarHandler
