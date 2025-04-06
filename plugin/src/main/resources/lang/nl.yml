@@ -105,7 +105,8 @@ kit:
     title: "<gray>Selecteer een kit</gray>"
     item_name: "<!italic><name>"
     item_description: "<description>"
-
+  layout:
+    changed: "<green>Layout opgeslagen!<gray> (<white><slot> <gray>→ <white><new_slot>)"
 # ###############################
 #                              #
 #             Shop             #
@@ -290,6 +291,7 @@ plugin:
   starting_arena_handler: "🎮 Arena handler starten..."
   arena_handler_ready: "✅ Arena handler gereed (<duration>s)"
   placeholders_ready: "📎 Placeholders gereed"
+  placeholders_failed_registration: "⚠️ PlaceHolderAPI registratie mislukt"
   placeholderapi_missing: "⚠️ PlaceholderAPI ontbreekt!"
 
 # ###############################
