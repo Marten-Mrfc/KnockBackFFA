@@ -1,14 +1,12 @@
-// src/main/kotlin/dev/marten_mrfcyt/knockbackffa/kits/models/Kit.kt
 package dev.marten_mrfcyt.knockbackffa.kits.models
 
-import KitItem
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
-import mlib.api.utilities.message
+import dev.marten_mrfcyt.knockbackffa.kits.KitLayoutManager
+import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import java.io.File
-import kotlin.apply
 import kotlin.collections.set
 import kotlin.text.clear
 
@@ -27,14 +25,21 @@ class Kit(
 
     // Apply kit to player
     fun applyTo(player: Player) {
+        val plugin = KnockBackFFA.instance
         player.inventory.clear()
-        _items.forEach { (slot, kitItem) ->
-            val builtItem = kitItem.build(KnockBackFFA.instance)
-            player.inventory.setItem(slot, builtItem)
+
+        val playerData = PlayerData.getInstance(plugin).getPlayerDataModel(player.uniqueId)
+        val kitLayout = playerData.kitLayouts[name]
+
+        _items.forEach { (originalSlot, kitItem) ->
+            val builtItem = kitItem.build(plugin)
+            val targetSlot = kitLayout?.get(originalSlot) ?: originalSlot
+            player.inventory.setItem(targetSlot, builtItem)
         }
 
-        KnockBackFFA.instance.playerBoostManager.removeAllKitBoosts(player)
-        KnockBackFFA.instance.playerBoostManager.handleKitChange(player, name)
+        plugin.playerBoostManager.removeAllKitBoosts(player)
+        plugin.playerBoostManager.handleKitChange(player, name)
+        KitLayoutManager.unmarkKitLoading(player.uniqueId)
     }
 
 

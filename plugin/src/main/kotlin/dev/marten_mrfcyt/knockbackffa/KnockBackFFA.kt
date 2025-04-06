@@ -4,6 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.DeathBlock
 import dev.marten_mrfcyt.knockbackffa.boosts.managers.BoostManager
 import dev.marten_mrfcyt.knockbackffa.boosts.managers.PlayerBoostManager
+import dev.marten_mrfcyt.knockbackffa.kits.KitLayoutManager
 import dev.marten_mrfcyt.knockbackffa.kits.managers.KitManager
 import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import dev.marten_mrfcyt.knockbackffa.player.*
@@ -61,8 +62,10 @@ class KnockBackFFA : KotlinPlugin() {
     }
 
     override fun onDisable() {
-        logger.info(TranslationManager.translate("plugin.disabled"))
+        PlayerData.getInstance(this).saveAll()
         PlayerData.getInstance(this).mysqlHandler.disconnect()
+        logger.info(TranslationManager.translate("plugin.disabled"))
+        printStoppedMessage()
     }
 
     private fun printStartupHeader() {
@@ -74,6 +77,12 @@ class KnockBackFFA : KotlinPlugin() {
     private fun printReadyMessage() {
         logger.info("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
         logger.info("┃    ✨ KnockBackFFA is Ready     ┃")
+        logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
+    }
+
+    private fun printStoppedMessage() {
+        logger.info("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+        logger.info("┃    ❌ KnockBackFFA Stopped      ┃")
         logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
     }
 
@@ -149,7 +158,8 @@ class KnockBackFFA : KotlinPlugin() {
             PlayerQuitListener(ScoreboardHandler(this), BossBarHandler(this)),
             ScoreHandler(this),
             DeathBlock(),
-            PlayerHandler(this)
+            PlayerHandler(this),
+            KitLayoutManager(this),
         )
         logger.info(TranslationManager.translate("plugin.events_registered", "count" to 5))
     }

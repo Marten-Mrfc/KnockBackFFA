@@ -1,3 +1,5 @@
+package dev.marten_mrfcyt.knockbackffa.kits.models
+
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
@@ -26,7 +28,7 @@ data class KitItem(
     val slot: Int
 ) {
     fun build(plugin: KnockBackFFA): ItemStack {
-        val item = Material.valueOf(material).let { ItemStack(it) }
+        val item = ItemStack(Material.valueOf(material))
         val meta = item.itemMeta ?: plugin.server.itemFactory.getItemMeta(item.type) ?: return item
 
         // Apply basic properties

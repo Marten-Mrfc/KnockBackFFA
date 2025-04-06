@@ -105,7 +105,8 @@ kit:
     title: "<gray>Please select a kit</gray>"
     item_name: "<!italic><name>"
     item_description: "<description>"
-
+layout:
+    changed: "<green>Saved new layout<gray> (<white><slot> <gray>→ <white><new_slot>)"
 # ###############################
 #                              #
 #             Shop             #

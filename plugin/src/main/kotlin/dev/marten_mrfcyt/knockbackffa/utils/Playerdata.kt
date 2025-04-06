@@ -73,6 +73,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                         kd_ratio DOUBLE DEFAULT 0,
                         owned_kits TEXT,
                         boosts TEXT,
+                        kit_layouts TEXT,
                         PRIMARY KEY (player_id)
                     )
                 """.trimIndent())
@@ -183,6 +184,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     setDouble(8, model.kdRatio)
                     setString(9, model.ownedKits.joinToString(","))
                     setString(10, model.boosts.joinToString(","))
+                    setString(11, serializeKitLayouts(model.kitLayouts))
                 }.executeUpdate()
             } catch (e: Exception) {
                 plugin.logger.severe("Error saving player data to MySQL: ${e.message}")
