@@ -11,6 +11,20 @@ class MySQLHandler(private val config: StorageConfig, private val plugin: KnockB
     fun connect() {
         plugin.logger.info("Connecting to MySQL database...")
         try {
+            // First connect to MySQL without specifying a database
+            val connectionWithoutDB = DriverManager.getConnection(
+                "jdbc:mysql://${config.mysqlHost}:${config.mysqlPort}/",
+                config.mysqlUser,
+                config.mysqlPassword
+            )
+
+            // Create the database if it doesn't exist
+            val statement = connectionWithoutDB.createStatement()
+            statement.executeUpdate("CREATE DATABASE IF NOT EXISTS ${config.mysqlDatabase}")
+            statement.close()
+            connectionWithoutDB.close()
+
+            // Now connect to the specific database
             connection = DriverManager.getConnection(
                 "jdbc:mysql://${config.mysqlHost}:${config.mysqlPort}/${config.mysqlDatabase}",
                 config.mysqlUser,
@@ -36,6 +50,23 @@ class MySQLHandler(private val config: StorageConfig, private val plugin: KnockB
     }
 
     fun getConnection(): Connection? {
+        // Check if connection is valid, try to reconnect if not
+        try {
+            if (connection == null || connection!!.isClosed) {
+                connect()
+            }
+        } catch (e: SQLException) {
+            plugin.logger.severe("Failed to check/restore database connection!")
+            e.printStackTrace()
+        }
         return connection
+    }
+
+    fun isConnected(): Boolean {
+        return try {
+            connection != null && !connection!!.isClosed
+        } catch (e: SQLException) {
+            false
+        }
     }
 }
