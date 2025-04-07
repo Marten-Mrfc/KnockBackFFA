@@ -4,7 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import org.bukkit.entity.Player
 
-fun loadKit(plugin: KnockBackFFA, player: Player) {
+fun loadKit(plugin: KnockBackFFA, player: Player, joining: Boolean) {
     val playerDataInstance = PlayerData.getInstance(plugin)
     val playerDataModel = playerDataInstance.getPlayerDataModel(player.uniqueId)
 
@@ -20,8 +20,10 @@ fun loadKit(plugin: KnockBackFFA, player: Player) {
         KitLayoutManager.markKitLoading(player.uniqueId)
 
         try {
+            if (joining) {
+                KnockBackFFA.instance.playerBoostManager.loadPlayerBoostsOnJoin(player)
+            }
             KnockBackFFA.kitManager.applyKit(player, kitName, true)
-            KnockBackFFA.instance.playerBoostManager.loadPlayerBoostsOnJoin(player)
         } catch (e: Exception) {
             plugin.logger.warning("[KitLoader] Failed to load kit for player ${player.name}: ${e.message}")
         }

@@ -22,7 +22,7 @@ class PlayerJoinListener(
 
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
         if (currentArena != null) {
-            loadKit(KnockBackFFA.instance, source)
+            loadKit(KnockBackFFA.instance, source, true)
             source.teleport(currentArena)
         }
     }

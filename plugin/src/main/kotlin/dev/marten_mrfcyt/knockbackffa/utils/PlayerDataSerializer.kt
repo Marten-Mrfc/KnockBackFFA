@@ -1,5 +1,6 @@
 package dev.marten_mrfcyt.knockbackffa.utils
 
+import dev.marten_mrfcyt.knockbackffa.utils.models.BoostTiming
 import dev.marten_mrfcyt.knockbackffa.utils.models.PlayerDataModel
 import org.bukkit.configuration.ConfigurationSection
 import org.bukkit.configuration.file.YamlConfiguration
@@ -7,7 +8,6 @@ import java.sql.ResultSet
 import java.util.UUID
 
 object PlayerDataSerializer {
-    // Convert from ResultSet to Model
     fun fromResultSet(rs: ResultSet, playerId: UUID): PlayerDataModel {
         return PlayerDataModel(
             playerId = playerId,
@@ -20,7 +20,8 @@ object PlayerDataSerializer {
             kdRatio = rs.getDouble("kd_ratio"),
             ownedKits = rs.getString("owned_kits")?.splitToList() ?: emptyList(),
             boosts = rs.getString("boosts")?.splitToList() ?: emptyList(),
-            kitLayouts = rs.getString("kit_layouts")?.parseKitLayoutsString() ?: emptyMap()
+            kitLayouts = rs.getString("kit_layouts")?.parseKitLayoutsString() ?: emptyMap(),
+            boostTimings = rs.getString("boost_timings")?.parseBoostTimingsString() ?: emptyMap()
         )
     }
 
@@ -36,19 +37,23 @@ object PlayerDataSerializer {
         model.kdRatio = config.getDouble("kd-ratio")
         model.ownedKits = config.getStringList("owned_kits")
         model.boosts = config.getStringList("boosts")
+
         val layoutsSection = config.getConfigurationSection("kit_layouts")
         if (layoutsSection != null) {
             model.kitLayouts = parseKitLayouts(layoutsSection)
         }
 
+        val timingsSection = config.getConfigurationSection("boost_timings")
+        if (timingsSection != null) {
+            model.boostTimings = parseBoostTimings(timingsSection)
+        }
+
         return model
     }
 
-    // Convert from Model to YamlConfiguration
     fun toYaml(model: PlayerDataModel): YamlConfiguration {
         val config = YamlConfiguration()
 
-        // Basic properties
         config.set("kit", model.kit)
         config.set("deaths", model.deaths)
         config.set("kills", model.kills)
@@ -59,22 +64,24 @@ object PlayerDataSerializer {
         config.set("owned_kits", model.ownedKits)
         config.set("boosts", model.boosts)
 
-        // Kit layouts
         model.kitLayouts.forEach { (kitName, layout) ->
             layout.forEach { (originalSlot, newSlot) ->
                 config.set("kit_layouts.$kitName.$originalSlot", newSlot)
             }
         }
 
+        model.boostTimings?.forEach { (boostId, timing) ->
+            config.set("boost_timings.$boostId.start_time", timing.startTime)
+            config.set("boost_timings.$boostId.end_time", timing.endTime)
+        }
+
         return config
     }
 
-    // Helper for parsing kit layouts from database string
     private fun String.parseKitLayoutsString(): Map<String, Map<Int, Int>> {
         val result = mutableMapOf<String, MutableMap<Int, Int>>()
         if (isEmpty()) return result
 
-        // Split by kit (format: "kitName:0=1,2=3;kitName2:4=5,6=7")
         split(";").forEach { kitEntry ->
             val kitParts = kitEntry.split(":", limit = 2)
             if (kitParts.size != 2) return@forEach
@@ -82,7 +89,6 @@ object PlayerDataSerializer {
             val kitName = kitParts[0]
             val layoutMap = mutableMapOf<Int, Int>()
 
-            // Process slot mappings
             kitParts[1].split(",").forEach { slotMapping ->
                 val slotParts = slotMapping.split("=", limit = 2)
                 if (slotParts.size != 2) return@forEach
@@ -91,8 +97,7 @@ object PlayerDataSerializer {
                     val originalSlot = slotParts[0].toInt()
                     val newSlot = slotParts[1].toInt()
                     layoutMap[originalSlot] = newSlot
-                } catch (e: NumberFormatException) {
-                    // Skip invalid entries
+                } catch (_: NumberFormatException) {
                 }
             }
 
@@ -104,7 +109,30 @@ object PlayerDataSerializer {
         return result
     }
 
-    // Helper for parsing kit layouts from config
+    private fun String.parseBoostTimingsString(): Map<String, BoostTiming> {
+        val result = mutableMapOf<String, BoostTiming>()
+        if (isEmpty()) return result
+
+        split(";").forEach { boostEntry ->
+            val boostParts = boostEntry.split(":", limit = 2)
+            if (boostParts.size != 2) return@forEach
+
+            val boostId = boostParts[0]
+            val timeParts = boostParts[1].split("=", limit = 2)
+
+            if (timeParts.size != 2) return@forEach
+
+            try {
+                val startTime = timeParts[0].toLong()
+                val endTime = timeParts[1].toLong()
+                result[boostId] = BoostTiming(startTime, endTime)
+            } catch (_: NumberFormatException) {
+            }
+        }
+
+        return result
+    }
+
     private fun parseKitLayouts(section: ConfigurationSection): Map<String, Map<Int, Int>> {
         val result = mutableMapOf<String, MutableMap<Int, Int>>()
 
@@ -117,8 +145,7 @@ object PlayerDataSerializer {
                     val originalSlot = slotKey.toInt()
                     val newSlot = kitSection.getInt(slotKey)
                     layoutMap[originalSlot] = newSlot
-                } catch (e: NumberFormatException) {
-                    // Skip invalid entries
+                } catch (_: NumberFormatException) {
                 }
             }
 
@@ -128,8 +155,30 @@ object PlayerDataSerializer {
         return result
     }
 
-    // Helper for array fields
+    private fun parseBoostTimings(section: ConfigurationSection): Map<String, BoostTiming> {
+        val result = mutableMapOf<String, BoostTiming>()
+
+        section.getKeys(false).forEach { boostId ->
+            val boostSection = section.getConfigurationSection(boostId) ?: return@forEach
+
+            val startTime = boostSection.getLong("start_time")
+            val endTime = boostSection.getLong("end_time")
+
+            result[boostId] = BoostTiming(startTime, endTime)
+        }
+
+        return result
+    }
+
     private fun String.splitToList(): List<String> {
         return if (this.isNotEmpty()) this.split(",").map { it.trim() } else emptyList()
+    }
+
+    fun serializeBoostTimings(boostTimings: Map<String, BoostTiming>?): String {
+        if (boostTimings.isNullOrEmpty()) return ""
+
+        return boostTimings.entries.joinToString(";") { (boostId, timing) ->
+            "$boostId:${timing.startTime}=${timing.endTime}"
+        }
     }
 }

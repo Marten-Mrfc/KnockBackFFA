@@ -28,12 +28,18 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     init {
         plugin.logger.info("📃 Storage type: ${storageConfig.storageType}")
         if (useMySQL) {
-            mysqlHandler.connect()
-            createPlayerDataTable()
-            prepareStatements()
+            initializeDatabase()
         }
         startPeriodicSaving()
     }
+
+    private fun initializeDatabase() {
+        mysqlHandler.connect()
+        createPlayerDataTable()
+        checkAndMigrateDatabase()
+        prepareStatements()
+    }
+
     private fun prepareStatements() {
         try {
             mysqlHandler.getConnection()?.let { connection ->
@@ -42,25 +48,85 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     mysqlHandler.connect()
                 }
 
-                preparedStatements["select"] = connection.prepareStatement("SELECT * FROM player_data WHERE player_id = ?")
-                preparedStatements["replace"] = connection.prepareStatement("""
-                    REPLACE INTO player_data (player_id, kit, deaths, kills, killstreak, max_killstreak,
-                    coins, kd_ratio, owned_kits, boosts, kit_layouts) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """.trimIndent())
-                preparedStatements["sum_kills"] = connection.prepareStatement("SELECT SUM(kills) FROM player_data")
+                val statements = mapOf(
+                    "select" to "SELECT * FROM player_data WHERE player_id = ?",
+                    "replace" to """
+                        REPLACE INTO player_data (player_id, kit, deaths, kills, killstreak, max_killstreak,
+                        coins, kd_ratio, owned_kits, boosts, kit_layouts, boost_timings) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    """.trimIndent(),
+                    "sum_kills" to "SELECT SUM(kills) FROM player_data"
+                )
+
+                statements.forEach { (name, sql) ->
+                    preparedStatements[name] = connection.prepareStatement(sql)
+                }
             } ?: throw IllegalStateException("Database connection is null")
         } catch (e: Exception) {
-            plugin.logger.severe("Failed to prepare statements: ${e.message}")
-            e.printStackTrace()
+            logError("Failed to prepare statements", e)
         }
+    }
+
+    private fun checkAndMigrateDatabase() {
+        if (!useMySQL) return
+
+        mysqlHandler.getConnection()?.let { connection ->
+            try {
+                val metaData = connection.metaData
+                val expectedColumns = getExpectedColumns()
+
+                // Check which columns exist
+                val existingColumns = mutableSetOf<String>()
+                metaData.getColumns(null, null, "player_data", null).use { resultSet ->
+                    while (resultSet.next()) {
+                        existingColumns.add(resultSet.getString("COLUMN_NAME").lowercase())
+                    }
+                }
+
+                // Add any missing columns
+                connection.createStatement().use { statement ->
+                    var migrationsPerformed = false
+
+                    expectedColumns.forEach { (columnName, columnType) ->
+                        if (columnName != "player_id" && !existingColumns.contains(columnName.lowercase())) {
+                            plugin.logger.info("Adding missing '$columnName' column to database...")
+                            statement.executeUpdate("ALTER TABLE player_data ADD COLUMN $columnName $columnType")
+                            migrationsPerformed = true
+                        }
+                    }
+
+                    if (migrationsPerformed) {
+                        plugin.logger.info("Database migrations completed successfully")
+                    } else {
+                        plugin.logger.info("Database schema is up to date")
+                    }
+                }
+            } catch (e: Exception) {
+                logError("Failed to migrate database", e)
+            }
+        } ?: plugin.logger.severe("Cannot check database structure: connection is null")
+    }
+
+    private fun getExpectedColumns(): Map<String, String> {
+        return mapOf(
+            "player_id" to "VARCHAR(36) NOT NULL PRIMARY KEY",
+            "kit" to "VARCHAR(255)",
+            "deaths" to "INT DEFAULT 0",
+            "kills" to "INT DEFAULT 0",
+            "killstreak" to "INT DEFAULT 0",
+            "max_killstreak" to "INT DEFAULT 0",
+            "coins" to "INT DEFAULT 0",
+            "kd_ratio" to "DOUBLE DEFAULT 0",
+            "owned_kits" to "TEXT",
+            "boosts" to "TEXT",
+            "kit_layouts" to "TEXT",
+            "boost_timings" to "TEXT"
+        )
     }
 
     private fun createPlayerDataTable() {
         try {
-            mysqlHandler.getConnection()?.let { connection ->
-                // Don't use connection.use{} here as that will close the connection
-                // We want to keep the connection open
-                val statement = connection.createStatement()
+            mysqlHandler.getConnection()?.createStatement()?.use { statement ->
                 statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS player_data (
                         player_id VARCHAR(36) NOT NULL,
@@ -74,16 +140,16 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                         owned_kits TEXT,
                         boosts TEXT,
                         kit_layouts TEXT,
+                        boost_timings TEXT,
                         PRIMARY KEY (player_id)
                     )
                 """.trimIndent())
-                statement.close() // Just close the statement, not the connection
             } ?: throw IllegalStateException("Database connection is null")
         } catch (e: Exception) {
-            plugin.logger.severe("Failed to create player_data table: ${e.message}")
-            e.printStackTrace()
+            logError("Failed to create player_data table", e)
         }
     }
+
     private fun startPeriodicSaving() {
         object : BukkitRunnable() {
             override fun run() = saveAllDirtyData()
@@ -96,8 +162,8 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
         val dataToSave = HashSet(dirtyPlayerData)
         dirtyPlayerData.removeAll(dataToSave)
 
-        for (playerId in dataToSave) {
-            val playerData = playerDataCache[playerId] ?: continue
+        dataToSave.forEach { playerId ->
+            val playerData = playerDataCache[playerId] ?: return@forEach
             if (useMySQL) {
                 savePlayerDataToMySQL(playerId, playerData)
             } else {
@@ -106,18 +172,11 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
         }
     }
 
-    // Legacy method for backward compatibility
-    fun getPlayerData(playerId: UUID): YamlConfiguration =
-        PlayerDataSerializer.toYaml(getPlayerDataModel(playerId))
-
     fun getPlayerDataModel(playerId: UUID): PlayerDataModel {
-        playerDataCache[playerId]?.let { return it }
-
-        val model = if (useMySQL) getPlayerDataModelFromMySQL(playerId)
-        else getPlayerDataModelFromFile(playerId)
-
-        playerDataCache[playerId] = model
-        return model
+        return playerDataCache.computeIfAbsent(playerId) {
+            if (useMySQL) getPlayerDataModelFromMySQL(playerId)
+            else getPlayerDataModelFromFile(playerId)
+        }
     }
 
     private fun getPlayerDataModelFromFile(playerId: UUID): PlayerDataModel {
@@ -134,24 +193,19 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     private fun getPlayerDataModelFromMySQL(playerId: UUID): PlayerDataModel {
         mysqlHandler.getConnection()?.let { connection ->
             try {
-                val statement = preparedStatements["select"] ?: return@let
-                statement.setString(1, playerId.toString())
-
-                statement.executeQuery().use { resultSet ->
-                    if (resultSet.next()) {
-                        return PlayerDataSerializer.fromResultSet(resultSet, playerId)
+                preparedStatements["select"]?.let { statement ->
+                    statement.setString(1, playerId.toString())
+                    statement.executeQuery().use { resultSet ->
+                        if (resultSet.next()) {
+                            return PlayerDataSerializer.fromResultSet(resultSet, playerId)
+                        }
                     }
                 }
             } catch (e: Exception) {
-                plugin.logger.severe("Error loading player data: ${e.message}")
+                logError("Error loading player data", e)
             }
         }
         return PlayerDataModel(playerId)
-    }
-
-    // Legacy method for backward compatibility
-    fun savePlayerData(playerId: UUID, playerData: YamlConfiguration) {
-        savePlayerDataModel(playerId, PlayerDataSerializer.fromYaml(playerData, playerId))
     }
 
     fun savePlayerDataModel(playerId: UUID, model: PlayerDataModel) {
@@ -164,16 +218,14 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             val playerDataFile = File(playerDataDirectory, "$playerId.yml")
             PlayerDataSerializer.toYaml(model).save(playerDataFile)
         } catch (e: Exception) {
-            plugin.logger.severe("Error saving player data file: ${e.message}")
+            logError("Error saving player data file", e)
         }
     }
 
     private fun savePlayerDataToMySQL(playerId: UUID, model: PlayerDataModel) {
         mysqlHandler.getConnection()?.let { connection ->
             try {
-                val statement = preparedStatements["replace"] ?: return@let
-
-                statement.apply {
+                preparedStatements["replace"]?.apply {
                     setString(1, playerId.toString())
                     setString(2, model.kit)
                     setInt(3, model.deaths)
@@ -185,33 +237,21 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     setString(9, model.ownedKits.joinToString(","))
                     setString(10, model.boosts.joinToString(","))
                     setString(11, serializeKitLayouts(model.kitLayouts))
-                }.executeUpdate()
+                    setString(12, PlayerDataSerializer.serializeBoostTimings(model.boostTimings))
+                    executeUpdate()
+                }
             } catch (e: Exception) {
-                plugin.logger.severe("Error saving player data to MySQL: ${e.message}")
+                logError("Error saving player data to MySQL", e)
             }
         }
     }
 
     private fun serializeKitLayouts(kitLayouts: Map<String, Map<Int, Int>>): String {
-        val result = StringBuilder()
-
-        kitLayouts.entries.forEachIndexed { kitIndex, (kitName, layout) ->
-            result.append(kitName)
-            result.append(":")
-
-            layout.entries.forEachIndexed { slotIndex, (origSlot, newSlot) ->
-                result.append("$origSlot=$newSlot")
-                if (slotIndex < layout.size - 1) {
-                    result.append(",")
-                }
-            }
-
-            if (kitIndex < kitLayouts.size - 1) {
-                result.append(";")
+        return kitLayouts.entries.joinToString(";") { (kitName, layout) ->
+            "$kitName:" + layout.entries.joinToString(",") { (origSlot, newSlot) ->
+                "$origSlot=$newSlot"
             }
         }
-
-        return result.toString()
     }
 
     fun clearCache(playerId: UUID) {
@@ -228,36 +268,47 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
 
     fun getTotalKills(): Int {
         if (useMySQL) {
-            mysqlHandler.getConnection()?.let { connection ->
-                try {
-                    val statement = preparedStatements["sum_kills"] ?: return 0
-                    statement.executeQuery().use { resultSet ->
-                        if (resultSet.next()) {
-                            return resultSet.getInt(1)
-                        }
-                    }
-                } catch (e: Exception) {
-                    plugin.logger.severe("Error getting total kills: ${e.message}")
-                }
-            }
-            return 0
+            return getMySQLTotalKills()
         } else {
-            if (playerDataCache.isNotEmpty() && playerDataDirectory.listFiles()?.size == playerDataCache.size) {
-                return playerDataCache.values.sumOf { it.kills }
-            }
-
-            var totalKills = 0
-            playerDataDirectory.listFiles()?.forEach { file ->
-                try {
-                    val playerId = UUID.fromString(file.nameWithoutExtension)
-                    val config = YamlConfiguration.loadConfiguration(file)
-                    val model = PlayerDataSerializer.fromYaml(config, playerId)
-                    totalKills += model.kills
-                } catch (e: IllegalArgumentException) {
-                }
-            }
-            return totalKills
+            return getFileTotalKills()
         }
+    }
+
+    private fun getMySQLTotalKills(): Int {
+        mysqlHandler.getConnection()?.let { connection ->
+            try {
+                preparedStatements["sum_kills"]?.executeQuery()?.use { resultSet ->
+                    if (resultSet.next()) {
+                        return resultSet.getInt(1)
+                    }
+                }
+            } catch (e: Exception) {
+                logError("Error getting total kills", e)
+            }
+        }
+        return 0
+    }
+
+    private fun getFileTotalKills(): Int {
+        if (playerDataCache.isNotEmpty() && playerDataDirectory.listFiles()?.size == playerDataCache.size) {
+            return playerDataCache.values.sumOf { it.kills }
+        }
+
+        var totalKills = 0
+        playerDataDirectory.listFiles()?.forEach { file ->
+            try {
+                val playerId = UUID.fromString(file.nameWithoutExtension)
+                val config = YamlConfiguration.loadConfiguration(file)
+                totalKills += PlayerDataSerializer.fromYaml(config, playerId).kills
+            } catch (_: IllegalArgumentException) {
+            }
+        }
+        return totalKills
+    }
+
+    private fun logError(message: String, e: Exception) {
+        plugin.logger.severe("$message: ${e.message}")
+        e.printStackTrace()
     }
 
     companion object {

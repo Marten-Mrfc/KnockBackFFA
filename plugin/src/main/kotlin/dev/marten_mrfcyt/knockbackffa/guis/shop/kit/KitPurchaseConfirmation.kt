@@ -20,8 +20,8 @@ class KitPurchaseConfirmation(
 
     init {
         val kit = getKit()
-        val playerData = PlayerData.getInstance(plugin).getPlayerData(player.uniqueId)
-        val coins = playerData.getInt("coins", 0)
+        val playerData = PlayerData.getInstance(plugin).getPlayerDataModel(player.uniqueId)
+        val coins = playerData.coins
         val canAfford = coins >= kit.price
 
         val message = mutableListOf(
@@ -50,10 +50,10 @@ class KitPurchaseConfirmation(
                 if (KitOwnership.buyKit(p, kitName)) {
                     p.message(TranslationManager.translate("shop.kits.confirmation.success", "kit_name" to kit.displayName))
 
-                    val data = PlayerData.getInstance(plugin).getPlayerData(p.uniqueId)
-                    data.set("kit", kitName)
-                    PlayerData.getInstance(plugin).savePlayerData(p.uniqueId, data)
-
+                    val data = PlayerData.getInstance(plugin).getPlayerDataModel(p.uniqueId)
+                    data.kit = kitName
+                    PlayerData.getInstance(plugin).savePlayerDataModel(p.uniqueId, data)
+                    KnockBackFFA.kitManager.applyKit(p, kitName, true)
                     p.closeInventory()
                 } else {
                     p.message(TranslationManager.translate("shop.kits.confirmation.failed"))

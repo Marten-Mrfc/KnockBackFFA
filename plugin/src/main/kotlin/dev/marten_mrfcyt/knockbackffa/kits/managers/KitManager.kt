@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.managers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.bypassMode
 import dev.marten_mrfcyt.knockbackffa.kits.models.Kit
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.message
@@ -64,7 +65,7 @@ class KitManager(private val plugin: KnockBackFFA) {
         val lastUse = kitCooldowns[playerId] ?: 0L
         val remainingCooldown = ((lastUse + (kitCooldownSeconds * 1000) - now) / 1000).toInt()
 
-        if (remainingCooldown > 0 && !force) {
+        if (remainingCooldown > 0 && !force && !bypassMode.getOrDefault(player, false)) {
             player.message(TranslationManager.translate("kit.cooldown", "seconds" to remainingCooldown))
             return false
         }

@@ -30,16 +30,13 @@ class Kit(
 
         val playerData = PlayerData.getInstance(plugin).getPlayerDataModel(player.uniqueId)
         val kitLayout = playerData.kitLayouts[name]
-
         _items.forEach { (originalSlot, kitItem) ->
             val builtItem = kitItem.build(plugin)
             val targetSlot = kitLayout?.get(originalSlot) ?: originalSlot
             player.inventory.setItem(targetSlot, builtItem)
         }
-
-        plugin.playerBoostManager.removeAllKitBoosts(player)
-        plugin.playerBoostManager.handleKitChange(player, name)
         KitLayoutManager.unmarkKitLoading(player.uniqueId)
+        plugin.playerBoostManager.handleKitChange(player, name)
     }
 
 

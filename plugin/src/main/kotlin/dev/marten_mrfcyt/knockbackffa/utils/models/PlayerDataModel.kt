@@ -13,5 +13,6 @@ data class PlayerDataModel(
     var kdRatio: Double = 0.0,
     var ownedKits: List<String> = emptyList(),
     var boosts: List<String> = emptyList(),
+    var boostTimings: Map<String, BoostTiming>? = null,
     var kitLayouts: Map<String, Map<Int, Int>> = emptyMap()
 )
