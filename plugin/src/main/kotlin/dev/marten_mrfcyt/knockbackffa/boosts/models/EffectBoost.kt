@@ -72,8 +72,6 @@ abstract class EffectBoost(
 
         plugin.server.scheduler.runTaskLater(plugin, Runnable {
             if (player.isOnline && pendingApplications.containsKey(player.uniqueId)) {
-                removePotionEffect(player)
-
                 applyPotionEffect(player)
 
                 applyCustomEffect(player)
@@ -98,6 +96,13 @@ abstract class EffectBoost(
         val player = event.entity
         if (isActive(player.uniqueId)) {
             pendingApplications[player.uniqueId] = true
+            plugin.server.scheduler.runTaskLater(plugin, Runnable {
+                if (player.isOnline) {
+                    applyPotionEffect(player)
+                    applyCustomEffect(player)
+                    pendingApplications.remove(player.uniqueId)
+                }
+            }, applyDelay)
         }
     }
 
@@ -114,13 +119,6 @@ abstract class EffectBoost(
                 }
             }, applyDelay)
         }
-    }
-
-    @EventHandler
-    fun onPlayerQuit(event: PlayerQuitEvent) {
-        val playerId = event.player.uniqueId
-        pendingApplications.remove(playerId)
-        activeEffects.remove(playerId)
     }
 
     override fun isActive(playerUUID: UUID): Boolean {

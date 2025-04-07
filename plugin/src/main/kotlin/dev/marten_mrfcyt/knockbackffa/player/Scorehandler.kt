@@ -20,56 +20,58 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         event.drops.clear()
         val source = event.player
         val killer = source.killer
+
         if (killer != null) {
-            event.deathMessage((translateListRandom("player.killed_by_message", "player_name" to source.name, "killer_name" to killer.name)).asMini())
+            event.deathMessage((translateListRandom("player.killed_by_message",
+                "player_name" to source.name,
+                "killer_name" to killer.name)).asMini())
         } else {
-            event.deathMessage((translateListRandom("player.death_message", "player_name" to source.name)).asMini())
+            event.deathMessage((translateListRandom("player.death_message",
+                "player_name" to source.name)).asMini())
         }
+
         source.inventory.clear()
+
         try {
-            val playerDataHandler = PlayerData.getInstance(plugin)
-            val playerData = playerDataHandler.getPlayerData(source.uniqueId)
-            playerData.apply {
-                set("deaths", getInt("deaths", 0) + 1)
-                set("killstreak", 0)
-                val deaths = getInt("deaths", 0)
-                val kills = getInt("kills", 0)
+            val playerDataInstance = PlayerData.getInstance(plugin)
+
+            // Update the victim's data
+            val sourceDataModel = playerDataInstance.getPlayerDataModel(source.uniqueId)
+            sourceDataModel.apply {
+                deaths += 1
+                killstreak = 0
+
                 val df = DecimalFormat("#.##")
                 df.roundingMode = RoundingMode.CEILING
-                val kdRatio = if (deaths != 0) kills.toFloat() / deaths else kills.toFloat()
-                val kdRatioRounded = df.format(kdRatio).replace(',', '.').toFloat()
-                set("kd-ratio", kdRatioRounded)
+                val kdRatio = if (deaths != 0) kills.toDouble() / deaths else kills.toDouble()
+                val kdRatioRounded = df.format(kdRatio).replace(',', '.').toDouble()
+                this.kdRatio = kdRatioRounded
             }
-            playerDataHandler.savePlayerData(source.uniqueId, playerData)
+            playerDataInstance.savePlayerDataModel(source.uniqueId, sourceDataModel)
 
-            killer?.let {
-                val killerData = playerDataHandler.getPlayerData(it.uniqueId)
-                killerData.apply {
-                    val currentKills = getInt("kills", 0) + 1
-                    val currentKillstreak = getInt("killstreak", 0) + 1
-                    val currentMaxKillstreak = getInt("max-killstreak", 0)
+            // Update the killer's data if exists
+            killer?.let { killerPlayer ->
+                val killerDataModel = playerDataInstance.getPlayerDataModel(killerPlayer.uniqueId)
+                killerDataModel.apply {
+                    kills += 1
+                    killstreak += 1
+                    coins += 1
 
-                    set("kills", currentKills)
-                    set("killstreak", currentKillstreak)
-                    set("coins", getInt("coins", 0) + 1)
-
-                    if (currentKillstreak > currentMaxKillstreak) {
-                        set("max-killstreak", currentKillstreak)
+                    if (killstreak > maxKillstreak) {
+                        maxKillstreak = killstreak
                     }
 
-                    val killerDeaths = getInt("deaths", 0)
-                    val killerKills = getInt("kills", 0)
-                    val killerKdRatio =
-                        if (killerDeaths != 0) killerKills.toDouble() / killerDeaths else killerKills.toDouble()
                     val df = DecimalFormat("#.##")
                     df.roundingMode = RoundingMode.CEILING
+                    val killerKdRatio = if (deaths != 0) kills.toDouble() / deaths else kills.toDouble()
                     val killerKdRatioRounded = df.format(killerKdRatio).replace(',', '.').toDouble()
-                    set("kd-ratio", killerKdRatioRounded)
+                    this.kdRatio = killerKdRatioRounded
                 }
-                playerDataHandler.savePlayerData(it.uniqueId, killerData)
+                playerDataInstance.savePlayerDataModel(killerPlayer.uniqueId, killerDataModel)
             }
         } catch (e: Exception) {
-            plugin.logger.severe(TranslationManager.translate("error.data_save", "error" to e.message.toString()))
+            plugin.logger.severe(TranslationManager.translate("error.data_save",
+                "error" to e.message.toString()))
             e.printStackTrace()
             plugin.server.onlinePlayers.forEach {
                 it.error(TranslationManager.translate("error.data_save_admin"))
@@ -81,8 +83,10 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
     fun respawn(event: PlayerRespawnEvent) {
         val source = event.player
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
+
         source.message(TranslationManager.translate("kit.loading_kit"))
-        loadKit(KnockBackFFA.instance, source)
+        loadKit(KnockBackFFA.instance, source, false)
+
         if (currentArena != null) {
             event.respawnLocation = currentArena
         }

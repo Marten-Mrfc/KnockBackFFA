@@ -44,13 +44,16 @@ class KitSelector(private val plugin: KnockBackFFA, source: Player) {
         event.isCancelled = true
 
         val playerData = PlayerData.getInstance(plugin)
-        val playerDataConfig = playerData.getPlayerData(player.uniqueId)
+        val playerDataConfig = playerData.getPlayerDataModel(player.uniqueId)
+        val oldKit = playerDataConfig.kit
+        playerDataConfig.kit = kitName
+        playerData.savePlayerDataModel(player.uniqueId, playerDataConfig)
 
-        playerDataConfig.set("kit", kitName)
-        playerData.savePlayerData(player.uniqueId, playerDataConfig)
-
-        if (KnockBackFFA.kitManager.applyKit(player, kitName)) {
+        if (KnockBackFFA.kitManager.applyKit(player, kitName, false)) {
             player.message(translate("player.kit_applied", "kit_name" to kitName))
+        } else {
+            playerDataConfig.kit = oldKit
+            playerData.savePlayerDataModel(player.uniqueId, playerDataConfig)
         }
 
         player.closeInventory()

@@ -28,9 +28,10 @@ class KitShop(private val plugin: KnockBackFFA, private val player: Player) {
             .setBackground(Material.BLACK_STAINED_GLASS_PANE)
 
         val kitItems = mutableListOf<PaginatedGui.PaginatedItem>()
-        val playerData = PlayerData.getInstance(plugin).getPlayerData(player.uniqueId)
-        val ownedKits = KitOwnership.getOwnedKits(player.uniqueId)
-        val coins = playerData.getInt("coins", 0)
+        val playerDataInstance = PlayerData.getInstance(plugin)
+        val playerDataModel = playerDataInstance.getPlayerDataModel(player.uniqueId)
+        val ownedKits = playerDataModel.ownedKits
+        val coins = playerDataModel.coins
 
         KnockBackFFA.kitManager.getAllKitNames().forEach { kitName ->
             val kit = KnockBackFFA.kitManager.getKit(kitName)
@@ -76,11 +77,11 @@ class KitShop(private val plugin: KnockBackFFA, private val player: Player) {
 
         builder.onItemClick { _, _, index ->
             val kitName = KnockBackFFA.kitManager.getAllKitNames().getOrNull(index) ?: return@onItemClick
-            val owned = KitOwnership.ownsKit(player.uniqueId, kitName)
+            val owned = ownedKits.contains(kitName)
 
             if (owned) {
-                playerData.set("kit", kitName)
-                PlayerData.getInstance(plugin).savePlayerData(player.uniqueId, playerData)
+                playerDataModel.kit = kitName
+                playerDataInstance.savePlayerDataModel(player.uniqueId, playerDataModel)
                 player.message(TranslationManager.translate("shop.kits.selected", "kit_name" to kitName))
                 player.closeInventory()
             } else {
@@ -92,7 +93,7 @@ class KitShop(private val plugin: KnockBackFFA, private val player: Player) {
             gui.item(Material.GOLD_INGOT) {
                 name(TranslationManager.translate("shop.common.your_coins", "coins" to coins).asMini())
                 slots(49)
-                onClick {  event ->
+                onClick { event ->
                     event.isCancelled = true
                 }
             }

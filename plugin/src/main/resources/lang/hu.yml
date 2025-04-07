@@ -83,22 +83,24 @@ arena:
 #                              #
 # ###############################
 kit:
- loading_kit: "Felszerelés betöltése..."
- shop:
-   already_owned: "<red>Már a tulajdonodban van ez a felszerelés!"
-   not_enough_coins: "<red>Nincs elég érméd a felszerelés megvásárlására!"
- load:
-   failed: "Nem sikerült betölteni a felszerelést: <name>. Hiba: <error>"
- not_found: "Nincs felszerelés ilyen névvel: <name>"
- cooldown: "<red>Várnod kell <seconds> másodpercet, hogy újra felszerelést válthass!."
- delete:
-   failed: "Nem sikerült kitörölni a felszerelést: <name>. Hiba: <error>"
- reload:
-   success: "<count> felszerelés újratöltve!"
- selector:
+  loading_kit: "Felszerelés betöltése..."
+  shop:
+    already_owned: "<red>Már a tulajdonodban van ez a felszerelés!"
+    not_enough_coins: "<red>Nincs elég érméd a felszerelés megvásárlására!"
+  load:
+    failed: "Nem sikerült betölteni a felszerelést: <name>. Hiba: <error>"
+  not_found: "Nincs felszerelés ilyen névvel: <name>"
+  cooldown: "<red>Várnod kell <seconds> másodpercet, hogy újra felszerelést válthass!."
+  delete:
+    failed: "Nem sikerült kitörölni a felszerelést: <name>. Hiba: <error>"
+  reload:
+    success: "<count> felszerelés újratöltve!"
+  selector:
     title: "<gray>Válassz egy felszerelést!</gray>"
     item_name: "<!italic><name>"
     item_description: "<description>"
+  layout:
+    changed: "<green>Saved new layout<gray> (<white><slot> <gray>→ <white><new_slot>)"
 # ###############################
 #                              #
 #             Shop             #
@@ -274,6 +276,7 @@ plugin:
   starting_arena_handler: "🎮 Aréna kezelő indítása..."
   arena_handler_ready: "✅ Aréna kezelő elindult (<duration>s)"
   placeholders_ready: "📎 Placeholderek regisztrálva"
+  placeholders_failed_registration: "⚠️ Failed to register placeholders"
   placeholderapi_missing: "⚠️ Nem található PlaceholderAPI!"
 # ###############################
 #                              #

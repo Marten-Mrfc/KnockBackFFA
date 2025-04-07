@@ -1,6 +1,9 @@
 package dev.marten_mrfcyt.knockbackffa.utils
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import mlib.api.utilities.asMini
+import mlib.api.utilities.message
+import mlib.api.utilities.notMini
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.event.ClickEvent
 import net.kyori.adventure.text.event.HoverEvent
@@ -18,13 +21,13 @@ import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.net.URL
 import java.util.logging.Level
+import kotlin.text.append
 
 @Suppress("UnstableApiUsage")
 class UpdateTracker(private val plugin: KnockBackFFA) : Listener {
     private var latestVersion: String? = null
     private var updateAvailable = false
     private val updateCheckUrl = "https://api.github.com/repos/Marten-Mrfc/KnockBackFFA/releases/latest"
-    private val mm = MiniMessage.miniMessage()
 
     init {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
@@ -63,7 +66,12 @@ class UpdateTracker(private val plugin: KnockBackFFA) : Listener {
 
                         notifyOnlinePlayers()
                     } else {
-                        plugin.logger.info("✅ KnockBackFFA is up to date (Active: $currentVersion | Latest: $latestVersion)")
+                        plugin.logger.info("┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
+                        plugin.logger.info("┃                 ✅ UP TO DATE                   ┃")
+                        plugin.logger.info("┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫")
+                        plugin.logger.info("┃ Active: $currentVersion ${isDevelopmentVersion(currentVersion, latestVersion) ?: ""}")
+                        plugin.logger.info("┃ Latest: $latestVersion")
+                        plugin.logger.info("┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
                     }
                 }
             }
@@ -71,7 +79,22 @@ class UpdateTracker(private val plugin: KnockBackFFA) : Listener {
             plugin.logger.log(Level.WARNING, "Failed to check for updates: ${e.message}", e)
         }
     }
+    private fun isDevelopmentVersion(current: String, latest: String?): String? {
+        if (latest == null) return null
 
+        val currentParts = current.removePrefix("v").split(".")
+        val latestParts = latest.removePrefix("v").split(".")
+
+        for (i in currentParts.indices.take(minOf(currentParts.size, latestParts.size))) {
+            val currentNum = currentParts[i].toIntOrNull() ?: 0
+            val latestNum = latestParts[i].toIntOrNull() ?: 0
+
+            if (currentNum > latestNum) return " 🧪 DEV"
+            if (currentNum < latestNum) return null
+        }
+
+        return if (currentParts.size > latestParts.size) " 🧪 DEV" else null
+    }
     private fun isNewerVersion(latestVersion: String?, currentVersion: String): Boolean {
         if (latestVersion == null) return false
 
@@ -101,32 +124,27 @@ class UpdateTracker(private val plugin: KnockBackFFA) : Listener {
         if (!updateAvailable || latestVersion == null) return
 
         val currentVersion = plugin.pluginMeta.version
-
-        val header = mm.deserialize("<dark_gray><bold>┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓")
-        val title = mm.deserialize("<dark_gray><bold>┃        <yellow><bold>🔄 UPDATE AVAILABLE     <dark_gray><bold>┃")
-        val divider = mm.deserialize("<dark_gray><bold>┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫")
-
-        val currentVersionText = mm.deserialize("<dark_gray><bold>┃ <gray>Current: <red><bold>v${currentVersion}")
-        val latestVersionText = mm.deserialize("<dark_gray><bold>┃ <gray>Latest:  <green><bold>${latestVersion}")
-
         val downloadUrl = "https://github.com/Marten-Mrfc/KnockBackFFA/releases/latest"
+
+        val messages = listOf(
+            "<dark_gray><bold>┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓",
+            "<dark_gray><bold>┃        <yellow><bold>🔄 UPDATE AVAILABLE     <dark_gray><bold>┃",
+            "<dark_gray><bold>┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫",
+            "<dark_gray><bold>┃ <gray>Current: <red><bold>v${currentVersion}",
+            "<dark_gray><bold>┃ <gray>Latest:  <green><bold>${latestVersion}"
+        )
+
         val downloadText = Component.text("┃ ", NamedTextColor.DARK_GRAY, TextDecoration.BOLD)
             .append(Component.text("Download: ", NamedTextColor.GRAY))
             .append(
                 Component.text("CLICK HERE", NamedTextColor.AQUA, TextDecoration.BOLD)
                     .clickEvent(ClickEvent.openUrl(downloadUrl))
-                    .hoverEvent(HoverEvent.showText(mm.deserialize("<gray>Click to open <aqua><underlined>${downloadUrl}")))
+                    .hoverEvent(HoverEvent.showText(("<gray>Click to open <aqua><underlined>${downloadUrl}").asMini()))
             )
 
-        val footer = mm.deserialize("<dark_gray><bold>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
-
-        player.sendMessage(header)
-        player.sendMessage(title)
-        player.sendMessage(divider)
-        player.sendMessage(currentVersionText)
-        player.sendMessage(latestVersionText)
-        player.sendMessage(Component.text("").append(downloadText))
-        player.sendMessage(footer)
+        messages.forEach { player.message(it) }
+        player.message((Component.text("").append(downloadText)).notMini())
+        player.message("<dark_gray><bold>┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛")
     }
 
     @EventHandler

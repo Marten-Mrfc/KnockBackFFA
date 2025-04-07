@@ -18,8 +18,9 @@ class BoostPurchaseConfirmation(
     init {
         val boost = plugin.boostManager.getBoost(boostId)
 
-        val playerData = PlayerData.getInstance(plugin).getPlayerData(player.uniqueId)
-        val coins = playerData.getInt("coins", 0)
+        val playerDataInstance = PlayerData.getInstance(plugin)
+        val playerDataModel = playerDataInstance.getPlayerDataModel(player.uniqueId)
+        val coins = playerDataModel.coins
         val canAfford = coins >= boost.price
 
         val message = mutableListOf<Component>(
@@ -50,8 +51,8 @@ class BoostPurchaseConfirmation(
             .confirmText(TranslationManager.translate("shop.boosts.confirmation.confirm", "price" to boost.price).asMini())
             .cancelText(TranslationManager.translate("shop.boosts.confirmation.cancel").asMini())
             .onConfirm(Consumer { p ->
-                val data = PlayerData.getInstance(plugin).getPlayerData(p.uniqueId)
-                val currentCoins = data.getInt("coins", 0)
+                val dataModel = playerDataInstance.getPlayerDataModel(p.uniqueId)
+                val currentCoins = dataModel.coins
 
                 if (currentCoins < boost.price) {
                     p.message(TranslationManager.translate("shop.boosts.not_enough_coins"))
@@ -59,8 +60,8 @@ class BoostPurchaseConfirmation(
                     return@Consumer
                 }
 
-                data.set("coins", currentCoins - boost.price)
-                PlayerData.getInstance(plugin).savePlayerData(p.uniqueId, data)
+                dataModel.coins = currentCoins - boost.price
+                playerDataInstance.savePlayerDataModel(p.uniqueId, dataModel)
 
                 plugin.playerBoostManager.addBoost(p.uniqueId, boostId, boost.getDuration() ?: java.time.Duration.ZERO)
 

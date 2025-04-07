@@ -56,25 +56,21 @@ object KnockbackResistanceBoostType : EffectBoost(
         return PotionEffectType.GLOWING
     }
 
-    override fun apply(player: Player): Boolean {
-        // Add to our tracking map
+    override fun applyCustomEffect(player: Player) {
         activeBoosts[player.uniqueId] = true
         player.getAttribute(Attribute.KNOCKBACK_RESISTANCE)?.baseValue = resistancePercentage / 100.0
         if (glowEffect) {
+            player.removePotionEffect(PotionEffectType.GLOWING)
             player.addPotionEffect(PotionEffect(
                 PotionEffectType.GLOWING,
                 Int.MAX_VALUE,
                 0,
                 ambient,
-                false,
+                particles,
                 true
             ))
         }
-
-        player.message(activationMessage)
-        return true
-    }
-
+        player.message(activationMessage)    }
     override fun removeCustomEffect(player: Player) {
         // Remove from our tracking map
         activeBoosts.remove(player.uniqueId)

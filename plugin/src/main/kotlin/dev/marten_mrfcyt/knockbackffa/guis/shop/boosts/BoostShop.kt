@@ -27,8 +27,8 @@ class BoostShop(private val plugin: KnockBackFFA, private val player: Player) {
             .size(GuiSize.ROW_SIX)
             .setBackground(Material.BLACK_STAINED_GLASS_PANE)
 
-        val playerData = PlayerData.getInstance(plugin).getPlayerData(player.uniqueId)
-        val coins = playerData.getInt("coins", 0)
+        val playerData = PlayerData.getInstance(plugin).getPlayerDataModel(player.uniqueId)
+        val coins = playerData.coins
 
         val boostItems = mutableListOf<PaginatedGui.PaginatedItem>()
         plugin.boostManager.getAllBoosts().forEach { boost ->

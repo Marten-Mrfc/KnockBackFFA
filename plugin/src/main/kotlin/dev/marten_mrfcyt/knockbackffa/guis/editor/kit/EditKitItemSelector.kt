@@ -1,7 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.guis.editor.kit
 
-import KitItem
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.models.KitItem
 import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.gui.types.builder.StandardGuiBuilder

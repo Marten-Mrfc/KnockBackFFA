@@ -9,7 +9,6 @@ import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerJoinEvent
 import org.bukkit.event.player.PlayerQuitEvent
-
 class PlayerJoinListener(
     private val scoreboardHandler: ScoreboardHandler,
     private val bossBarHandler: BossBarHandler
@@ -23,7 +22,7 @@ class PlayerJoinListener(
 
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
         if (currentArena != null) {
-            loadKit(KnockBackFFA.instance, source)
+            loadKit(KnockBackFFA.instance, source, true)
             source.teleport(currentArena)
         }
     }

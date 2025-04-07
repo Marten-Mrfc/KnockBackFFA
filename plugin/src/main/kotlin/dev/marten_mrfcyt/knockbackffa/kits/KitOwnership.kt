@@ -10,14 +10,13 @@ import java.util.UUID
 object KitOwnership {
 
     fun ownsKit(playerId: UUID, kitName: String): Boolean {
-        val playerData = PlayerData.getInstance(KnockBackFFA.instance).getPlayerData(playerId)
-        val ownedKits = playerData.getStringList("owned_kits")
-        return kitName == "default" || ownedKits.contains(kitName)
+        val playerDataModel = PlayerData.getInstance(KnockBackFFA.instance).getPlayerDataModel(playerId)
+        return kitName == "default" || playerDataModel.ownedKits.contains(kitName)
     }
 
     fun getOwnedKits(playerId: UUID): List<String> {
-        val playerData = PlayerData.getInstance(KnockBackFFA.instance).getPlayerData(playerId)
-        val ownedKits = playerData.getStringList("owned_kits").toMutableList()
+        val playerDataModel = PlayerData.getInstance(KnockBackFFA.instance).getPlayerDataModel(playerId)
+        val ownedKits = playerDataModel.ownedKits.toMutableList()
         if (!ownedKits.contains("default")) {
             ownedKits.add("default")
         }
@@ -25,12 +24,15 @@ object KitOwnership {
     }
 
     fun addKit(playerId: UUID, kitName: String) {
-        val playerData = PlayerData.getInstance(KnockBackFFA.instance).getPlayerData(playerId)
-        val ownedKits = playerData.getStringList("owned_kits").toMutableList()
-        if (!ownedKits.contains(kitName)) {
-            ownedKits.add(kitName)
-            playerData.set("owned_kits", ownedKits)
-            PlayerData.getInstance(KnockBackFFA.instance).savePlayerData(playerId, playerData)
+        val playerData = PlayerData.getInstance(KnockBackFFA.instance)
+        val playerDataModel = playerData.getPlayerDataModel(playerId)
+
+        if (!playerDataModel.ownedKits.contains(kitName)) {
+            val updatedKits = playerDataModel.ownedKits.toMutableList().apply {
+                add(kitName)
+            }
+            playerDataModel.ownedKits = updatedKits
+            playerData.savePlayerDataModel(playerId, playerDataModel)
         }
     }
 
@@ -43,17 +45,22 @@ object KitOwnership {
             return false
         }
 
-        val playerData = PlayerData.getInstance(plugin).getPlayerData(player.uniqueId)
-        val coins = playerData.getInt("coins", 0)
+        val playerData = PlayerData.getInstance(plugin)
+        val playerDataModel = playerData.getPlayerDataModel(player.uniqueId)
 
-        if (coins < kit.price) {
+        if (playerDataModel.coins < kit.price) {
             player.message(TranslationManager.translate("kit.shop.not_enough_coins"))
             return false
         }
 
-        playerData.set("coins", coins - kit.price)
-        PlayerData.getInstance(plugin).savePlayerData(player.uniqueId, playerData)
-        addKit(player.uniqueId, kitName)
+        playerDataModel.coins -= kit.price
+
+        val updatedKits = playerDataModel.ownedKits.toMutableList().apply {
+            add(kitName)
+        }
+        playerDataModel.ownedKits = updatedKits
+
+        playerData.savePlayerDataModel(player.uniqueId, playerDataModel)
         return true
     }
 }

@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.kits.managers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.bypassMode
 import dev.marten_mrfcyt.knockbackffa.kits.models.Kit
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.message
@@ -58,14 +59,13 @@ class KitManager(private val plugin: KnockBackFFA) {
     private val kitCooldowns = mutableMapOf<UUID, Long>()
     private val kitCooldownSeconds = 30
 
-    fun applyKit(player: Player, kitName: String): Boolean {
+    fun applyKit(player: Player, kitName: String, force: Boolean): Boolean {
         val now = System.currentTimeMillis()
         val playerId = player.uniqueId
-
         val lastUse = kitCooldowns[playerId] ?: 0L
         val remainingCooldown = ((lastUse + (kitCooldownSeconds * 1000) - now) / 1000).toInt()
 
-        if (remainingCooldown > 0) {
+        if (remainingCooldown > 0 && !force && !bypassMode.getOrDefault(player, false)) {
             player.message(TranslationManager.translate("kit.cooldown", "seconds" to remainingCooldown))
             return false
         }
@@ -113,5 +113,21 @@ class KitManager(private val plugin: KnockBackFFA) {
         }
         loadAllKits()
         plugin.logger.info(TranslationManager.translate("kit.reload.success", "count" to cachedKits.size))
+    }
+
+    fun reloadKit(kitName: String): Boolean {
+        try {
+            val kit = Kit.load(kitName)
+            if (kit != null) {
+                cachedKits[kitName] = kit
+                plugin.logger.info(TranslationManager.translate("kit.reload.single.success", "name" to kitName))
+                return true
+            }
+            return false
+        } catch (e: Exception) {
+            plugin.logger.log(Level.WARNING, TranslationManager.translate("kit.load.failed",
+                "name" to kitName, "error" to e.message.toString()), e)
+            return false
+        }
     }
 }
