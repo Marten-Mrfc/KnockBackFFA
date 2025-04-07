@@ -191,7 +191,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     }
 
     private fun getPlayerDataModelFromMySQL(playerId: UUID): PlayerDataModel {
-        mysqlHandler.getConnection()?.let { connection ->
+        mysqlHandler.getConnection()?.let { _ ->
             try {
                 preparedStatements["select"]?.let { statement ->
                     statement.setString(1, playerId.toString())
@@ -223,7 +223,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     }
 
     private fun savePlayerDataToMySQL(playerId: UUID, model: PlayerDataModel) {
-        mysqlHandler.getConnection()?.let { connection ->
+        mysqlHandler.getConnection()?.let { _ ->
             try {
                 preparedStatements["replace"]?.apply {
                     setString(1, playerId.toString())
@@ -275,7 +275,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     }
 
     private fun getMySQLTotalKills(): Int {
-        mysqlHandler.getConnection()?.let { connection ->
+        mysqlHandler.getConnection()?.let { _ ->
             try {
                 preparedStatements["sum_kills"]?.executeQuery()?.use { resultSet ->
                     if (resultSet.next()) {

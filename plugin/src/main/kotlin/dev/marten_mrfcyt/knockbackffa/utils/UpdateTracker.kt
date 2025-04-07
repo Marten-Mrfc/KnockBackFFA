@@ -19,6 +19,7 @@ import org.json.simple.JSONObject
 import org.json.simple.parser.JSONParser
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import java.net.URI
 import java.net.URL
 import java.util.logging.Level
 import kotlin.text.append
@@ -39,7 +40,7 @@ class UpdateTracker(private val plugin: KnockBackFFA) : Listener {
 
     private fun checkForUpdates() {
         try {
-            val connection = URL(updateCheckUrl).openConnection()
+            val connection = URI(updateCheckUrl).toURL().openConnection()
             connection.setRequestProperty("Accept", "application/vnd.github.v3+json")
             connection.setRequestProperty("User-Agent", "KnockBackFFA-UpdateChecker")
             connection.connectTimeout = 5000

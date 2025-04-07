@@ -57,7 +57,7 @@ class KitManager(private val plugin: KnockBackFFA) {
     }
 
     private val kitCooldowns = mutableMapOf<UUID, Long>()
-    private val kitCooldownSeconds = 30
+    private val kitCooldownSeconds = plugin.config.getInt("kit-cooldown", 30)
 
     fun applyKit(player: Player, kitName: String, force: Boolean): Boolean {
         val now = System.currentTimeMillis()

@@ -6,6 +6,7 @@
 
 language: "en" # Language for the plugin.
 mapDuration: 60 # Duration between map changes in seconds.
+kit-cooldown: 30 # The duration of the kit cooldown in seconds.
 allowDropping: false # Allow players to drop items
 allowPickUp: false # Allow players to pick up items
 allowCrafting: true # Allow players to craft items

@@ -75,7 +75,7 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
                 return
             }
 
-            val kit = KnockBackFFA.kitManager.getKit(activeKit) ?: return
+            val kit = KnockBackFFA.kitManager.getKit(activeKit)
 
             // Map to store the current layout (originalSlot -> currentSlot)
             val currentLayout = mutableMapOf<Int, Int>()

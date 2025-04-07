@@ -82,16 +82,16 @@ object PlayerDataSerializer {
         val result = mutableMapOf<String, MutableMap<Int, Int>>()
         if (isEmpty()) return result
 
-        split(";").forEach { kitEntry ->
+        split(";").forEach outerForEach@ { kitEntry ->
             val kitParts = kitEntry.split(":", limit = 2)
-            if (kitParts.size != 2) return@forEach
+            if (kitParts.size != 2) return@outerForEach
 
             val kitName = kitParts[0]
             val layoutMap = mutableMapOf<Int, Int>()
 
-            kitParts[1].split(",").forEach { slotMapping ->
+            kitParts[1].split(",").forEach innerForEach@ { slotMapping ->
                 val slotParts = slotMapping.split("=", limit = 2)
-                if (slotParts.size != 2) return@forEach
+                if (slotParts.size != 2) return@innerForEach
 
                 try {
                     val originalSlot = slotParts[0].toInt()
@@ -113,14 +113,14 @@ object PlayerDataSerializer {
         val result = mutableMapOf<String, BoostTiming>()
         if (isEmpty()) return result
 
-        split(";").forEach { boostEntry ->
+        split(";").forEach outerForEach@ { boostEntry ->
             val boostParts = boostEntry.split(":", limit = 2)
-            if (boostParts.size != 2) return@forEach
+            if (boostParts.size != 2) return@outerForEach
 
             val boostId = boostParts[0]
             val timeParts = boostParts[1].split("=", limit = 2)
 
-            if (timeParts.size != 2) return@forEach
+            if (timeParts.size != 2) return@outerForEach
 
             try {
                 val startTime = timeParts[0].toLong()
