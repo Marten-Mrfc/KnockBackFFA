@@ -1,3 +1,4 @@
+
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import org.bukkit.event.EventHandler
@@ -11,6 +12,12 @@ class DeathBlock() : Listener {
     fun onDeathBlock(event: PlayerMoveEvent) {
         val currentArena = currentArena ?: return
         val killBlock = currentArena.killBlock
+
+        if (event.to.y < -64) {
+            event.player.health = 0.0
+            event.player.damage(100.0)
+            return
+        }
 
         val adjustedLocation = event.to.clone().add(0.0, -0.245, 0.0)
         val blockBelowPlayer = adjustedLocation.block
