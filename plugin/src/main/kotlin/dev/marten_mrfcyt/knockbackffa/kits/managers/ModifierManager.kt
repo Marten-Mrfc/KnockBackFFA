@@ -204,7 +204,15 @@ class ModifierManager(private val plugin: KnockBackFFA) {
     fun handleEvent(player: Player, item: ItemStack?, args: Map<String, Any>, id: String) {
         item?.itemMeta?.let { meta ->
             if (checkCustomValue(meta, plugin, "modify", id)) {
-                registry.getModifier(id)?.handle(player, item, args)
+                val originalSlot = getCustomValue(meta, plugin, "slot") as? Int
+                val kitName = getCustomValue(meta, plugin, "kit_name") as? String
+                val updatedArgs = args.toMutableMap()
+                if (originalSlot != null && kitName != null && !args.containsKey("slot")) {
+                    updatedArgs["slot"] = originalSlot
+                    updatedArgs["kit_name"] = kitName
+                }
+
+                registry.getModifier(id)?.handle(player, item, updatedArgs)
             }
         }
     }

@@ -1,8 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
@@ -28,8 +28,11 @@ object OnKillModifier : ModifyObject(
         val slot = (args["slot"] as? Int) ?: return
         val kitName = (args["kit_name"] as? String) ?: return
         val amount = kitConfig.getInt("kit.$kitName.items.$slot.amount")
+
+        val resolvedSlot = KitSlotResolver.resolveSlot(player, slot)
+
         item.amount = amount
-        player.inventory.setItem(slot, item)
+        player.inventory.setItem(resolvedSlot, item)
     }
 
     @EventHandler

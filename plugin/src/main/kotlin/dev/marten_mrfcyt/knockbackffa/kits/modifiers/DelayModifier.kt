@@ -1,8 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
@@ -43,6 +43,8 @@ object DelayModifier : ModifyObject(
             "kit_name" to kitName
         )
         KnockBackFFA.instance.modifierManager.handleEvent(player, item, args, id)
-        KnockBackFFA.instance.modifierManager.handleEvent(player, event.consumable, args, "infinite")
+
+        val consumable = KitSlotResolver.findKitItem(player, kitName, slot) ?: event.consumable
+        KnockBackFFA.instance.modifierManager.handleEvent(player, consumable, args, "infinite")
     }
 }

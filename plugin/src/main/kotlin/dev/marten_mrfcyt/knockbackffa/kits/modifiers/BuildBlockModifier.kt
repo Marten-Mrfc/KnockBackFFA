@@ -2,8 +2,8 @@ package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
@@ -12,6 +12,7 @@ import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.ItemStack
 import org.bukkit.scheduler.BukkitRunnable
+
 @KitModifier("buildBlock")
 object BuildBlockModifier : ModifyObject(
     id = "buildBlock",

@@ -1,8 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import mlib.api.utilities.getCustomValue
 import mlib.api.utilities.message
