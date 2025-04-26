@@ -4,6 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
@@ -40,9 +41,13 @@ object OnKillModifier : ModifyObject(
         val source = event.entity.killer ?: return
         for (item in source.inventory.contents) {
             if (item == null) continue
-            val itemMeta = item.itemMeta ?: continue
-            val slot = getCustomValue(itemMeta, plugin, "slot") as? Int ?: continue
-            val kitName = getCustomValue(itemMeta, plugin, "kit_name") as? String ?: continue
+            val playerDataInstance = PlayerData.getInstance(plugin)
+            val slot = source.inventory.contents.indexOfFirst {
+                it?.isSimilar(item) == true
+            }
+            if (slot == -1) return
+            val playerDataModel = playerDataInstance.getPlayerDataModel(event.player.uniqueId)
+            val kitName = playerDataModel.kit ?: return
             val args = mapOf(
                 "slot" to slot,
                 "kit_name" to kitName

@@ -121,28 +121,39 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             logger.severe(TranslationManager.translate("modifiers.register.error", "error" to e.message.toString()))
             e.printStackTrace()
         }
-    }
-
-    private fun processModifierClass(className: String): String? {
+    }    private fun processModifierClass(className: String): String? {
         try {
+            logger.info("[Modifier Registration] Processing class: $className")
             val clazz = Class.forName(className)
 
             if (!ModifyObject::class.java.isAssignableFrom(clazz) ||
                 java.lang.reflect.Modifier.isAbstract(clazz.modifiers)) {
+                logger.info("[Modifier Registration] Class $className is not a valid modifier class (not a ModifyObject or is abstract)")
                 return null
             }
 
             val annotation = clazz.getAnnotation(KitModifier::class.java)
             if (annotation != null) {
-                val field = clazz.getDeclaredField("INSTANCE")
-                field.isAccessible = true
-                val modifier = field.get(null) as ModifyObject
-
-                registry.register(modifier)
-                return modifier.id
+                logger.info("[Modifier Registration] Found KitModifier annotation with ID: ${annotation.id} on class $className")
+                try {
+                    val field = clazz.getDeclaredField("INSTANCE")
+                    field.isAccessible = true
+                    val modifier = field.get(null) as ModifyObject
+                    
+                    logger.info("[Modifier Registration] Successfully obtained modifier instance: ${modifier.id}")
+                    registry.register(modifier)
+                    return modifier.id
+                } catch (e: Exception) {
+                    logger.severe("[Modifier Registration] Failed to access INSTANCE field on $className: ${e.message}")
+                    e.printStackTrace()
+                    return null
+                }
+            } else {
+                logger.info("[Modifier Registration] Class $className does not have the KitModifier annotation")
             }
         } catch (e: Exception) {
-            logger.warning(TranslationManager.translate("modifiers.register.class_error", "class" to className, "error" to e.message.toString()))
+            logger.severe("[Modifier Registration] Exception processing class $className: ${e.message}")
+            e.printStackTrace()
         }
         return null
     }
