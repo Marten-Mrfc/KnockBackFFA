@@ -62,8 +62,24 @@ class KnockBackFFA : KotlinPlugin() {
     }
 
     override fun onDisable() {
-        PlayerData.getInstance(this).saveAll()
-        PlayerData.getInstance(this).mysqlHandler.disconnect()
+        try {
+            logger.info("Saving all player data before shutdown...")
+            PlayerData.getInstance(this).saveAll()
+            logger.info("Player data saved successfully")
+        } catch (e: Exception) {
+            logger.severe("Error saving player data: ${e.message}")
+            e.printStackTrace()
+        }
+        
+        try {
+            logger.info("Closing database connections...")
+            PlayerData.getInstance(this).mysqlHandler.disconnect()
+            logger.info("Database connections closed")
+        } catch (e: Exception) {
+            logger.severe("Error closing database connections: ${e.message}")
+            e.printStackTrace()
+        }
+        
         logger.info(TranslationManager.translate("plugin.disabled"))
         printStoppedMessage()
     }
