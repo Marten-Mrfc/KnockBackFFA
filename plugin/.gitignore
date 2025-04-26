@@ -117,3 +117,4 @@ run/
 !gradle-wrapper.jar
 /server
 /Server
+/.history
