@@ -55,6 +55,11 @@ arena:
     success: "<green>Elteleportálva a(z) <white><arena_name><green> arénába!"
   create:
     success: "<green>Aréna létrehozva: <white><arena_name>"
+    started: "<green>Starting arena creation for <white><arena_name>"
+    cancelled: "<red>Arena creation cancelled."
+    failed: "<red>Failed to create arena. Please try again."
+    incomplete: "<red>Your editor is incomplete. Please select two points first."
+    selection_incomplete: "<red>You need to select two points first! Try again when your editor is complete."
     location: "<green>Aréna létrehozása: <white>arena <arena_name> at <x>, <y>, <z>"
     file:
       not_found: "Nem létezik arena.yml fájl, készítés folyamatban..."
@@ -65,6 +70,7 @@ arena:
   delete:
     start: "<dark_red>Aréna törlése folyamatban: <arena_name>"
     success: "Az aréna törlésre került: <arena_name>"
+    failed: "<red>Failed to delete arena <arena_name>. Please try again."
     not_found: "<red>Nem található ilyen aréna: <arena_name>. Biztos helyesen írtad?"
   list:
     none: "<red>Nincsenek elérhető arénák!"
@@ -77,6 +83,19 @@ arena:
     killblock_not_found: "Nem sikerült betölteni az arénát: <arena_name>: Nincs megadva killBlokk!"
   deathblock:
     killblock_null: "A killBlokk null ennél az arénánál: <arena_name>"
+  selection:
+    worldedit_available: "<green>WorldEdit detected! Use the WorldEdit wand to select two points."
+    worldedit_wand_given: "<green>WorldEdit wand has been added to your inventory."
+    using_custom_wand: "<green>Using KnockBackFFA editor wand. A wand has been added to your inventory."
+    region_instructions: "<yellow>Please select two points to define the spawn region."
+    spawnpoint_instructions: "<yellow>Go to where you want players to spawn and set the spawnpoint."
+    first_position_set: "<green>First position set at <white><x>, <y>, <z>"
+    second_position_set: "<green>Second position set at <white><x>, <y>, <z>"
+    complete: "<green>Selection complete! You can now set the spawn region."
+    spawnpoint_set: "<green>Spawnpoint set at <white><x>, <y>, <z>"
+  settings:
+    coming_soon: "<yellow>Arena settings GUI is coming soon!"
+    missing_name: "<red>Please specify an arena name to edit settings."
 # ###############################
 #                              #
 #             Kits             #
@@ -239,19 +258,23 @@ commands:
       missing_name: "Adj meg egy nevet az arénának!"
     delete:
       missing_name: "Adj meg egy nevet az arénának!"
+    settings:
+      missing_name: "<red>Please specify an arena name to edit settings."
+      coming_soon: "<yellow>Arena settings GUI is coming soon!"
     help: |
-      <gold><bold>KnockBackFFA<reset> <gray>- <white>Aréna parancsok
-      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Aréna készítése
-      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>Arénák listázása
-      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Aréna törlése
+      <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Command
+      <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Create an arena
+      <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>List all arenas
+      <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Delete an arena
+      <white><bold>*</bold> <green>/kbffa arena settings<gray>: <white>Configure arena settings
   kit:
     create:
       missing_lore: "Adj meg egy leírást a felszerelésnek!"
       missing_name: "Adj meg egy nevet a felszerelésnek!"
     delete:
       default_kit: "Nem törölheted az alap felszerelést!"
-      success: "<green>Felszerelés törölve: <name>"
-      not_found: "Nem található ilyen felszerelés: <name>"
+      success: "<green>Successfully deleted kit <n>!"
+      not_found: "Kit <n> does not exist!"
       missing_name: "Adj meg egy nevet a felszerelésnek!"
 # ###############################
 #                              #
