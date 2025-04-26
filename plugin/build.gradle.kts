@@ -9,7 +9,6 @@ plugins {
 }
 
 group = "dev.Marten_mrfcyt"
-version = "0.6.1"
 version = "0.7.0-alpha"
 
 repositories {
@@ -22,6 +21,7 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://libraries.minecraft.net")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
+    maven("https://maven.enginehub.org/repo/")
 }
 
 val centralDependencies = listOf(
@@ -36,9 +36,12 @@ dependencies {
     compileOnly("me.clip:placeholderapi:2.11.6")
     compileOnly("org.junit.jupiter:junit-jupiter-api:5.7.2")
     compileOnly("org.mockito:mockito-core:5.11.0")
+    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     implementation("org.bstats:bstats-bukkit:3.1.0")
     implementation("mlib.api:MLib:0.0.1")
+    implementation("com.h2database:h2:2.2.224") // Required for MySQL functionality
+    implementation("com.mysql:mysql-connector-j:9.2.0") // Explicitly add MySQL connector
 }
 
 val targetJavaVersion = 21
@@ -52,10 +55,64 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
     kotlinOptions.jvmTarget = "21"
 }
 
+// Function to dynamically discover resources in src/main/resources
+fun discoverResources(): Map<String, Set<String>> {
+    val resourcesDir = file("src/main/resources")
+    val result = mutableMapOf<String, MutableSet<String>>()
+    
+    // Initialize result categories
+    result["criticalResources"] = mutableSetOf()
+    result["languageFiles"] = mutableSetOf()
+    result["pluginDescriptors"] = mutableSetOf()
+    
+    if (resourcesDir.exists()) {
+        resourcesDir.walk().filter { it.isFile }.forEach { file ->
+            val relativePath = file.relativeTo(resourcesDir).path.replace('\\', '/')
+            
+            when {
+                // Plugin descriptors
+                relativePath == "plugin.yml" || relativePath == "paper-plugin.yml" -> {
+                    result["pluginDescriptors"]?.add(relativePath)
+                }
+                // Language files
+                relativePath.startsWith("lang/") && (relativePath.endsWith(".yml") || relativePath.endsWith(".yaml")) -> {
+                    result["languageFiles"]?.add(relativePath)
+                }
+                // Critical resources in root directory
+                !relativePath.contains("/") && (relativePath.endsWith(".yml") || relativePath.endsWith(".yaml")) -> {
+                    result["criticalResources"]?.add(relativePath)
+                }
+            }
+        }
+    }
+    
+    return result
+}
+
+// This is the key task for ensuring resources are properly processed
 tasks.processResources {
+    // Set UTF-8 as the input file encoding
     filteringCharset = "UTF-8"
+    
+    // Process plugin.yml for variable expansion
     filesMatching("plugin.yml") {
-        expand("version" to version, "libraries" to centralDependencies)
+        expand(mapOf(
+            "version" to version,
+            "libraries" to centralDependencies
+        ))
+    }
+    
+    // Make sure resources are copied even if they already exist in the output
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    
+    // Log what resources are being processed
+    doFirst {
+        println("Processing resources:")
+        source.forEach { file ->
+            if (file.isFile) {
+                println("- ${file.name}")
+            }
+        }
     }
 }
 
