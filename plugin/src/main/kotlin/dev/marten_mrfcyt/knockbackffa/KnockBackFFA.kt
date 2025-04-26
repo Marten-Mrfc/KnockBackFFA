@@ -109,12 +109,34 @@ class KnockBackFFA : KotlinPlugin() {
             dataFolder.mkdirs()
             logger.info("📁 Data folder created")
         }
+        
+        ensureResourceFileExists("config.yml")
+        ensureResourceFileExists("kits.yml")
+        ensureResourceFileExists("boosts.yml")
+        
+        val langFolder = File(dataFolder, "lang")
+        if (!langFolder.exists()) {
+            langFolder.mkdirs()
+        }
     }
-
-    private fun setupConfig() {
+    
+    private fun ensureResourceFileExists(fileName: String) {
+        val file = File(dataFolder, fileName)
+        if (!file.exists()) {
+            logger.warning("⚠️ $fileName not found, creating from template...")
+            try {
+                saveResource(fileName, false)
+                logger.info("📄 $fileName created successfully")
+            } catch (e: Exception) {
+                logger.severe("❌ Failed to create $fileName: ${e.message}")
+                e.printStackTrace()
+            }
+        }
+    }
+      private fun setupConfig() {
         try {
             if (!File(dataFolder, "config.yml").exists()) {
-                saveResource("config.yml", false)
+                ensureResourceFileExists("config.yml")
             }
             reloadConfig()
             saveDefaultConfig()
@@ -124,12 +146,7 @@ class KnockBackFFA : KotlinPlugin() {
     }
 
     private fun startupKits() {
-        val kitConfig = File(dataFolder, "kits.yml")
-        if (!kitConfig.exists()) {
-            logger.warning(TranslationManager.translate("plugin.kits_file_missing"))
-            saveResource("kits.yml", false)
-            logger.info(TranslationManager.translate("plugin.kits_file_created"))
-        }
+        ensureResourceFileExists("kits.yml")
         kitManager = KitManager(this)
         logger.info(TranslationManager.translate("plugin.kits_loaded", "count" to kitManager.getAllKitNames().size))
     }
@@ -139,12 +156,7 @@ class KnockBackFFA : KotlinPlugin() {
     }
 
     fun loadBoosts() {
-        val boostConfig = File(dataFolder, "boosts.yml")
-        if (!boostConfig.exists()) {
-            logger.warning(TranslationManager.translate("plugin.boosts_file_missing"))
-            saveResource("boosts.yml", false)
-            logger.info(TranslationManager.translate("plugin.boosts_file_created"))
-        }
+        ensureResourceFileExists("boosts.yml")
         boostManager = BoostManager(this)
         boostManager.registerEvents(this)
         logger.info(TranslationManager.translate("plugin.boosts_loaded", "count" to boostManager.getAllBoosts().size))
@@ -173,12 +185,9 @@ class KnockBackFFA : KotlinPlugin() {
             PlayerJoinListener(ScoreboardHandler(this), BossBarHandler(this)),
             PlayerQuitListener(ScoreboardHandler(this), BossBarHandler(this)),
             ScoreHandler(this),
-            DeathBlock(),
             PlayerHandler(this),
             KitLayoutManager(this),
         )
-        logger.info(TranslationManager.translate("plugin.events_registered", "count" to 5))
-    }
 
     private fun startArenaHandler(mapDuration: Int) {
         logger.info(TranslationManager.translate("plugin.starting_arena_handler"))
