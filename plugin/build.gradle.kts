@@ -10,6 +10,7 @@ plugins {
 
 group = "dev.Marten_mrfcyt"
 version = "0.6.1"
+version = "0.7.0-alpha"
 
 repositories {
     mavenCentral()
@@ -61,29 +62,232 @@ tasks.processResources {
 kotlin {
     jvmToolchain(21)
 }
-tasks.withType<ShadowJar> {
-    relocate("org.bstats", "com.typewritermc.engine.paper.extensions.bstats")
-    minimize {
-        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
-        exclude(dependency("org.jetbrains.kotlin:kotlin-reflect"))
-        exclude(dependency("com.github.shynixn.mccoroutine:mccoroutine-bukkit-core"))
 
+// Task to create JAR with resources
+tasks.jar {
+    // Ensure resources are processed
+    dependsOn("processResources")
+    
+    // Include resources at the root of the JAR (not in a resources/ directory)
+    from("${layout.buildDirectory}/resources/main") {
+        duplicatesStrategy = DuplicatesStrategy.INCLUDE
     }
 }
-task<ShadowJar>("buildAndMove") {
-    dependsOn("shadowJar")
 
+// ShadowJar configuration
+tasks.withType<ShadowJar> {
+    // Ensure resources are processed before creating the JAR
+    dependsOn("processResources")
+    
+    // Don't add a suffix to the output file
+    archiveClassifier.set("")
+    
+    // Handle duplicates
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+    
+    // Include resources directly (not in a resources/ directory)
+    from("${layout.buildDirectory}/resources/main") {
+        // This ensures resources don't go inside a 'resources' folder in the JAR
+        into("")
+    }
+
+    minimize {
+        exclude(dependency("org.jetbrains.kotlin:kotlin-stdlib"))
+        // Don't minimize resources
+        exclude("lang/**")
+        exclude("*.yml")
+    }
+    
+    // Merge service files
+    mergeServiceFiles()
+    
+    // Validate the JAR after creation
+    doLast {
+        println("ShadowJar created at: ${archiveFile.get().asFile.absolutePath}")
+        println("JAR size: ${archiveFile.get().asFile.length()} bytes")
+        
+        // This is to ensure resources aren't added under a resources/ directory
+        val resourcesDir = file("build/resources/main")
+        if (resourcesDir.exists()) {
+            println("\nAdding resources directly at root level...")
+            exec {
+                commandLine = listOf(
+                    "jar", 
+                    "uf", 
+                    archiveFile.get().asFile.absolutePath,
+                    "-C", resourcesDir.absolutePath, "."
+                )
+            }
+        }
+        
+        validateJarResources(archiveFile.get().asFile)
+    }
+}
+
+// Setup build task to depend on shadowJar
+tasks.build {
+    dependsOn("shadowJar")
+}
+
+// Create a task to move the JAR to the server plugins directory
+tasks.register<Copy>("buildAndMove") {
+    dependsOn("shadowJar")
+    
     group = "build"
     description = "Builds the jar and moves it to the server folder"
-
-    doLast {
-        val jar = file("build/libs/${project.name}-${version}-all.jar")
-        val server = file("server/plugins/${project.name.capitalizeAsciiOnly()}-${version}.jar")
-
-        if (server.exists()) {
-            server.delete()
+    
+    from("${layout.buildDirectory}/libs/${project.name}-${project.version}.jar")
+    into("server/plugins")
+    rename { "${project.name.capitalizeAsciiOnly()}-${project.version}.jar" }
+    
+    doFirst {
+        val targetDir = file("server/plugins")
+        if (!targetDir.exists()) {
+            targetDir.mkdirs()
         }
+        
+        val existingJar = file("server/plugins/${project.name.capitalizeAsciiOnly()}-${project.version}.jar")
+        if (existingJar.exists()) {
+            existingJar.delete()
+            println("Deleted existing JAR file: ${existingJar.absolutePath}")
+        }
+    }
+    
+    doLast {
+        val destFile = file("server/plugins/${project.name.capitalizeAsciiOnly()}-${project.version}.jar")
+        println("JAR successfully copied to: ${destFile.absolutePath}")
+    }
+}
 
-        jar.copyTo(server, overwrite = true)
+// Create a separate task for validating JAR resources
+tasks.register("validateJar") {
+    group = "verification"
+    description = "Validates resources in the built JAR file"
+    
+    dependsOn("shadowJar")
+    
+    doLast {
+        val jarFile = file("build/libs/${project.name}-${version}.jar")
+        if (jarFile.exists()) {
+            validateJarResources(jarFile)
+        } else {
+            throw GradleException("JAR file not found: ${jarFile.absolutePath}. Run 'shadowJar' task first.")
+        }
+    }
+}
+
+
+// Utility function to validate resources in the JAR file
+fun validateJarResources(jarFile: File) {
+    println("\n=== Validating JAR Resources ===")
+    
+    if (!jarFile.exists()) {
+        throw GradleException("JAR file not found at: ${jarFile.absolutePath}")
+    }
+    
+    // Discover resources
+    val discoveredResources = discoverResources()
+    val criticalResources = discoveredResources["criticalResources"] ?: emptySet()
+    val languageFiles = discoveredResources["languageFiles"] ?: emptySet()
+    val pluginDescriptors = discoveredResources["pluginDescriptors"] ?: emptySet()
+    
+    // Get JAR contents
+    val process = ProcessBuilder("jar", "-tf", jarFile.absolutePath)
+        .redirectErrorStream(true)
+        .start()
+    
+    val output = process.inputStream.bufferedReader().readText()
+    val jarEntries = output.lines()
+        .filter { it.isNotBlank() }
+        .toList()
+    
+    // Extract YAML resources
+    val yamlResources = jarEntries.filter { 
+        it.endsWith(".yml") || it.endsWith(".yaml") 
+    }
+    
+    println("Found ${yamlResources.size} YAML files in JAR:")
+    yamlResources.forEach { println("  - $it") }
+    
+    // Extract key paths (root or resources/ prefix pattern)
+    val resourcePattern = """(?:resources/)?(.+\.yml)""".toRegex()
+    val normalizedResources = yamlResources.mapNotNull { path ->
+        resourcePattern.find(path)?.groupValues?.get(1)
+    }.toSet()
+    
+    println("\nNormalized resource paths:")
+    normalizedResources.sorted().forEach { 
+        println("  - $it") 
+    }
+    
+    // Check for critical resources
+    val missingResources = mutableListOf<String>()
+    
+    println("\nChecking for critical resources:")
+    
+    // Function to check if a resource exists in normalized resources
+    fun isResourceInJar(resourcePath: String): Boolean {
+        val normalizedPath = resourcePath.replace('\\', '/')
+        return normalizedResources.any { 
+            it == normalizedPath || it.endsWith("/$normalizedPath")
+        }
+    }
+    
+    // Check critical resources
+    criticalResources.forEach { resource ->
+        if (isResourceInJar(resource)) {
+            println("  ✅ Found: $resource")
+        } else {
+            println("  ❌ Missing: $resource")
+            missingResources.add(resource)
+        }
+    }
+    
+    // Check language files
+    println("\nChecking for language files:")
+    val foundLanguageFiles = mutableListOf<String>()
+    
+    languageFiles.forEach { langFile ->
+        if (isResourceInJar(langFile)) {
+            println("  ✅ Found: $langFile")
+            foundLanguageFiles.add(langFile)
+        } else {
+            println("  ❓ Not found: $langFile")
+        }
+    }
+    
+    if (foundLanguageFiles.isEmpty() && !languageFiles.isEmpty()) {
+        println("  ❌ No language files found!")
+        missingResources.add("Language files")
+    } else if (!languageFiles.isEmpty()) {
+        println("  ✅ Found ${foundLanguageFiles.size}/${languageFiles.size} language files")
+    }
+    
+    // Check for plugin.yml and paper-plugin.yml
+    val foundDescriptors = pluginDescriptors.filter { isResourceInJar(it) }
+    
+    println("\nChecking for plugin descriptors:")
+    if (foundDescriptors.isNotEmpty()) {
+        foundDescriptors.forEach { println("  ✅ Found: $it") }
+    } else if (!pluginDescriptors.isEmpty()) {
+        println("  ❌ Missing plugin descriptors!")
+        missingResources.add("Plugin descriptors (plugin.yml)")
+    }
+    
+    // Final validation
+    if (missingResources.isEmpty()) {
+        println("\n✅ JAR VALIDATION PASSED - All required resources are present")
+        println("   Total resources: ${normalizedResources.size}")
+        println("   YAML files: ${yamlResources.size}")
+        println("   Plugin descriptors: ${foundDescriptors.size}")
+    } else {
+        throw GradleException("""
+            ❌ JAR VALIDATION FAILED - Missing required resources:
+            ${missingResources.joinToString("\n") { "   - $it" }}
+            
+            Please ensure all required resources are in the src/main/resources directory.
+            Critical resources should be directly in src/main/resources.
+            Language files should be in src/main/resources/lang/.
+        """.trimIndent())
     }
 }
