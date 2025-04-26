@@ -1,4 +1,4 @@
-package dev.marten_mrfcyt.knockbackffa.arena
+package dev.marten_mrfcyt.knockbackffa.arena.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
@@ -16,15 +16,7 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: Material)
         return
     }
 
-    val location = source.location
     val arenaName = name.replace(" ", "_")
-
-    source.message(translate("arena.create.location",
-        "arena_name" to arenaName,
-        "x" to "%.1f".format(location.x),
-        "y" to "%.1f".format(location.y),
-        "z" to "%.1f".format(location.z)
-    ))
 
     val config = File("$dataFolder/arena.yml")
     if (!config.exists()) {
@@ -41,22 +33,19 @@ fun Plugin.createArena(source: CommandSender, name: String, killBlock: Material)
     }
 
     val arenaConfig = YamlConfiguration.loadConfiguration(config)
-    if (!arenaConfig.contains("arenas.$arenaName")) {
-        if (location.world?.pvp == true) {
-            server.scheduler.runTaskAsynchronously(this, Runnable {
-                KnockBackFFA.instance.arenaHandler.addArena(Arena(arenaName, location, killBlock))
-            })
-            source.message(translate("arena.create.success",
-                "arena_name" to arenaName
-            ))
-        } else {
-            source.message(translate("arena.create.pvp_required"))
-        }
-    } else {
+    if (arenaConfig.contains("arenas.$arenaName")) {
         source.message(translate("arena.create.exists",
             "arena_name" to arenaName
         ))
+        return
     }
+
+    if (source.location.world?.pvp != true) {
+        source.message(translate("arena.create.pvp_required"))
+        return
+    }
+
+    KnockBackFFA.instance.arenaCreationHandler.startArenaCreation(source, arenaName, killBlock)
 }
 
 fun Plugin.deleteArena(source: CommandSender, name: String) {
@@ -78,13 +67,17 @@ fun Plugin.deleteArena(source: CommandSender, name: String) {
         return
     }
 
-    val location = ArenaHandler(KnockBackFFA.instance).locationFetcher(name)
+    val arena = KnockBackFFA.instance.arenaHandler.loadArenaByName(name)
 
-    if (location != null) {
+    if (arena != null) {
         server.scheduler.runTaskAsynchronously(this, Runnable {
-            ArenaHandler(KnockBackFFA.instance).removeArena(Arena(name, location))
+            KnockBackFFA.instance.arenaHandler.removeArena(arena)
         })
         source.message(translate("arena.delete.success",
+            "arena_name" to name
+        ))
+    } else {
+        source.message(translate("arena.delete.failed",
             "arena_name" to name
         ))
     }

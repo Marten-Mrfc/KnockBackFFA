@@ -1,18 +1,22 @@
 package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.arena.utils.ArenaModel
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.utilities.*
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.configuration.file.YamlConfiguration
+import org.bukkit.entity.Player
 import java.io.File
+import java.util.*
 
-data class Arena(val name: String, val location: Location, val killBlock: Material = Material.VOID_AIR)
-var currentArena: Arena? = null
+var currentArena: ArenaModel? = null
+
 class ArenaHandler(private val plugin: KnockBackFFA) {
     private val arenaConfig: YamlConfiguration
+    private val arenaCreationSessions = mutableMapOf<UUID, ArenaCreationSession>()
 
     init {
         val arenaFile = File("${plugin.dataFolder}/arena.yml")
@@ -23,20 +27,37 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile)
     }
 
-    fun addArena(arena: Arena) {
+    fun addArena(arena: ArenaModel) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
-            arenaConfig.set("arenas.${arena.name}.location.world", arena.location.world?.name)
-            arenaConfig.set("arenas.${arena.name}.location.x", arena.location.x)
-            arenaConfig.set("arenas.${arena.name}.location.y", arena.location.y)
-            arenaConfig.set("arenas.${arena.name}.location.z", arena.location.z)
-            arenaConfig.set("arenas.${arena.name}.location.yaw", arena.location.yaw)
-            arenaConfig.set("arenas.${arena.name}.location.pitch", arena.location.pitch)
+
+            if (arena.spawnRegion != null) {
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.world", arena.spawnRegion.first.world?.name)
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.min.x", minOf(arena.spawnRegion.first.x, arena.spawnRegion.second.x))
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.min.y", minOf(arena.spawnRegion.first.y, arena.spawnRegion.second.y))
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.min.z", minOf(arena.spawnRegion.first.z, arena.spawnRegion.second.z))
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.max.x", maxOf(arena.spawnRegion.first.x, arena.spawnRegion.second.x))
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.max.y", maxOf(arena.spawnRegion.first.y, arena.spawnRegion.second.y))
+                arenaConfig.set("arenas.${arena.name}.spawnRegion.max.z", maxOf(arena.spawnRegion.first.z, arena.spawnRegion.second.z))
+            }
+
+            arenaConfig.set("arenas.${arena.name}.spawnpoint.world", arena.spawnpoint.world?.name)
+            arenaConfig.set("arenas.${arena.name}.spawnpoint.x", arena.spawnpoint.x)
+            arenaConfig.set("arenas.${arena.name}.spawnpoint.y", arena.spawnpoint.y)
+            arenaConfig.set("arenas.${arena.name}.spawnpoint.z", arena.spawnpoint.z)
+            arenaConfig.set("arenas.${arena.name}.spawnpoint.yaw", arena.spawnpoint.yaw)
+            arenaConfig.set("arenas.${arena.name}.spawnpoint.pitch", arena.spawnpoint.pitch)
+
             arenaConfig.set("arenas.${arena.name}.killBlock", arena.killBlock.name)
+
+            arena.settings.forEach { (key, value) ->
+                arenaConfig.set("arenas.${arena.name}.settings.$key", value)
+            }
+
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
         })
     }
 
-    fun removeArena(arena: Arena) {
+    fun removeArena(arena: ArenaModel) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
             arenaConfig.set("arenas.${arena.name}", null)
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
@@ -56,33 +77,97 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         val keys = arenaSection.getKeys(false)
         var loadedCount = 0
         for (key in keys) {
-            val location = locationFetcher(key)
-            if (location != null) {
+            val arena = loadArenaByName(key)
+            if (arena != null) {
                 loadedCount++
             } else {
                 plugin.logger.warning(translate("arena.load.failed", "arena_name" to key))
             }
         }
         plugin.logger.info(translate("arena.load.success", "count" to loadedCount.toString()))
-    }
+    }    fun loadArenaByName(name: String): ArenaModel? {
 
-    fun switchArena() {
+        val worldName = arenaConfig.getString("arenas.$name.spawnRegion.world") ?: arenaConfig.getString("arenas.$name.spawnpoint.world")
+        val world = worldName?.let { Bukkit.getWorld(it) } ?: return null
+
+        val spawnpoint = if (arenaConfig.contains("arenas.$name.spawnpoint")) {
+            Location(
+                world,
+                arenaConfig.getDouble("arenas.$name.spawnpoint.x"),
+                arenaConfig.getDouble("arenas.$name.spawnpoint.y"),
+                arenaConfig.getDouble("arenas.$name.spawnpoint.z"),
+                arenaConfig.getDouble("arenas.$name.spawnpoint.yaw").toFloat(),
+                arenaConfig.getDouble("arenas.$name.spawnpoint.pitch").toFloat()
+            )
+        } else if (arenaConfig.contains("arenas.$name.location")) {
+
+            Location(
+                world,
+                arenaConfig.getDouble("arenas.$name.location.x"),
+                arenaConfig.getDouble("arenas.$name.location.y"),
+                arenaConfig.getDouble("arenas.$name.location.z"),
+                arenaConfig.getDouble("arenas.$name.location.yaw").toFloat(),
+                arenaConfig.getDouble("arenas.$name.location.pitch").toFloat()
+            )
+        } else {
+            return null
+        }
+
+        val spawnRegion = if (arenaConfig.contains("arenas.$name.spawnRegion")) {
+            val min = Location(
+                world,
+                arenaConfig.getDouble("arenas.$name.spawnRegion.min.x"),
+                arenaConfig.getDouble("arenas.$name.spawnRegion.min.y"),
+                arenaConfig.getDouble("arenas.$name.spawnRegion.min.z")
+            )
+            val max = Location(
+                world,
+                arenaConfig.getDouble("arenas.$name.spawnRegion.max.x"),
+                arenaConfig.getDouble("arenas.$name.spawnRegion.max.y"),
+                arenaConfig.getDouble("arenas.$name.spawnRegion.max.z")
+            )
+            Pair(min, max)
+        } else {
+            null
+        }
+
+        val killBlockName = arenaConfig.getString("arenas.$name.killBlock") ?: Material.VOID_AIR.name
+        val killBlock = try {
+            Material.valueOf(killBlockName)
+        } catch (e: IllegalArgumentException) {
+            plugin.logger.warning(translate("arena.load.killblock_not_found", "arena_name" to name))
+            Material.VOID_AIR
+        }
+
+        val settings = mutableMapOf<String, Any>()
+        val settingsSection = arenaConfig.getConfigurationSection("arenas.$name.settings")
+        settingsSection?.getKeys(false)?.forEach { key ->
+            settingsSection.get(key)?.let { settings[key] = it }
+        }
+
+        return ArenaModel(
+            name = name,
+            spawnRegion = spawnRegion,
+            spawnpoint = spawnpoint,
+            killBlock = killBlock,
+            settings = settings
+        )
+    }    fun switchArena() {
         arenaConfig.load(File("${plugin.dataFolder}/arena.yml"))
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
 
         if (arenaSection != null && arenaSection.getKeys(false).isNotEmpty()) {
             val arenaName = arenaSection.getKeys(false).random()
-            val location = locationFetcher(arenaName)
-            val killBlock = arenaConfig.getString("arenas.$arenaName.killBlock") ?: Material.VOID_AIR.name
-            if (location != null) {
-                currentArena = Arena(arenaName, location, Material.valueOf(killBlock))
+            val arena = loadArenaByName(arenaName)
+
+            if (arena != null) {
+                currentArena = arena
                 Bukkit.getScheduler().runTask(plugin, Runnable {
                     Bukkit.getOnlinePlayers().forEach { player ->
-                        player.teleport(location)
-                        player.message(translate("arena.switch.success", "arena_name" to (currentArena?.name ?: "unknown")))
+                        player.teleport(arena.spawnpoint)
+                        player.sendMini(translate("arena.switch.success", "arena_name" to (currentArena?.name ?: "unknown")))
                     }
                     plugin.config.set("currentArena", arenaName)
-                    plugin.config.set("currentLocation", location)
                     plugin.saveConfig()
                 })
             } else {
@@ -96,35 +181,71 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
     private fun clearArenaData() {
         Bukkit.getScheduler().runTask(plugin, Runnable {
             plugin.config.set("currentArena", null)
-            plugin.config.set("currentLocation", null)
         })
         currentArena = null
-    }
-
-    internal fun locationFetcher(key: String): Location? {
-        val worldName = arenaConfig.getString("arenas.$key.location.world")
-        val x = arenaConfig.getDouble("arenas.$key.location.x")
-        val y = arenaConfig.getDouble("arenas.$key.location.y")
-        val z = arenaConfig.getDouble("arenas.$key.location.z")
-        val yaw = arenaConfig.getDouble("arenas.$key.location.yaw")
-        val pitch = arenaConfig.getDouble("arenas.$key.location.pitch")
-        val world = worldName?.let { Bukkit.getWorld(it) }
-        val killBlock = arenaConfig.getString("arenas.$key.killBlock") ?: Material.VOID_AIR.name
-
-        return if (world != null) {
-            if (killBlock.isNotEmpty()) {
-                Location(world, x, y, z, yaw.toFloat(), pitch.toFloat())
-            } else {
-                plugin.logger.warning(translate("arena.load.killblock_not_found", "arena_name" to key))
-                null
-            }
-        } else {
-            null
-        }
     }
 
     fun getArenaNames(): List<String> {
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
         return arenaSection?.getKeys(false)?.toList() ?: emptyList()
     }
+
+    fun startArenaCreation(player: Player, name: String, killBlock: Material): ArenaCreationSession {
+        val session = ArenaCreationSession(name, killBlock)
+        arenaCreationSessions[player.uniqueId] = session
+        return session
+    }
+
+    fun getArenaCreationSession(player: Player): ArenaCreationSession? {
+        return arenaCreationSessions[player.uniqueId]
+    }
+    fun completeArenaCreation(player: Player): Boolean {
+        val session = arenaCreationSessions[player.uniqueId] ?: return false
+
+        if (!session.isComplete()) {
+            player.sendMini(translate("arena.create.incomplete"))
+            return false
+        }
+
+        val arena = ArenaModel(
+            name = session.name,
+            spawnRegion = session.spawnRegion,
+            spawnpoint = session.spawnpoint!!,
+            killBlock = session.killBlock
+        )
+
+        addArena(arena)
+        arenaCreationSessions.remove(player.uniqueId)
+        return true
+    }
+
+    fun cancelArenaCreation(player: Player) {
+        arenaCreationSessions.remove(player.uniqueId)
+    }
+}
+
+data class ArenaCreationSession(
+    val name: String,
+    val killBlock: Material,
+    var spawnRegion: Pair<Location, Location>? = null,
+    var spawnpoint: Location? = null,
+    var step: ArenaCreationStep = ArenaCreationStep.SELECT_REGION
+) {
+    fun isComplete(): Boolean {
+        return spawnRegion != null && spawnpoint != null
+    }
+
+    fun nextStep() {
+        step = when (step) {
+            ArenaCreationStep.SELECT_REGION -> ArenaCreationStep.SET_SPAWNPOINT
+            ArenaCreationStep.SET_SPAWNPOINT -> ArenaCreationStep.COMPLETE
+            ArenaCreationStep.COMPLETE -> ArenaCreationStep.COMPLETE
+        }
+    }
+}
+
+enum class ArenaCreationStep {
+    SELECT_REGION,
+    SET_SPAWNPOINT,
+    COMPLETE
 }

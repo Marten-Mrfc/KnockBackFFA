@@ -1,6 +1,6 @@
+package dev.marten_mrfcyt.knockbackffa.arena.utils
 
-package dev.marten_mrfcyt.knockbackffa.arena
-
+import dev.marten_mrfcyt.knockbackffa.arena.currentArena
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
@@ -13,9 +13,14 @@ class DeathBlock() : Listener {
         val currentArena = currentArena ?: return
         val killBlock = currentArena.killBlock
 
+        // Check if player is below y=-64 (void death)
         if (event.to.y < -64) {
             event.player.health = 0.0
             event.player.damage(100.0)
+            return
+        }
+
+        if (currentArena.isInSpawnRegion(event.to)) {
             return
         }
 
