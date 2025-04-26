@@ -2,9 +2,9 @@ package dev.marten_mrfcyt.knockbackffa
 
 import com.mojang.brigadier.arguments.StringArgumentType
 import com.mojang.brigadier.arguments.StringArgumentType.string
-import dev.marten_mrfcyt.knockbackffa.arena.createArena
-import dev.marten_mrfcyt.knockbackffa.arena.deleteArena
-import dev.marten_mrfcyt.knockbackffa.arena.listArena
+import dev.marten_mrfcyt.knockbackffa.arena.editor.createArena
+import dev.marten_mrfcyt.knockbackffa.arena.editor.deleteArena
+import dev.marten_mrfcyt.knockbackffa.arena.utils.listArena
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.guis.editor.boosts.BoostSelector
 import dev.marten_mrfcyt.knockbackffa.guis.editor.kit.EditKit
@@ -18,10 +18,8 @@ import mlib.api.commands.builders.command
 import mlib.api.utilities.*
 import org.bukkit.Material
 import org.bukkit.Registry
-import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
-import java.io.File
 
 private val blockSuggestions: List<String> by lazy {
     Registry.MATERIAL.stream()
@@ -103,7 +101,37 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
                 source.error(TranslationManager.translate("commands.arena.create.missing_name"))
             }
         }
+        literal("selection_complete") {
+            executes {
+                KnockBackFFA.instance.arenaCreationHandler.handleSelectionComplete(source as Player)
+            }
+        }
+        literal("spawnpoint_complete") {
+            executes {
+                KnockBackFFA.instance.arenaCreationHandler.handleSpawnpointComplete(source as Player)
+            }
+        }
+        literal("confirm") {
+            executes {
+                KnockBackFFA.instance.arenaCreationHandler.completeArenaCreation(source as Player)
+            }
+        }
+        literal("cancel") {
+            executes {
+                KnockBackFFA.instance.arenaCreationHandler.cancelArenaCreation(source as Player)
+            }
+        }
         literal("list") {
+            argument("page", StringArgumentType.word()) {
+                suggests { builder ->
+                    (1..5).forEach { builder.suggest(it.toString()) }
+                    builder.build()
+                }
+                executes {
+                    val pageNumber = getArgument<String>("page").toIntOrNull() ?: 1
+                    plugin.listArena(source, pageNumber)
+                }
+            }
             executes {
                 plugin.listArena(source)
             }
@@ -119,6 +147,21 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
             }
             executes {
                 source.error(TranslationManager.translate("commands.arena.delete.missing_name"))
+            }
+        }
+        literal("settings") {
+            argument("name", string()) {
+                suggests { builder ->
+                    arenaHandler.getArenaNames().forEach { builder.suggest(it) }
+                    builder.build()
+                }
+                executes {
+
+                    source.message(TranslationManager.translate("commands.arena.settings.coming_soon"))
+                }
+            }
+            executes {
+                source.error(TranslationManager.translate("commands.arena.settings.missing_name"))
             }
         }
         executes {

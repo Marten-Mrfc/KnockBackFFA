@@ -104,7 +104,7 @@ class EditKit(private val plugin: KnockBackFFA) {
                 // Back button
                 standardGui.item(Material.BARRIER) {
                     name("<gray>Go Back".asMini())
-                    description(listOf("<gray>Return to kit selection".asMini()))
+                    description(listOf("<gray>Return to kit editor".asMini()))
                     slots(17)
                     onClick { event -> goBack(event) }
                 }

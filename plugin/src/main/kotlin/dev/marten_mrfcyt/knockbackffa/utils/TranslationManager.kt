@@ -75,9 +75,7 @@ class TranslationManager(private val plugin: Plugin) {
         }
 
         val message = if (translation is List<*>) {
-            if (translation.isNotEmpty()) {
-                translation
-            } else {
+            translation.ifEmpty {
                 "Empty list for message key '$key'"
             }
         } else {

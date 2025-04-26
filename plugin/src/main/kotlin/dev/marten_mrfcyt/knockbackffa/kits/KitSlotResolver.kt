@@ -20,7 +20,13 @@ object KitSlotResolver {
 
         return playerData.kitLayouts[kitName]?.get(originalSlot) ?: originalSlot
     }
+    fun resolveNewSlot(player: Player, newSlot: Int): Int {
+        val plugin = KnockBackFFA.instance
+        val playerData = PlayerData.getInstance(plugin).getPlayerDataModel(player.uniqueId)
+        val kitName = playerData.kit ?: return newSlot
 
+        return playerData.kitLayouts[kitName]?.entries?.find { it.value == newSlot }?.key ?: newSlot
+    }
     /**
      * Finds the kit item in the player's inventory based on custom layout
      *

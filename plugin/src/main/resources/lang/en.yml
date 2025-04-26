@@ -59,6 +59,11 @@ arena:
     success: "<green>Teleported to arena <white><arena_name><green>!"
   create:
     success: "<green>Created arena <white><arena_name>"
+    started: "<green>Starting arena creation for <white><arena_name>"
+    cancelled: "<red>Arena creation cancelled."
+    failed: "<red>Failed to create arena. Please try again."
+    incomplete: "<red>Your editor is incomplete. Please select two points first."
+    selection_incomplete: "<red>You need to select two points first! Try again when your editor is complete."
     location: "<green>Creating <white>arena <arena_name> at <x>, <y>, <z>"
     file:
       not_found: "No arena.yml file found, creating a new one!"
@@ -69,6 +74,7 @@ arena:
   delete:
     start: "<dark_red>Deleting <white>arena <arena_name>!"
     success: "Arena <arena_name> <dark_red>deleted <white>successfully!"
+    failed: "<red>Failed to delete arena <arena_name>. Please try again."
     not_found: "<red>Arena <arena_name> not found. Is it misspelled?"
   list:
     none: "<red>No arenas found!"
@@ -81,6 +87,19 @@ arena:
     killblock_not_found: "Failed to load arena <arena_name>: Kill block not found"
   deathblock:
     killblock_null: "Kill block is null for arena: <arena_name>"
+  selection:
+    worldedit_available: "<green>WorldEdit detected! Use the WorldEdit wand to select two points."
+    worldedit_wand_given: "<green>WorldEdit wand has been added to your inventory."
+    using_custom_wand: "<green>Using KnockBackFFA editor wand. A wand has been added to your inventory."
+    region_instructions: "<yellow>Please select two points to define the spawn region."
+    spawnpoint_instructions: "<yellow>Go to where you want players to spawn and set the spawnpoint."
+    first_position_set: "<green>First position set at <white><x>, <y>, <z>"
+    second_position_set: "<green>Second position set at <white><x>, <y>, <z>"
+    complete: "<green>Selection complete! You can now set the spawn region."
+    spawnpoint_set: "<green>Spawnpoint set at <white><x>, <y>, <z>"
+  settings:
+    coming_soon: "<yellow>Arena settings GUI is coming soon!"
+    missing_name: "<red>Please specify an arena name to edit settings."
 
 # ###############################
 #                              #
@@ -251,20 +270,25 @@ commands:
       missing_name: "Please insert a name for the arena!"
     delete:
       missing_name: "Please insert a name for the arena!"
+    settings:
+      missing_name: "<red>Please specify an arena name to edit settings."
+      coming_soon: "<yellow>Arena settings GUI is coming soon!"
     help: |
       <gold><bold>KnockBackFFA<reset> <gray>- <white>Arena Command
       <white><bold>*</bold> <green>/kbffa arena create<gray>: <white>Create an arena
       <white><bold>*</bold> <green>/kbffa arena list<gray>: <white>List all arenas
       <white><bold>*</bold> <green>/kbffa arena delete<gray>: <white>Delete an arena
+      <white><bold>*</bold> <green>/kbffa arena settings<gray>: <white>Configure arena settings
   kit:
     create:
       missing_lore: "Please insert a lore for the kit!"
       missing_name: "Please insert a name for the kit!"
     delete:
       default_kit: "You can't delete the default kit!"
-      success: "<green>Successfully deleted kit <name>!"
-      not_found: "Kit <name> does not exist!"
+      success: "<green>Successfully deleted kit <n>!"
+      not_found: "Kit <n> does not exist!"
       missing_name: "Please insert a name for the kit!"
+
 
 # ###############################
 #                              #

@@ -22,12 +22,22 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         val killer = source.killer
 
         if (killer != null) {
-            event.deathMessage((translateListRandom("player.killed_by_message",
+            val message = translateListRandom("player.killed_by_message",
                 "player_name" to source.name,
-                "killer_name" to killer.name)).asMini())
+                "killer_name" to killer.name)
+            if (!message.contains("null")) {
+                event.deathMessage(message.asMini())
+            } else {
+                event.deathMessage(null)
+            }
         } else {
-            event.deathMessage((translateListRandom("player.death_message",
-                "player_name" to source.name)).asMini())
+            val message = translateListRandom("player.death_message",
+                "player_name" to source.name)
+            if (!message.contains("null")) {
+                event.deathMessage(message.asMini())
+            } else {
+                event.deathMessage(null)
+            }
         }
 
         source.inventory.clear()
@@ -35,7 +45,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         try {
             val playerDataInstance = PlayerData.getInstance(plugin)
 
-            // Update the victim's data
             val sourceDataModel = playerDataInstance.getPlayerDataModel(source.uniqueId)
             sourceDataModel.apply {
                 deaths += 1
@@ -49,7 +58,6 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
             }
             playerDataInstance.savePlayerDataModel(source.uniqueId, sourceDataModel)
 
-            // Update the killer's data if exists
             killer?.let { killerPlayer ->
                 val killerDataModel = playerDataInstance.getPlayerDataModel(killerPlayer.uniqueId)
                 killerDataModel.apply {
