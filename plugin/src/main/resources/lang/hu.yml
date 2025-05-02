@@ -23,26 +23,25 @@ player:
     - "<white><player_name><gray> <white><killer_name><gray> áldozata lett!"
     - "<white><player_name><gray> vesztébe esett <white><killer_name><gray> által!"
     - "<white><player_name><gray> nem tudott ellenálni <white><killer_name><gray> támadásának!"
-    -
 # ###############################
 #                              #
 #         Score Display        #
 #                              #
 # ###############################
 scoreboard:
-  title: ''
+  title: ""
   lines:
-    - '<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>'
-    - '<gray><b>├</b></gray><white>Következő pálya: </white><blue>%knockbackffa_next_map%</blue>'
-    - '<gray><b>└</b></gray><white>Jelenlegi pálya:</white> <green>%knockbackffa_map%</green>'
-    - ''
-    - '<gray><b>┌─</b></gray><gold><b>STATISZTIKÁK</b></gold>'
-    - '<gray><b>├</b></gray><white>Ping: </white><green>%player_ping%</green>'
-    - '<gray><b>├</b></gray><white>Öléseid: </white><green>%knockbackffa_kills%</green>'
-    - '<gray><b>├</b></gray><white>Ölés/Halál arány: </white><green>%knockbackffa_kd-ratio%</green>'
-    - '<gray><b>├</b></gray><white>Halálaid: </white><green>%knockbackffa_deaths%</green>'
-    - '<gray><b>├</b></gray><white>Érméid: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>Ölés sorozatod: </white> <green>%knockbackffa_killstreak%</green>'
+    - "<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>"
+    - "<gray><b>├</b></gray><white>Következő pálya: </white><blue>%knockbackffa_next_map%</blue>"
+    - "<gray><b>└</b></gray><white>Jelenlegi pálya:</white> <green>%knockbackffa_map%</green>"
+    - ""
+    - "<gray><b>┌─</b></gray><gold><b>STATISZTIKÁK</b></gold>"
+    - "<gray><b>├</b></gray><white>Ping: </white><green>%player_ping%</green>"
+    - "<gray><b>├</b></gray><white>Öléseid: </white><green>%knockbackffa_kills%</green>"
+    - "<gray><b>├</b></gray><white>Ölés/Halál arány: </white><green>%knockbackffa_kd-ratio%</green>"
+    - "<gray><b>├</b></gray><white>Halálaid: </white><green>%knockbackffa_deaths%</green>"
+    - "<gray><b>├</b></gray><white>Érméid: </white><green>%knockbackffa_coins%</green>"
+    - "<gray><b>└</b></gray><white>Ölés sorozatod: </white> <green>%knockbackffa_killstreak%</green>"
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
 # ###############################
@@ -61,10 +60,11 @@ arena:
     incomplete: "<red>Your editor is incomplete. Please select two points first."
     selection_incomplete: "<red>You need to select two points first! Try again when your editor is complete."
     location: "<green>Aréna létrehozása: <white>arena <arena_name> at <x>, <y>, <z>"
+    no_session: "<red>You do not have an active arena creation session."
     file:
       not_found: "Nem létezik arena.yml fájl, készítés folyamatban..."
       created: "arena.yml fájl elkészült!"
-      error: "<red>Nem sikerült elkészíteni az arena.yml fájlt: <error>"
+      error: "<red>Failed to create arena.yml file: <e>"
     exists: "<red>Már létezik ilyen nevű aréna: <arena_name>"
     pvp_required: "<red>A PvP-nek engedélyzve kell lennie ebben a világban!"
   delete:
@@ -77,7 +77,7 @@ arena:
     header: "<bold>Arénák:<reset>"
     entry: "<white><bold>*</bold> <green><arena_name><reset> <gray>Hely: <white><world><dark_gray> (<gray><x><white> <gray><y><white> <gray><z><dark_gray>)<reset>"
   load:
-    none: "Nem találtunk arénákat a configurációban! | Aréna készítéshez: /kbffa arena create <név> <killBlokk>"
+    none: "Arenas section not found in configuration | Please run /kbffa arena create <n> <killBlock>"
     failed: "Nem sikerült betölteni az arénát: <arena_name>"
     success: "⚔️ <count> aréna betöltve!"
     killblock_not_found: "Nem sikerült betölteni az arénát: <arena_name>: Nincs megadva killBlokk!"
@@ -93,6 +93,15 @@ arena:
     second_position_set: "<green>Second position set at <white><x>, <y>, <z>"
     complete: "<green>Selection complete! You can now set the spawn region."
     spawnpoint_set: "<green>Spawnpoint set at <white><x>, <y>, <z>"
+  editor:
+    using_custom_wand: "<green>Using KnockBackFFA editor wand. A wand has been added to your inventory."
+    region_instructions: "<yellow>Please select two points to define the spawn region."
+    spawnpoint_instructions: "<yellow>Go to where you want players to spawn and set the spawnpoint."
+    first_position_set: "<green>First position set at <white><x>, <y>, <z>"
+    second_position_set: "<green>Second position set at <white><x>, <y>, <z>"
+    complete: "<green>Selection complete! You can now set the spawn region."
+    spawnpoint_set: "<green>Spawnpoint set at <white><x>, <y>, <z>"
+    no_session: "<red>You do not have an active arena creation session."
   settings:
     coming_soon: "<yellow>Arena settings GUI is coming soon!"
     missing_name: "<red>Please specify an arena name to edit settings."
@@ -107,16 +116,16 @@ kit:
     already_owned: "<red>Már a tulajdonodban van ez a felszerelés!"
     not_enough_coins: "<red>Nincs elég érméd a felszerelés megvásárlására!"
   load:
-    failed: "Nem sikerült betölteni a felszerelést: <name>. Hiba: <error>"
-  not_found: "Nincs felszerelés ilyen névvel: <name>"
+    failed: "Failed to load kit: <n>. Error: <e>"
+  not_found: "Kit not found: <n>"
   cooldown: "<red>Várnod kell <seconds> másodpercet, hogy újra felszerelést válthass!."
   delete:
-    failed: "Nem sikerült kitörölni a felszerelést: <name>. Hiba: <error>"
+    failed: "Failed to delete kit: <n>, <e>"
   reload:
     success: "<count> felszerelés újratöltve!"
   selector:
     title: "<gray>Válassz egy felszerelést!</gray>"
-    item_name: "<!italic><name>"
+    item_name: "<!italic><n>"
     item_description: "<description>"
   layout:
     changed: "<green>Saved new layout<gray> (<white><slot> <gray>→ <white><new_slot>)"
@@ -172,7 +181,7 @@ shop:
     active: "<green>Aktív! <gray>Hátralévő idő: <white><minutes>perc <seconds>másodperc"
     click_to_purchase: "<yellow>Kattints a megvásárláshoz!"
     already_active: "<yellow>Már aktív ez a gyorsítód!"
-    item_name: "<yellow><name>"
+    item_name: "<yellow><n>"
     duration_format:
       hours: "<hours>óra <minutes>perc"
       minutes: "<minutes>perc"
@@ -183,12 +192,12 @@ shop:
     not_enough_coins: "<red>Nincs elég érméd a megvásárláshoz!"
     confirmation:
       gui_title: "<dark_gray>Bolt <gray>» <white>Fizetés befejezése"
-      title: "<yellow>Gyorsító megvásárlása: <gold><name>"
+      title: "<yellow>Purchase Boost: <gold><n>"
       balance_sufficient: "<gray>Érméid: <green><coins> érme"
       balance_insufficient: "<gray>Érméid: <red><coins> érme"
       confirm: "<green>Megvásárlás <price> érmééert!"
       cancel: "<red>Mégsem"
-      success: "<green>Megvásároltad a <name> <green>gyorsítót!"
+      success: "<green>You purchased the <n> <green>boost!"
     active_gui:
       title: "<dark_gray>Gyorsítók <gray>» <white>Aktív gyorsítók"
       back: "<yellow>« Vissza a Boltba"
@@ -197,7 +206,7 @@ shop:
         description:
           - "<gray>Nincsenek aktív gyorsítóid"
           - "<gray>Látogasd meg a boltot a gyorsítók vásárlásához!"
-      boost_name: "<yellow><name>"
+      boost_name: "<yellow><n>"
       boost_description_line: "<gray><line>"
       time_remaining: "<gray>Hátralévő idő: <green><time>"
       kit_boost: "<gray>Felszerelés gyorsítók - Nem időhöz kötött"
@@ -211,25 +220,25 @@ shop:
 #                              #
 # ###############################
 boost:
-  expired: "<red>Lejárt a gyorsítód: <name>"
+  expired: "<red>Your <n> has expired!"
   error:
-    apply_kit_boost: "Nem sikerült bekapcsolni a felszerelés gyorsítót: <boost_id>. Hiba: <error>"
-    remove_kit_boost: "Nem sikerült kikapcsolni a felszerelés gyorsítót: <boost_id>. Hiba: <error>"
-    apply_player_boost: "Nem sikerült bekapcsolni a <boost_id> gyorsítót <player> játékosnak. Hiba: <error>"
-    apply_kit_boosts: "Nem sikerült bekapcsolni a felszerelés gyorsítót a <kit_name> felszerelésre. Hiba: <error>"
+    apply_kit_boost: "Failed to apply kit boost <boost_id>: <e>"
+    remove_kit_boost: "Failed to remove kit boost <boost_id>: <e>"
+    apply_player_boost: "Failed to apply boost <boost_id> to player <player>: <e>"
+    apply_kit_boosts: "Failed to apply kit boosts for kit <kit_name>: <e>"
   manager:
     not_found: "‼️ Nem található gyorsító ilyen IDvel: <id>"
-    config_apply_failed: "‼️ Nem sikerült frissíteni a gyorsító beállításait: <boost_id>. Hiba: <error>"
+    config_apply_failed: "‼️ Failed to apply configuration to boost <boost_id>: <e>"
     register_start: "🤖 Gyorsítók automatikus regisztrálása..."
     register_success: "✅ <count> gyorsító regisztrálva: <names>"
-    register_error: "‼️ Nem sikerült betölteni a gyorsítókat: <error>"
-    class_process_error: "‼️ Nem sikerült feldolgozni a gyorsító osztályt: <class>. Hiba: <error>"
+    register_error: "‼️ Error loading boosts: <e>"
+    class_process_error: "‼️ Could not process potential boost class <class>: <e>"
     listeners_registered: "👂 <count> gyorsító figyelő regisztrálva!"
     reload:
       start: "🔄 Gyorsító rendszer újrainditása..."
       unregistered: "❌ <count> gyorsító figyelő kiregisztrálva"
       complete: "✅ Gyorsítók újratöltve: <count> gyorsító újratöltve (<change> változás)"
-      error: "‼️ Nem sikerült újratölteni a gyorsítókat: <error>"
+      error: "‼️ Failed to reload boosts: <e>"
       recovery: "🔧 Helyreállítás..."
 # ###############################
 #                              #
@@ -238,7 +247,7 @@ boost:
 # ###############################
 error:
   player_only: "<red>Ezt csak játékosok tehetik meg!"
-  data_save: "Nem sikerült a játékosok adatainak elmentése/betöltése: <error>"
+  data_save: "Failed to load or save player data: <e>"
   data_save_admin: "<red>Nem sikerült a játékosok adatainak elmentése/betöltése. Lépj kapcsolatba egy adminisztrátorral!"
 # ###############################
 #                              #
@@ -247,7 +256,9 @@ error:
 # ###############################
 commands:
   debug:
-    title: "Debug parancs"
+    title: "<gold><bold>KnockBackFFA Debug</bold>"
+    status: "Debug mode is now <status>"
+    item_info: "Item in hand: <item>"
   bypass:
     toggle: "Bypass mód: <status>"
   reload:
@@ -274,8 +285,6 @@ commands:
     delete:
       default_kit: "Nem törölheted az alap felszerelést!"
       success: "<green>Successfully deleted kit <n>!"
-      not_found: "Kit <n> does not exist!"
-      missing_name: "Adj meg egy nevet a felszerelésnek!"
 # ###############################
 #                              #
 #            Plugin            #
