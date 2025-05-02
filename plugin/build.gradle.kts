@@ -21,7 +21,6 @@ repositories {
     maven("https://repo.extendedclip.com/content/repositories/placeholderapi/")
     maven("https://libraries.minecraft.net")
     maven("https://s01.oss.sonatype.org/content/repositories/snapshots/")
-    maven("https://maven.enginehub.org/repo/")
 }
 
 val centralDependencies = listOf(
@@ -34,14 +33,8 @@ dependencies {
     compileOnly("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
     compileOnly("com.mojang:brigadier:1.0.18")
     compileOnly("me.clip:placeholderapi:2.11.6")
-    compileOnly("org.junit.jupiter:junit-jupiter-api:5.7.2")
-    compileOnly("org.mockito:mockito-core:5.11.0")
-    compileOnly("com.sk89q.worldedit:worldedit-bukkit:7.3.0")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.2")
     implementation("org.bstats:bstats-bukkit:3.1.0")
     implementation("mlib.api:MLib:0.0.1")
-    implementation("com.h2database:h2:2.2.224")
-    implementation("com.mysql:mysql-connector-j:9.2.0")
 }
 
 val targetJavaVersion = 21
@@ -111,7 +104,9 @@ tasks.processResources {
 }
 
 kotlin {
-    jvmToolchain(21)
+    jvmToolchain {
+        languageVersion.set(JavaLanguageVersion.of(targetJavaVersion))
+    }
 }
 
 tasks.jar {
@@ -170,25 +165,30 @@ tasks.build {
     dependsOn("shadowJar")
 }
 
-tasks.register<Copy>("buildAndMove") {
-    dependsOn("shadowJar")
-
+tasks.register("buildAndMove") {
+    dependsOn("buildProduction")
     group = "build"
     description = "Builds the jar and moves it to the server folder"
 
+    println("Building and moving JAR to server folder...")
     doLast {
-        val jar = file("build/libs/${project.name}-${version}-all.jar")
+        val jar = file("build/libs/${project.name}-${version}-prod.jar")
         if (!jar.exists()) {
             throw GradleException("JAR file not found: ${jar.absolutePath}. Run 'shadowJar' task first.")
         }
+        println("JAR file found: ${jar.absolutePath}")
         val server = file("server/plugins/${project.name.capitalizeAsciiOnly()}-${version}.jar")
         if (!server.parentFile.exists()) {
             server.parentFile.mkdirs()
         }
+        println("Moving JAR to server folder: ${server.absolutePath}")
         if (server.exists()) {
+            println("Deleting existing JAR at: ${server.absolutePath}")
             server.delete()
-            jar.copyTo(server, overwrite = true)
         }
+        println("Copying JAR to server folder...")
+        jar.copyTo(server, overwrite = true)
+        println("JAR moved successfully to: ${server.absolutePath}")
     }
 }
 
@@ -198,10 +198,7 @@ tasks.register("buildProduction") {
     dependsOn("clean")
     dependsOn("shadowJar")
     dependsOn("validateJar")
-
     tasks.findByName("validateJar")?.mustRunAfter("shadowJar")
-    tasks.findByName("shadowJar")?.mustRunAfter("test")
-
     doLast {
         val jarFile = file("build/libs/${project.name}-${version}.jar")
 
