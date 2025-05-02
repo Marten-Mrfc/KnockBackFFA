@@ -4,9 +4,9 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.utilities.action
 import mlib.api.utilities.asMini
+import mlib.api.utilities.debug
 import mlib.api.utilities.message
 import mlib.api.utilities.sendMini
-import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -22,15 +22,8 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
 
     private val playerSelections = mutableMapOf<UUID, Selection>()
     private val playersInSelectionMode = mutableMapOf<UUID, SelectionMode>()
-    private var worldEditAvailable = false
-
-    init {
-
-        worldEditAvailable = Bukkit.getPluginManager().getPlugin("WorldEdit") != null
-    }
 
     companion object {
-        const val WAND_KEY = "knockbackffa:selection_wand"
         val WAND_MATERIAL = Material.GOLDEN_AXE
     }
 
@@ -39,23 +32,12 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
 
         when (mode) {
             SelectionMode.SPAWN_REGION -> {
-                if (worldEditAvailable) {
-                    player.sendMini(translate("arena.editor.worldedit_available"))
-
-                    if (!hasWorldEditWand(player)) {
-                        player.sendMini(translate("arena.editor.worldedit_wand_given"))
-                        giveWorldEditWand(player)
-                    }
-                } else {
-                    player.sendMini(translate("arena.editor.using_custom_wand"))
-                    giveCustomSelectionWand(player)
-                }
+                player.sendMini(translate("arena.editor.using_custom_wand"))
+                giveCustomSelectionWand(player)
                 player.sendMini(translate("arena.editor.region_instructions"))
             }
             SelectionMode.SPAWNPOINT -> {
-                if (!worldEditAvailable) {
-                    removeCustomSelectionWand(player)
-                }
+                removeCustomSelectionWand(player)
                 player.sendMini(translate("arena.editor.spawnpoint_instructions"))
             }
         }
@@ -65,13 +47,15 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
 
     fun getSelection(player: Player): Selection? {
         val selection = playerSelections[player.uniqueId]
-        println("[KnockBackFFA-DEBUG] getSelection for ${player.name}: ${selection?.firstPosition != null} ${selection?.secondPosition != null}")
+        
+        // Use the plugin's template debug method
+        plugin.debug("getSelection called for ${player.name}: $selection")
+        
         return selection
     }
 
     fun clearSelection(player: Player) {
-
-        if (!worldEditAvailable && isInSelectionMode(player)) {
+        if (isInSelectionMode(player)) {
             removeCustomSelectionWand(player)
         }
 
@@ -112,7 +96,6 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
     }
 
     private fun removeCustomSelectionWand(player: Player) {
-
         val inventory = player.inventory
         val itemsToRemove = mutableListOf<ItemStack>()
 
@@ -126,24 +109,6 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
         for (item in itemsToRemove) {
             inventory.remove(item)
         }
-    }
-
-    fun isWorldEditAvailable(): Boolean {
-        return worldEditAvailable
-    }
-
-    private fun hasWorldEditWand(player: Player): Boolean {
-        if (!worldEditAvailable) return false
-
-        return player.inventory.contents.any {
-            it?.type == Material.WOODEN_AXE
-        }
-    }
-
-    private fun giveWorldEditWand(player: Player) {
-        if (!worldEditAvailable) return
-
-        Bukkit.dispatchCommand(player, "worldedit:wand")
     }
 
     private fun isCustomSelectionWand(item: ItemStack?): Boolean {
@@ -160,7 +125,7 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
 
         if (isSecondPosition) {
             selection.secondPosition = location
-            println("[KnockBackFFA-DEBUG] Set secondPosition for ${player.name} at ${location.x}, ${location.y}, ${location.z}")
+            plugin.debug("Set secondPosition for ${player.name} at x=${location.x}, y=${location.y}, z=${location.z}")
             player.action(translate("arena.editor.second_position_set",
                 "x" to "%.1f".format(location.x),
                 "y" to "%.1f".format(location.y),
@@ -168,7 +133,7 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
             ))
         } else {
             selection.firstPosition = location
-            println("[KnockBackFFA-DEBUG] Set firstPosition for ${player.name} at ${location.x}, ${location.y}, ${location.z}")
+            plugin.debug("Set firstPosition for ${player.name} at x=${location.x}, y=${location.y}, z=${location.z}")
             player.action(translate("arena.editor.first_position_set",
                 "x" to "%.1f".format(location.x),
                 "y" to "%.1f".format(location.y),
@@ -177,63 +142,14 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
         }
 
         if (selection.isComplete()) {
-            println("[KnockBackFFA-DEBUG] Selection is complete for ${player.name}")
+            plugin.debug("Selection complete for ${player.name}: firstPos=${selection.firstPosition}, secondPos=${selection.secondPosition}")
             player.action(translate("arena.editor.complete"))
 
             player.message("<green><bold><click:run_command:/kbffa arena selection_complete>[ Set Spawn Region ]</click></bold></green>")
         }
     }
 
-    fun getWorldEditSelection(player: Player): Pair<Location, Location>? {
-        if (!worldEditAvailable) {
-            println("[KnockBackFFA-DEBUG] WorldEdit not available for ${player.name}")
-            return null
-        }
 
-        try {
-            println("[KnockBackFFA-DEBUG] Attempting to get WorldEdit editor for ${player.name}")
-
-            val worldEditPlugin = Bukkit.getPluginManager().getPlugin("WorldEdit")
-            val worldEditClass = Class.forName("com.sk89q.worldedit.bukkit.WorldEditPlugin")
-
-            val getSessionMethod = worldEditClass.getMethod("getSession", Player::class.java)
-            val session = getSessionMethod.invoke(worldEditPlugin, player)
-
-            val sessionClass = session.javaClass
-            val getSelectionMethod = sessionClass.getMethod("getSelection", Class.forName("com.sk89q.worldedit.world.World"))
-
-            val bukkitAdapterClass = Class.forName("com.sk89q.worldedit.bukkit.BukkitAdapter")
-            val adaptMethod = bukkitAdapterClass.getMethod("adapt", org.bukkit.World::class.java)
-            val weWorld = adaptMethod.invoke(null, player.world)
-
-            val region = getSelectionMethod.invoke(session, weWorld)
-            if (region == null) {
-                println("[KnockBackFFA-DEBUG] No WorldEdit region found for ${player.name}")
-                return null
-            }
-
-            val regionClass = region.javaClass
-            val getMinimumPointMethod = regionClass.getMethod("getMinimumPoint")
-            val getMaximumPointMethod = regionClass.getMethod("getMaximumPoint")
-
-            val minPoint = getMinimumPointMethod.invoke(region)
-            val maxPoint = getMaximumPointMethod.invoke(region)
-
-            val blockVectorToLocationMethod = bukkitAdapterClass.getDeclaredMethod("adapt", player.world.javaClass, Class.forName("com.sk89q.worldedit.math.BlockVector3"))
-
-            val minLoc = blockVectorToLocationMethod.invoke(null, player.world, minPoint) as Location
-            val maxLoc = blockVectorToLocationMethod.invoke(null, player.world, maxPoint) as Location
-
-            println("[KnockBackFFA-DEBUG] Successfully got WorldEdit editor for ${player.name}: ${minLoc.x},${minLoc.y},${minLoc.z} to ${maxLoc.x},${maxLoc.y},${maxLoc.z}")
-            return Pair(minLoc, maxLoc)
-        } catch (e: Exception) {
-
-            println("[KnockBackFFA-DEBUG] Failed to get WorldEdit editor for ${player.name}: ${e.message}")
-            plugin.logger.warning("Failed to get WorldEdit editor: ${e.message}")
-            e.printStackTrace()
-            return null
-        }
-    }
 
     fun setSpawnpoint(player: Player, location: Location) {
         val selection = playerSelections.getOrPut(player.uniqueId) { Selection() }
@@ -259,7 +175,6 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
 
         when (mode) {
             SelectionMode.SPAWN_REGION -> {
-
                 if (isCustomSelectionWand(item)) {
                     when (event.action) {
                         Action.LEFT_CLICK_BLOCK -> {

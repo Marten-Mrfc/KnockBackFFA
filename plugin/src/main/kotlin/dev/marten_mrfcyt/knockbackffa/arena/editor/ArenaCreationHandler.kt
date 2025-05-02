@@ -14,9 +14,8 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
 
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
-    }
-
-    fun startArenaCreation(player: Player, name: String, killBlock: Material) {
+    }    fun startArenaCreation(player: Player, name: String, killBlock: Material) {
+        mlib.api.utilities.debug(plugin, "Starting arena creation for ${player.name}: arena=${name}, killBlock=${killBlock.name}")
 
         plugin.arenaHandler.startArenaCreation(player, name, killBlock)
 
@@ -31,6 +30,7 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
         )
 
         sendSelectionCompletionButton(player)
+        mlib.api.utilities.debug(plugin, "Arena creation session initialized for ${player.name}")
     }
 
     private fun sendSelectionCompletionButton(player: Player) {
@@ -80,29 +80,6 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
         }
 
         val selection = plugin.selectionManager.getSelection(player)
-
-        if (plugin.selectionManager.isWorldEditAvailable()) {
-            val weSelection = plugin.selectionManager.getWorldEditSelection(player)
-            if (weSelection != null) {
-
-                session.spawnRegion = weSelection
-                session.nextStep()
-
-                plugin.selectionManager.clearSelection(player)
-                plugin.selectionManager.startSelection(player, SelectionMode.SPAWNPOINT)
-                sendSpawnpointButton(player)
-                return
-            } else {
-
-                if (selection?.isComplete() != true) {
-
-                    player.sendMini(TranslationManager.Companion.translate("arena.create.worldedit_selection_not_found"))
-                    sendSelectionCompletionButton(player)
-                    return
-                }
-
-            }
-        }
 
         if (selection?.isComplete() == true) {
 

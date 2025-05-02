@@ -21,6 +21,8 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
         val source = event.player
         val killer = source.killer
 
+        debug(plugin, "Player ${source.name} died" + if (killer != null) " killed by ${killer.name}" else " (not by a player)")
+
         if (killer != null) {
             val message = translateListRandom("player.killed_by_message",
                 "player_name" to source.name,
@@ -85,18 +87,20 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                 it.error(TranslationManager.translate("error.data_save_admin"))
             }
         }
-    }
-
-    @EventHandler
+    }    @EventHandler
     fun respawn(event: PlayerRespawnEvent) {
         val source = event.player
         val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
 
+        debug(plugin, "Player ${source.name} respawning")
         source.message(TranslationManager.translate("kit.loading_kit"))
         loadKit(KnockBackFFA.instance, source, false)
 
         if (currentArena != null) {
+            debug(plugin, "Setting respawn location for ${source.name} to ${currentArena.x}, ${currentArena.y}, ${currentArena.z}")
             event.respawnLocation = currentArena
+        } else {
+            debug(plugin, "No current arena location found for respawning ${source.name}")
         }
     }
 }

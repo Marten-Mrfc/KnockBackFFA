@@ -33,6 +33,6 @@ class ArenaInitializer(private val plugin: KnockBackFFA) {
 
         plugin.registerEvents(DeathBlock())
 
-        plugin.logger.info("[KnockBackFFA] Arena system initialized - registered event listeners")
+        debug("Arena system initialized - registered event listeners")
     }
 }

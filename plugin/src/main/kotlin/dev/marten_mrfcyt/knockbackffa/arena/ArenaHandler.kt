@@ -23,12 +23,13 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         if (!arenaFile.exists()) {
             arenaFile.createNewFile()
             YamlConfiguration().save(arenaFile)
+            debug("Arena file created at ${arenaFile.absolutePath}")
         }
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile)
     }
-
     fun addArena(arena: ArenaModel) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+            debug("Adding arena: ${arena.name}")
 
             if (arena.spawnRegion != null) {
                 arenaConfig.set("arenas.${arena.name}.spawnRegion.world", arena.spawnRegion.first.world?.name)
@@ -52,40 +53,42 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             arena.settings.forEach { (key, value) ->
                 arenaConfig.set("arenas.${arena.name}.settings.$key", value)
             }
-
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
+            debug("Arena ${arena.name} saved successfully")
         })
-    }
-
-    fun removeArena(arena: ArenaModel) {
+    }    fun removeArena(arena: ArenaModel) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
+            debug("Removing arena: ${arena.name}")
             arenaConfig.set("arenas.${arena.name}", null)
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
             plugin.saveConfig()
+            debug("Arena ${arena.name} removed successfully")
         })
-    }
-
-    fun loadArenas() {
+    }    fun loadArenas() {
         arenaConfig.load(File("${plugin.dataFolder}/arena.yml"))
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
 
         if (arenaSection == null) {
             plugin.logger.warning(translate("arena.load.none"))
+            debug("No arenas found in configuration")
             return
         }
 
         val keys = arenaSection.getKeys(false)
+        debug("Found ${keys.size} arenas in configuration")
         var loadedCount = 0
         for (key in keys) {
             val arena = loadArenaByName(key)
             if (arena != null) {
                 loadedCount++
+                debug( "Successfully loaded arena: ${arena.name}")
             } else {
                 plugin.logger.warning(translate("arena.load.failed", "arena_name" to key))
+                debug( "Failed to load arena: $key")
             }
         }
         plugin.logger.info(translate("arena.load.success", "count" to loadedCount.toString()))
-    }    fun loadArenaByName(name: String): ArenaModel? {
+    }fun loadArenaByName(name: String): ArenaModel? {
 
         val worldName = arenaConfig.getString("arenas.$name.spawnRegion.world") ?: arenaConfig.getString("arenas.$name.spawnpoint.world")
         val world = worldName?.let { Bukkit.getWorld(it) } ?: return null
@@ -134,7 +137,7 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         val killBlockName = arenaConfig.getString("arenas.$name.killBlock") ?: Material.VOID_AIR.name
         val killBlock = try {
             Material.valueOf(killBlockName)
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             plugin.logger.warning(translate("arena.load.killblock_not_found", "arena_name" to name))
             Material.VOID_AIR
         }

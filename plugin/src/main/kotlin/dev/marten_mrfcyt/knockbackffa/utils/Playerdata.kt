@@ -4,6 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.models.PlayerDataModel
 import dev.marten_mrfcyt.knockbackffa.utils.mysql.MySQLHandler
 import dev.marten_mrfcyt.knockbackffa.utils.mysql.StorageConfig
+import mlib.api.utilities.debug
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.scheduler.BukkitRunnable
 import java.io.File
@@ -24,13 +25,14 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     }
 
     private val useMySQL get() = storageConfig.storageType.lowercase() == "mysql"
-
     init {
         plugin.logger.info("📃 Storage type: ${storageConfig.storageType}")
+        debug("Initializing PlayerData with storage type: ${storageConfig.storageType}")
         if (useMySQL) {
             initializeDatabase()
         }
         startPeriodicSaving()
+        debug( "PlayerData initialization complete")
     }
 
     private fun initializeDatabase() {
@@ -63,7 +65,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                 }
             } ?: throw IllegalStateException("Database connection is null")
         } catch (e: Exception) {
-            logError("Failed to prepare statements", e)
+            throw IllegalStateException("Failed to prepare SQL statements", e)
         }
     }
 
@@ -102,7 +104,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     }
                 }
             } catch (e: Exception) {
-                logError("Failed to migrate database", e)
+                throw IllegalStateException("Failed to check or migrate database", e)
             }
         } ?: plugin.logger.severe("Cannot check database structure: connection is null")
     }
@@ -123,9 +125,9 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             "boost_timings" to "TEXT"
         )
     }
-
     private fun createPlayerDataTable() {
         try {
+            debug( "Creating player_data table if it doesn't exist")
             mysqlHandler.getConnection()?.createStatement()?.use { statement ->
                 statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS player_data (
@@ -144,9 +146,10 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                         PRIMARY KEY (player_id)
                     )
                 """.trimIndent())
+                mlib.api.utilities.debug("player_data table created or verified")
             } ?: throw IllegalStateException("Database connection is null")
         } catch (e: Exception) {
-            logError("Failed to create player_data table", e)
+            mlib.api.utilities.debug("Error creating player_data table: ${e.message}")
         }
     }
 
@@ -156,21 +159,6 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
         }.runTaskTimerAsynchronously(plugin, saveInterval, saveInterval)
     }
 
-    private fun saveAllDirtyData() {
-        if (dirtyPlayerData.isEmpty()) return
-
-        val dataToSave = HashSet(dirtyPlayerData)
-        dirtyPlayerData.removeAll(dataToSave)
-
-        dataToSave.forEach { playerId ->
-            val playerData = playerDataCache[playerId] ?: return@forEach
-            if (useMySQL) {
-                savePlayerDataToMySQL(playerId, playerData)
-            } else {
-                savePlayerDataToFile(playerId, playerData)
-            }
-        }
-    }
 
     fun getPlayerDataModel(playerId: UUID): PlayerDataModel {
         return playerDataCache.computeIfAbsent(playerId) {
@@ -178,51 +166,59 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             else getPlayerDataModelFromFile(playerId)
         }
     }
-
     private fun getPlayerDataModelFromFile(playerId: UUID): PlayerDataModel {
         val playerDataFile = File(playerDataDirectory, "$playerId.yml")
+        debug( "Loading player data for $playerId from file")
         return if (!playerDataFile.exists()) {
             playerDataFile.createNewFile()
+            debug( "Created new player data file for $playerId")
             PlayerDataModel(playerId)
         } else {
             val config = YamlConfiguration.loadConfiguration(playerDataFile)
+            debug( "Loaded existing player data for $playerId from file")
             PlayerDataSerializer.fromYaml(config, playerId)
         }
     }
 
     private fun getPlayerDataModelFromMySQL(playerId: UUID): PlayerDataModel {
-        mysqlHandler.getConnection()?.let { _ ->
-            try {
-                preparedStatements["select"]?.let { statement ->
-                    statement.setString(1, playerId.toString())
-                    statement.executeQuery().use { resultSet ->
-                        if (resultSet.next()) {
-                            return PlayerDataSerializer.fromResultSet(resultSet, playerId)
+        debug("Loading player data for $playerId from MySQL")
+            mysqlHandler.getConnection()?.let { _ ->
+                try {
+                    preparedStatements["select"]?.let { statement ->
+                        statement.setString(1, playerId.toString())
+                        statement.executeQuery().use { resultSet ->
+                            if (resultSet.next()) {
+                                debug("Found existing player data in MySQL for $playerId")
+                                return PlayerDataSerializer.fromResultSet(resultSet, playerId)
+                            }
                         }
                     }
+                    debug("No data found in MySQL for $playerId, creating new model")
+                } catch (_: Exception) {
+                    debug("Error loading player data from MySQL for $playerId")
                 }
-            } catch (e: Exception) {
-                logError("Error loading player data", e)
-            }
         }
         return PlayerDataModel(playerId)
-    }
 
+    }
     fun savePlayerDataModel(playerId: UUID, model: PlayerDataModel) {
         playerDataCache[playerId] = model
         dirtyPlayerData.add(playerId)
+        debug("Marked player data for $playerId as dirty (pending save)")
     }
 
-    private fun savePlayerDataToFile(playerId: UUID, model: PlayerDataModel) {
+    fun savePlayerDataToFile(playerId: UUID, model: PlayerDataModel) {
         try {
             val playerDataFile = File(playerDataDirectory, "$playerId.yml")
+            debug("Saving player data for $playerId to file")
             PlayerDataSerializer.toYaml(model).save(playerDataFile)
+            debug("Successfully saved player data for $playerId to file")
         } catch (e: Exception) {
-            logError("Error saving player data file", e)
+            throw IllegalStateException("Error saving player data to file", e)
         }
     }
 
-    private fun savePlayerDataToMySQL(playerId: UUID, model: PlayerDataModel) {
+    fun savePlayerDataToMySQL(playerId: UUID, model: PlayerDataModel) {
         mysqlHandler.getConnection()?.let { _ ->
             try {
                 preparedStatements["replace"]?.apply {
@@ -241,12 +237,26 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     executeUpdate()
                 }
             } catch (e: Exception) {
-                logError("Error saving player data to MySQL", e)
+                throw IllegalStateException("Error saving player data to MySQL", e)
             }
         }
     }
+    fun saveAllDirtyData() {
+            if (dirtyPlayerData.isEmpty()) return
 
-    private fun serializeKitLayouts(kitLayouts: Map<String, Map<Int, Int>>): String {
+            val dataToSave = HashSet(dirtyPlayerData)
+            dirtyPlayerData.removeAll(dataToSave)
+
+            dataToSave.forEach { playerId ->
+                val playerData = playerDataCache[playerId] ?: return@forEach
+                if (useMySQL) {
+                    savePlayerDataToMySQL(playerId, playerData)
+                } else {
+                    savePlayerDataToFile(playerId, playerData)
+                }
+            }
+        }
+    fun serializeKitLayouts(kitLayouts: Map<String, Map<Int, Int>>): String {
         return kitLayouts.entries.joinToString(";") { (kitName, layout) ->
             "$kitName:" + layout.entries.joinToString(",") { (origSlot, newSlot) ->
                 "$origSlot=$newSlot"
@@ -263,8 +273,30 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
         }
         playerDataCache.remove(playerId)
     }
-
     fun saveAll() = saveAllDirtyData()
+    
+    fun saveAllSync() {
+        if (dirtyPlayerData.isEmpty()) {
+            debug( "No dirty player data to save")
+            return
+        }
+        
+        val dataToSave = HashSet(dirtyPlayerData)
+        dirtyPlayerData.removeAll(dataToSave)
+        
+        debug( "Saving data for ${dataToSave.size} players synchronously")
+        
+        dataToSave.forEach { playerId ->
+            val playerData = playerDataCache[playerId] ?: return@forEach
+            if (useMySQL) {
+                debug("Saving data for player $playerId to MySQL")
+                savePlayerDataToMySQL(playerId, playerData)
+            } else {
+                debug( "Saving data for player $playerId to file")
+                savePlayerDataToFile(playerId, playerData)
+            }
+        }
+    }
 
     fun getTotalKills(): Int {
         if (useMySQL) {
@@ -273,8 +305,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             return getFileTotalKills()
         }
     }
-
-    private fun getMySQLTotalKills(): Int {
+    fun getMySQLTotalKills(): Int {
         mysqlHandler.getConnection()?.let { _ ->
             try {
                 preparedStatements["sum_kills"]?.executeQuery()?.use { resultSet ->
@@ -283,13 +314,13 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     }
                 }
             } catch (e: Exception) {
-                logError("Error getting total kills", e)
+                throw IllegalStateException("Error fetching total kills from MySQL", e)
             }
         }
         return 0
     }
 
-    private fun getFileTotalKills(): Int {
+    fun getFileTotalKills(): Int {
         if (playerDataCache.isNotEmpty() && playerDataDirectory.listFiles()?.size == playerDataCache.size) {
             return playerDataCache.values.sumOf { it.kills }
         }
@@ -319,6 +350,10 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
             return instance ?: synchronized(this) {
                 instance ?: PlayerData(plugin).also { instance = it }
             }
+        }
+        
+        fun getInstanceIfInitialized(): PlayerData? {
+            return instance
         }
     }
 }

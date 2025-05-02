@@ -1,5 +1,6 @@
 package dev.marten_mrfcyt.knockbackffa
 
+import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import dev.marten_mrfcyt.knockbackffa.arena.editor.ArenaCreationHandler
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaInitializer
@@ -40,8 +41,6 @@ class KnockBackFFA : KotlinPlugin() {
     lateinit var selectionManager: SelectionManager
         private set
     private lateinit var arenaInitializer: ArenaInitializer
-
-
     override fun onEnable() {
         super.onEnable()
         instance = this
@@ -54,11 +53,14 @@ class KnockBackFFA : KotlinPlugin() {
         setupConfig()
         setupUpdateTracker()
 
+        debug("Plugin initialization started")
+
         if (isEnabled) {
             arenaHandler = ArenaHandler(this)
             selectionManager = SelectionManager(this)
             arenaCreationHandler = ArenaCreationHandler(this)
             arenaInitializer = ArenaInitializer(this)
+            debug("Arena components initialized")
         }
 
         PlayerData.getInstance(this)
@@ -77,8 +79,13 @@ class KnockBackFFA : KotlinPlugin() {
     override fun onDisable() {
         try {
             logger.info("Saving all player data before shutdown...")
-            PlayerData.getInstance(this).saveAll()
-            logger.info("Player data saved successfully")
+            val playerData = PlayerData.getInstanceIfInitialized()
+            if (playerData != null) {
+                playerData.saveAllSync()
+                logger.info("Player data saved successfully")
+            } else {
+                logger.info("Player data manager not initialized, skipping save")
+            }
         } catch (e: Exception) {
             logger.severe("Error saving player data: ${e.message}")
             e.printStackTrace()
@@ -86,8 +93,13 @@ class KnockBackFFA : KotlinPlugin() {
         
         try {
             logger.info("Closing database connections...")
-            PlayerData.getInstance(this).mysqlHandler.disconnect()
-            logger.info("Database connections closed")
+            val playerData = PlayerData.getInstanceIfInitialized()
+            if (playerData != null && ::playerBoostManager.isInitialized) {
+                playerData.mysqlHandler.disconnect()
+                logger.info("Database connections closed")
+            } else {
+                logger.info("Database connections not initialized")
+            }
         } catch (e: Exception) {
             logger.severe("Error closing database connections: ${e.message}")
             e.printStackTrace()
@@ -166,21 +178,34 @@ class KnockBackFFA : KotlinPlugin() {
 
     private fun setupUpdateTracker() {
         UpdateTracker.init(this)
-    }
-
-    fun loadBoosts() {
-        ensureResourceFileExists("boosts.yml")
-        boostManager = BoostManager(this)
-        boostManager.registerEvents(this)
-        logger.info(TranslationManager.translate("plugin.boosts_loaded", "count" to boostManager.getAllBoosts().size))
-        playerBoostManager = PlayerBoostManager(this)
-        logger.info(TranslationManager.translate("plugin.player_boost_manager_initialized"))
+    }    fun loadBoosts() {
+        try {
+            ensureResourceFileExists("boosts.yml")
+            boostManager = BoostManager(this)
+            boostManager.registerEvents(this)
+            logger.info(TranslationManager.translate("plugin.boosts_loaded", "count" to boostManager.getAllBoosts().size))
+            playerBoostManager = PlayerBoostManager(this)
+            logger.info(TranslationManager.translate("plugin.player_boost_manager_initialized"))
+        } catch (e: Exception) {
+            logger.severe("Failed to load boosts: ${e.message}")
+            logger.info("Continuing with default boost configuration")
+            
+            boostManager = BoostManager(this)
+            playerBoostManager = PlayerBoostManager(this)
+        }
     }
 
     private fun setupModifiers() {
-        modifierManager = ModifierManager(this)
-        modifierManager.registerEvents(this)
-        logger.info(TranslationManager.translate("plugin.modifiers_loaded", "count" to modifierManager.getModifyObjects().size))
+        try {
+            modifierManager = ModifierManager(this)
+            modifierManager.registerEvents(this)
+            logger.info(TranslationManager.translate("plugin.modifiers_loaded", "count" to modifierManager.getModifyObjects().size))
+        } catch (e: Exception) {
+            logger.severe("Failed to setup modifiers: ${e.message}")
+            logger.info("Continuing with default modifier configuration")
+            
+            modifierManager = ModifierManager(this)
+        }
     }
 
     private fun registerCommands() {

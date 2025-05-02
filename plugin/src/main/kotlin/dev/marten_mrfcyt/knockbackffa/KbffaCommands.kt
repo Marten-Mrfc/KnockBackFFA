@@ -44,28 +44,25 @@ fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
         source.sendMessage("<green>* <white>/kit<gray>: <gold>Select a kit as a player".asMini())
         source.sendMessage("<green>* <white>/kbffa debug<gray>: <gold>Debug command".asMini())
         source.message("<gray>-------------------")
+        
+        debug("Player ${source.name} executed /kbffa command")
     }
 }
 
-fun debug(source: Player) {
-    source.message(TranslationManager.translate("commands.debug.title"))
-    source.message(source.inventory.itemInMainHand.toString())
-}
-
-private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {
-    literal("bypass") {
+private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {    literal("bypass") {
         requiresPermissions("kbffa.bypass")
         executes {
             val player = source as Player
             val isBypassing = bypassMode.getOrDefault(player, false)
             bypassMode[player] = !isBypassing
-            source.message(TranslationManager.translate("commands.bypass.toggle", "status" to if (!isBypassing) "enabled" else "disabled"))
+            val newStatus = if (!isBypassing) "enabled" else "disabled"
+            debug("Player ${player.name} toggled bypass mode: $newStatus")
+            source.message(TranslationManager.translate("commands.bypass.toggle", "status" to newStatus))
         }
     }
     literal("debug") {
         requiresPermissions("kbffa.debug")
         executes {
-            debug(source as Player)
         }
     }
     literal("reload") {

@@ -3,6 +3,7 @@ package dev.marten_mrfcyt.knockbackffa.player
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.asMini
+import mlib.api.utilities.debug
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -22,6 +23,7 @@ class ScoreboardHandler(private val plugin: KnockBackFFA) {
     )
 
     private fun createScoreboard(player: Player): PlayerBoard {
+        debug("Creating scoreboard for player: ${player.name}")
         val scoreboard = Bukkit.getScoreboardManager().newScoreboard
         val title = TranslationManager.translate("scoreboard.title").asMini()
 
@@ -31,6 +33,7 @@ class ScoreboardHandler(private val plugin: KnockBackFFA) {
         return PlayerBoard(scoreboard, objective).also {
             playerScoreboards[player.uniqueId] = it
             player.scoreboard = scoreboard
+            debug( "Scoreboard created and assigned to player: ${player.name}")
         }
     }
 

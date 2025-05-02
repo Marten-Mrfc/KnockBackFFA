@@ -16,7 +16,7 @@ bossbar: # Enable or disable the bossbar
   enabled: true
 scoreboard: # Enable or disable the scoreboard
   enabled: true
-
+debug: false # Enable or disable debug messages
 
 # ###############################
 #                              #
@@ -31,8 +31,7 @@ storage:
     port: 3306 # MySQL port
     database: knockbackffa # The database name
     user: root # Username for MySQL
-    password: '' # MySQL password
-
+    password: "" # MySQL password
 
 # ###############################
 #                              #
@@ -40,5 +39,6 @@ storage:
 #                              #
 # ###############################
 
-currentArena: '' # Current arena name
-currentLocation: '' # Current location of the player
+config-version: 1.0.0 # MLib version - Do Not Change
+currentArena: "" # Current arena name
+currentLocation: "" # Current location of the player

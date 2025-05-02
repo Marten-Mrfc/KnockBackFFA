@@ -1,10 +1,14 @@
 package dev.marten_mrfcyt.knockbackffa.utils
 
-import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import mlib.api.utilities.debug
+import java.util.jar.JarFile
 import org.bukkit.configuration.file.YamlConfiguration
 import org.bukkit.plugin.Plugin
 import java.io.File
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.util.*
+import kotlin.text.get
 import kotlin.toString
 
 class TranslationManager(private val plugin: Plugin) {
@@ -17,6 +21,25 @@ class TranslationManager(private val plugin: Plugin) {
         loadTranslations()
         loadConfiguredLanguage()
         plugin.logger.info("🌍 Using language: ${configuredLocale.displayLanguage} (${configuredLocale.language})")
+        debug("Translation system initialized with locale: ${configuredLocale.language}")
+    }
+    fun translate(key: String, vararg args: Pair<String, Any>): String {
+        val message = instance.get(key)
+
+        // Only debug important messages to avoid log spam
+        if (key.startsWith("arena.") || key.startsWith("error.") || key.startsWith("commands.")) {
+            debug("Translating key: $key with ${args.size} arguments")
+        }
+
+        return if (message is List<*>) {
+            message.firstOrNull()?.toString() ?: ""
+        } else {
+            message.toString()
+        }.let { str ->
+            args.fold(str) { acc, (placeholder, value) ->
+                acc.replace("{$placeholder}", value.toString())
+            }
+        }
     }
 
     companion object {
@@ -93,44 +116,73 @@ class TranslationManager(private val plugin: Plugin) {
         if (!translations.containsKey(configuredLocale)) {
             plugin.logger.warning("Language '$configLang' not found, falling back to English")
             configuredLocale = defaultLocale
-        }
-    }
-
-    private fun initLanguageFiles() {
+        }    }    private fun initLanguageFiles() {
         val langFolder = File(plugin.dataFolder, "lang")
         if (!langFolder.exists()) {
             langFolder.mkdirs()
         }
 
-        val resourceLangFolder = plugin.javaClass.classLoader.getResource("lang")
-        if (resourceLangFolder != null) {
-            val resourcePath = resourceLangFolder.path
-            val jarPath = resourcePath.substring(0, resourcePath.indexOf("!")).replace("file:", "")
-            val jarFile = java.util.jar.JarFile(jarPath)
-            val entries = jarFile.entries()
-
-            while (entries.hasMoreElements()) {
-                val entry = entries.nextElement()
-                if (entry.name.startsWith("lang/") && entry.name.endsWith(".yml")) {
-                    val resourceFileName = entry.name.substringAfterLast("/")
-                    val langFile = File(langFolder, resourceFileName)
-                    if (!langFile.exists()) {
-                        plugin.saveResource(entry.name, false)
-                        plugin.logger.info("🏗️ Created language file $resourceFileName")
+        try {
+            // First ensure English exists as a fallback
+            val enFile = File(langFolder, "en.yml")
+            if (!enFile.exists()) {
+                plugin.saveResource("lang/en.yml", false)
+                plugin.logger.info("🏗️ Created fallback language file en.yml")
+            }
+              
+            // Then try the dynamic approach with proper error handling
+            val resourceLangFolder = plugin.javaClass.classLoader.getResource("lang")
+            if (resourceLangFolder != null) {
+                try {
+                    val resourcePath = resourceLangFolder.toString()
+                    if (resourcePath.startsWith("jar:")) {
+                        val jarPath = resourcePath.substring(4, resourcePath.indexOf("!")).replace("file:", "")
+                        // Decode URL-encoded paths safely
+                        val decodedJarPath = try {
+                            URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name())
+                        } catch (_: Exception) {
+                            jarPath // Return original if decoding fails
+                        }
+                        
+                        val jarFile = JarFile(File(decodedJarPath))
+                        val entries = jarFile.entries()
+                        
+                        while (entries.hasMoreElements()) {
+                            val entry = entries.nextElement()
+                            if (entry.name.startsWith("lang/") && entry.name.endsWith(".yml") && !entry.name.endsWith("/en.yml")) {
+                                val resourceFileName = entry.name.substringAfterLast("/")
+                                val langFile = File(langFolder, resourceFileName)
+                                if (!langFile.exists()) {
+                                    plugin.saveResource(entry.name, false)
+                                    plugin.logger.info("🏗️ Created language file $resourceFileName")
+                                }
+                            }
+                        }
+                        jarFile.close()
+                    } else {
+                        // Handle file system case if needed
+                        plugin.logger.info("Language resources found in the file system, processing directly")
                     }
+                } catch (e: Exception) {
+                    plugin.logger.warning("Failed to extract language files dynamically: ${e.message}")
+                    plugin.logger.info("Continuing with English as fallback")
                 }
             }
+        } catch (e: Exception) {
+            plugin.logger.warning("Failed to initialize language files: ${e.message}")
+            // Continue execution with English
         }
-    }
-
-    private fun loadTranslations() {
+    }    private fun loadTranslations() {
         val langFolder = File(plugin.dataFolder, "lang")
         val loadedLocales = mutableListOf<String>()
         var totalTranslations = 0
 
+        debug("Loading translations from: ${langFolder.absolutePath}")
         langFolder.listFiles { file -> file.extension == "yml" }?.forEach { file ->
             try {
                 val locale = Locale.forLanguageTag(file.nameWithoutExtension)
+                debug("Processing language file: ${file.name} for locale: ${locale.language}")
+                
                 val loadedTranslations = YamlConfiguration.loadConfiguration(file)
                     .getValues(true)
                     .mapValues { (_, value) ->
@@ -143,8 +195,10 @@ class TranslationManager(private val plugin: Plugin) {
                 translations[locale] = loadedTranslations
                 loadedLocales.add("${locale.language}(${loadedTranslations.size})")
                 totalTranslations += loadedTranslations.size
+                debug("Successfully loaded ${loadedTranslations.size} translations for ${locale.language}")
             } catch (e: Exception) {
                 plugin.logger.warning("❌ Failed to load language file ${file.name}: ${e.message}")
+                debug("Error loading language file ${file.name}: ${e.message}")
             }
         }
 

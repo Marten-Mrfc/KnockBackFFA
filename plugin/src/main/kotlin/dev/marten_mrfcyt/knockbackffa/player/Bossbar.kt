@@ -12,11 +12,13 @@ import java.time.Instant
 import java.util.*
 
 class BossBarHandler(private val plugin: KnockBackFFA) {
-    private val playerBossBars = mutableMapOf<UUID, BossBar>()
+    private val playerBossBars = mutableMapOf<UUID, BossBar>()    fun showBossBar(player: Player) {
+        if (!plugin.config.getBoolean("bossbar.enabled", true)) {
+            mlib.api.utilities.debug(plugin, "BossBar disabled in config for ${player.name}, not showing")
+            return
+        }
 
-    fun showBossBar(player: Player) {
-        if (!plugin.config.getBoolean("bossbar.enabled", true)) return
-
+        mlib.api.utilities.debug(plugin, "Creating BossBar for ${player.name}, current arena: ${currentArena?.name ?: "None"}")
         val bossBar = BossBar.bossBar(
             formatBossBarText(currentArena?.name ?: "None"),
             1.0f,
@@ -26,6 +28,7 @@ class BossBarHandler(private val plugin: KnockBackFFA) {
 
         player.showBossBar(bossBar)
         playerBossBars[player.uniqueId] = bossBar
+        mlib.api.utilities.debug(plugin, "BossBar shown to ${player.name}, starting update task")
         startUpdateTask(player)
     }
 
@@ -34,18 +37,22 @@ class BossBarHandler(private val plugin: KnockBackFFA) {
             if (!player.isOnline) return@Runnable
             updateBossBarProgress(player)
         }, 0L, 20L)
-    }
-
-    private fun updateBossBarProgress(player: Player) {
+    }    private fun updateBossBarProgress(player: Player) {
         playerBossBars[player.uniqueId]?.let { bossBar ->
             val now = Instant.now()
             val duration = Duration.between(now, KnockBackFFA.nextSwitchTime)
             val totalDuration = plugin.config.getInt("mapDuration", 120)
 
             val progress = duration.seconds.toFloat() / totalDuration
-            bossBar.progress(progress.coerceIn(0f, 1f))
+            val boundedProgress = progress.coerceIn(0f, 1f)
+            bossBar.progress(boundedProgress)
 
             bossBar.name(formatBossBarText(currentArena?.name ?: "None"))
+            
+            // Debug less frequently to avoid spam (only when progress is a multiple of 0.1)
+            if ((boundedProgress * 10).toInt() % 2 == 0) {
+                mlib.api.utilities.debug(plugin, "Updated BossBar for ${player.name}: progress=${String.format("%.2f", boundedProgress)}, arena=${currentArena?.name ?: "None"}")
+            }
         }
     }
 
@@ -60,9 +67,8 @@ class BossBarHandler(private val plugin: KnockBackFFA) {
             "arena_name" to arenaName,
             "time_left" to timeLeft
         ).asMini()
-    }
-
-    fun removeBossBar(player: Player) {
+    }    fun removeBossBar(player: Player) {
+        mlib.api.utilities.debug(plugin, "Removing BossBar for ${player.name}")
         playerBossBars[player.uniqueId]?.let { bossBar ->
             player.hideBossBar(bossBar)
             playerBossBars.remove(player.uniqueId)

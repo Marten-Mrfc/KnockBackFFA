@@ -24,7 +24,7 @@ player:
     - "<white><player_name><gray> met their end, courtesy of <white><killer_name><gray>'s knockback!"
     - "<white><player_name><gray> was sent flying off the platform by <white><killer_name><gray>!"
     - "<white><player_name><gray> couldn't withstand the force of <white><killer_name><gray>'s attack and fell!"
-    -
+
 # ###############################
 #                              #
 #         Score Display        #
@@ -32,19 +32,19 @@ player:
 # ###############################
 
 scoreboard:
-  title: ''
+  title: ""
   lines:
-    - '<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>'
-    - '<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>'
-    - '<gray><b>└</b></gray><white>Current map:</white> <green>%knockbackffa_map%</green>'
-    - ''
-    - '<gray><b>┌─</b></gray><gold><b>STATS</b></gold>'
-    - '<gray><b>├</b></gray><white>Your ping: </white><green>%player_ping%</green>'
-    - '<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_kills%</green>'
-    - '<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>'
-    - '<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>'
-    - '<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>'
-    - '<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>'
+    - "<gray><b>┌─</b></gray><gold><b>KNOCKBACKFFA</b></gold>"
+    - "<gray><b>├</b></gray><white>Next map in </white><blue>%knockbackffa_next_map%</blue>"
+    - "<gray><b>└</b></gray><white>Current map:</white> <green>%knockbackffa_map%</green>"
+    - ""
+    - "<gray><b>┌─</b></gray><gold><b>STATS</b></gold>"
+    - "<gray><b>├</b></gray><white>Your ping: </white><green>%player_ping%</green>"
+    - "<gray><b>├</b></gray><white>Kills: </white><green>%knockbackffa_kills%</green>"
+    - "<gray><b>├</b></gray><white>K/D Ratio: </white><green>%knockbackffa_kd-ratio%</green>"
+    - "<gray><b>├</b></gray><white>Deaths: </white><green>%knockbackffa_deaths%</green>"
+    - "<gray><b>├</b></gray><white>Coins: </white><green>%knockbackffa_coins%</green>"
+    - "<gray><b>└</b></gray><white>KillStreak: </white> <green>%knockbackffa_killstreak%</green>"
 bossbar:
   format: "<white><arena_name> <gray>| <yellow><time_left>"
 
@@ -65,10 +65,11 @@ arena:
     incomplete: "<red>Your editor is incomplete. Please select two points first."
     selection_incomplete: "<red>You need to select two points first! Try again when your editor is complete."
     location: "<green>Creating <white>arena <arena_name> at <x>, <y>, <z>"
+    no_session: "<red>You do not have an active arena creation session."
     file:
       not_found: "No arena.yml file found, creating a new one!"
       created: "arena.yml file created!"
-      error: "<red>Failed to create arena.yml file: <error>"
+      error: "<red>Failed to create arena.yml file: <e>"
     exists: "<red>Arena <arena_name> already exists!"
     pvp_required: "<red>This world needs pvp to be enabled!"
   delete:
@@ -81,7 +82,7 @@ arena:
     header: "<bold>Arenas:<reset>"
     entry: "<white><bold>*</bold> <green><arena_name><reset> <gray>at <white><world><dark_gray> (<gray><x><white> <gray><y><white> <gray><z><dark_gray>)<reset>"
   load:
-    none: "Arenas section not found in configuration | Please run /kbffa arena create <name> <killBlock>"
+    none: "Arenas section not found in configuration | Please run /kbffa arena create <n> <killBlock>"
     failed: "Failed to load arena <arena_name>"
     success: "⚔️ Loaded <count> arenas"
     killblock_not_found: "Failed to load arena <arena_name>: Kill block not found"
@@ -97,6 +98,15 @@ arena:
     second_position_set: "<green>Second position set at <white><x>, <y>, <z>"
     complete: "<green>Selection complete! You can now set the spawn region."
     spawnpoint_set: "<green>Spawnpoint set at <white><x>, <y>, <z>"
+  editor:
+    using_custom_wand: "<green>Using KnockBackFFA editor wand. A wand has been added to your inventory."
+    region_instructions: "<yellow>Please select two points to define the spawn region."
+    spawnpoint_instructions: "<yellow>Go to where you want players to spawn and set the spawnpoint."
+    first_position_set: "<green>First position set at <white><x>, <y>, <z>"
+    second_position_set: "<green>Second position set at <white><x>, <y>, <z>"
+    complete: "<green>Selection complete! You can now set the spawn region."
+    spawnpoint_set: "<green>Spawnpoint set at <white><x>, <y>, <z>"
+    no_session: "<red>You do not have an active arena creation session."
   settings:
     coming_soon: "<yellow>Arena settings GUI is coming soon!"
     missing_name: "<red>Please specify an arena name to edit settings."
@@ -113,19 +123,20 @@ kit:
     already_owned: "<red>You already own this kit!"
     not_enough_coins: "<red>You don't have enough coins to buy this kit!"
   load:
-    failed: "Failed to load kit: <name>. Error: <error>"
-  not_found: "Kit not found: <name>"
+    failed: "Failed to load kit: <n>. Error: <e>"
+  not_found: "Kit not found: <n>"
   cooldown: "<red>You must wait <seconds> seconds before changing kits again."
   delete:
-    failed: "Failed to delete kit: <name>, <error>"
+    failed: "Failed to delete kit: <n>, <e>"
   reload:
     success: "Reloaded <count> kits"
   selector:
     title: "<gray>Please select a kit</gray>"
-    item_name: "<!italic><name>"
+    item_name: "<!italic><n>"
     item_description: "<description>"
   layout:
     changed: "<green>Saved new layout<gray> (<white><slot> <gray>→ <white><new_slot>)"
+
 # ###############################
 #                              #
 #             Shop             #
@@ -179,7 +190,7 @@ shop:
     active: "<green>Active! <gray>Time left: <white><minutes>m <seconds>s"
     click_to_purchase: "<yellow>Click to purchase!"
     already_active: "<yellow>You already have this boost active!"
-    item_name: "<yellow><name>"
+    item_name: "<yellow><n>"
     duration_format:
       hours: "<hours>h <minutes>m"
       minutes: "<minutes>m"
@@ -190,12 +201,12 @@ shop:
     not_enough_coins: "<red>You don't have enough coins to buy this boost!"
     confirmation:
       gui_title: "<dark_gray>Shop <gray>» <white>Confirm Purchase"
-      title: "<yellow>Purchase Boost: <gold><name>"
+      title: "<yellow>Purchase Boost: <gold><n>"
       balance_sufficient: "<gray>Your balance: <green><coins> coins"
       balance_insufficient: "<gray>Your balance: <red><coins> coins"
       confirm: "<green>Purchase for <price> coins"
       cancel: "<red>Cancel"
-      success: "<green>You purchased the <name> <green>boost!"
+      success: "<green>You purchased the <n> <green>boost!"
     active_gui:
       title: "<dark_gray>Boosts <gray>» <white>Active Boosts"
       back: "<yellow>« Back to Shop"
@@ -204,7 +215,7 @@ shop:
         description:
           - "<gray>You don't have any active boosts."
           - "<gray>Visit the shop to purchase boosts!"
-      boost_name: "<yellow><name>"
+      boost_name: "<yellow><n>"
       boost_description_line: "<gray><line>"
       time_remaining: "<gray>Time remaining: <green><time>"
       kit_boost: "<gray>KitBoost - Not Timed"
@@ -220,26 +231,27 @@ shop:
 # ###############################
 
 boost:
-  expired: "<red>Your <name> has expired!"
+  expired: "<red>Your <n> has expired!"
   error:
-    apply_kit_boost: "Failed to apply kit boost <boost_id>: <error>"
-    remove_kit_boost: "Failed to remove kit boost <boost_id>: <error>"
-    apply_player_boost: "Failed to apply boost <boost_id> to player <player>: <error>"
-    apply_kit_boosts: "Failed to apply kit boosts for kit <kit_name>: <error>"
+    apply_kit_boost: "Failed to apply kit boost <boost_id>: <e>"
+    remove_kit_boost: "Failed to remove kit boost <boost_id>: <e>"
+    apply_player_boost: "Failed to apply boost <boost_id> to player <player>: <e>"
+    apply_kit_boosts: "Failed to apply kit boosts for kit <kit_name>: <e>"
   manager:
     not_found: "‼️ Boost with ID <id> not found"
-    config_apply_failed: "‼️ Failed to apply configuration to boost <boost_id>: <error>"
+    config_apply_failed: "‼️ Failed to apply configuration to boost <boost_id>: <e>"
     register_start: "🤖 Registering boosts automatically..."
     register_success: "✅ Successfully found <count> boosts: <names>"
-    register_error: "‼️ Error loading boosts: <error>"
-    class_process_error: "‼️ Could not process potential boost class <class>: <error>"
+    register_error: "‼️ Error loading boosts: <e>"
+    class_process_error: "‼️ Could not process potential boost class <class>: <e>"
     listeners_registered: "👂 Registered <count> boost listeners"
     reload:
       start: "🔄 Starting boost system reload..."
       unregistered: "❌ Unregistered <count> boost listeners"
       complete: "✅ Boost reload complete: <count> boosts loaded (<change> change)"
-      error: "‼️ Failed to reload boosts: <error>"
+      error: "‼️ Failed to reload boosts: <e>"
       recovery: "🔧 Attempting recovery..."
+
 # ###############################
 #                              #
 #        Global Errors         #
@@ -248,7 +260,7 @@ boost:
 
 error:
   player_only: "<red>You must be a player to perform this action!"
-  data_save: "Failed to load or save player data: <error>"
+  data_save: "Failed to load or save player data: <e>"
   data_save_admin: "<red>Failed to load or save player data! Please contact an administrator."
 
 # ###############################
@@ -259,7 +271,9 @@ error:
 
 commands:
   debug:
-    title: "Debug command"
+    title: "<gold><bold>KnockBackFFA Debug</bold>"
+    status: "Debug mode is now <status>"
+    item_info: "Item in hand: <item>"
   bypass:
     toggle: "Bypass mode: <status>"
   reload:
@@ -286,9 +300,6 @@ commands:
     delete:
       default_kit: "You can't delete the default kit!"
       success: "<green>Successfully deleted kit <n>!"
-      not_found: "Kit <n> does not exist!"
-      missing_name: "Please insert a name for the kit!"
-
 
 # ###############################
 #                              #
