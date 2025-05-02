@@ -7,8 +7,12 @@ import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.plugin.Plugin
+import java.net.URL
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
 import java.util.logging.Level
-import kotlin.text.compareTo
+import java.util.jar.JarFile
+import java.io.File
 
 class BoostManager(private val plugin: KnockBackFFA) {
     private val boostRegistry = BoostRegistry(plugin)
@@ -97,7 +101,7 @@ class BoostManager(private val plugin: KnockBackFFA) {
                 val urls = resource.toString()
 
                 if (urls.startsWith("jar:")) {
-                    processJarResource(urls, path, registeredBoosts)
+                    processJarResource(resource, path, registeredBoosts)
                 } else {
                     processFileSystemResource(resource, registeredBoosts)
                 }
@@ -113,27 +117,40 @@ class BoostManager(private val plugin: KnockBackFFA) {
         }
     }
 
-    private fun processJarResource(urls: String, path: String, registeredBoosts: MutableList<String>) {
-        val jarPath = urls.substringAfter("jar:file:").substringBefore("!")
-        val jarFile = java.util.jar.JarFile(java.io.File(jarPath))
+    private fun processJarResource(resource: URL, path: String, registeredBoosts: MutableList<String>) {
+        try {
+            val urlStr = resource.toString()
+            val jarPath = urlStr.substringAfter("jar:file:").substringBefore("!")
+            // Safely decode URL-encoded paths
+            val decodedJarPath = try {
+                URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name())
+            } catch (e: Exception) {
+                jarPath // Return original if decoding fails
+            }
+            
+            val jarFile = JarFile(File(decodedJarPath))
+            
+            val entries = jarFile.entries()
+            while (entries.hasMoreElements()) {
+                val entry = entries.nextElement()
+                val entryName = entry.name
 
-        val entries = jarFile.entries()
-        while (entries.hasMoreElements()) {
-            val entry = entries.nextElement()
-            val entryName = entry.name
-
-            if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains('$')) {
-                val className = entryName.replace('/', '.').removeSuffix(".class")
-                val boostName = processBoostClass(className)
-                if (boostName != null) {
-                    registeredBoosts.add(boostName)
+                if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains('$')) {
+                    val className = entryName.replace('/', '.').removeSuffix(".class")
+                    val boostName = processBoostClass(className)
+                    if (boostName != null) {
+                        registeredBoosts.add(boostName)
+                    }
                 }
             }
+            jarFile.close()
+        } catch (e: Exception) {
+            plugin.logger.severe("Error processing JAR resources: ${e.message}")
+            // Continue execution without failing
         }
-        jarFile.close()
     }
 
-    private fun processFileSystemResource(resource: java.net.URL, registeredBoosts: MutableList<String>) {
+    private fun processFileSystemResource(resource: URL, registeredBoosts: MutableList<String>) {
         val directory = java.io.File(resource.toURI())
         if (directory.exists()) {
             directory.listFiles()?.forEach { file ->

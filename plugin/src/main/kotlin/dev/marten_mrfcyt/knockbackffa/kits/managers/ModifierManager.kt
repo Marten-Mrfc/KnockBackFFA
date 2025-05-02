@@ -10,9 +10,16 @@ import mlib.api.forms.Form
 import mlib.api.forms.FormType
 import mlib.api.utilities.*
 import org.bukkit.entity.Player
+import org.bukkit.event.HandlerList
 import org.bukkit.event.Listener
 import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.Plugin
+import java.io.File
+import java.net.URL
+import java.net.URLDecoder
+import java.nio.charset.StandardCharsets
+import java.util.jar.JarFile
+import java.util.logging.Level
 
 class ModifierManager(private val plugin: KnockBackFFA) {
     private val logger = plugin.logger
@@ -21,6 +28,7 @@ class ModifierManager(private val plugin: KnockBackFFA) {
     init {
         registerAllModifiers()
     }
+    
     fun reloadModifiers() {
         plugin.logger.info(TranslationManager.translate("modifiers.reload.start"))
 
@@ -30,9 +38,9 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             var unregistered = 0
             registry.getAllModifiers().forEach { modifier ->
                 if (modifier is Listener) {
-                    org.bukkit.event.HandlerList.getRegisteredListeners(plugin).forEach { listener ->
+                    HandlerList.getRegisteredListeners(plugin).forEach { listener ->
                         if (listener.listener == modifier) {
-                            org.bukkit.event.HandlerList.unregisterAll(modifier)
+                            HandlerList.unregisterAll(modifier)
                             unregistered++
                         }
                     }
@@ -74,32 +82,45 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             val resources = classLoader.getResources(path)
 
             var count = 0
-
+            
             while (resources.hasMoreElements()) {
                 val resource = resources.nextElement()
                 val urls = resource.toString()
 
                 if (urls.startsWith("jar:")) {
-                    val jarPath = urls.substringAfter("jar:file:").substringBefore("!")
-                    val jarFile = java.util.jar.JarFile(java.io.File(jarPath))
+                    try {
+                        val urlStr = resource.toString()
+                        val jarPath = urlStr.substringAfter("jar:file:").substringBefore("!")
+                        // Safely decode URL-encoded paths
+                        val decodedJarPath = try {
+                            URLDecoder.decode(jarPath, StandardCharsets.UTF_8.name())
+                        } catch (e: Exception) {
+                            jarPath // Return original if decoding fails
+                        }
+                        
+                        val jarFile = JarFile(File(decodedJarPath))
+                        
+                        val entries = jarFile.entries()
+                        while (entries.hasMoreElements()) {
+                            val entry = entries.nextElement()
+                            val entryName = entry.name
 
-                    val entries = jarFile.entries()
-                    while (entries.hasMoreElements()) {
-                        val entry = entries.nextElement()
-                        val entryName = entry.name
-
-                        if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains('$')) {
-                            val className = entryName.replace('/', '.').removeSuffix(".class")
-                            val modifierName = processModifierClass(className)
-                            if (modifierName != null) {
-                                registeredModifiers.add(modifierName)
-                                count++
+                            if (entryName.startsWith(path) && entryName.endsWith(".class") && !entryName.contains('$')) {
+                                val className = entryName.replace('/', '.').removeSuffix(".class")
+                                val modifierName = processModifierClass(className)
+                                if (modifierName != null) {
+                                    registeredModifiers.add(modifierName)
+                                    count++
+                                }
                             }
                         }
+                        jarFile.close()
+                    } catch (e: Exception) {
+                        plugin.logger.severe("Error processing JAR for modifiers: ${e.message}")
+                        // Continue execution without failing
                     }
-                    jarFile.close()
                 } else {
-                    val directory = java.io.File(resource.toURI())
+                    val directory = File(resource.toURI())
                     if (directory.exists()) {
                         directory.listFiles()?.forEach { file ->
                             if (file.isFile && file.name.endsWith(".class") && !file.name.contains('$')) {
@@ -121,38 +142,40 @@ class ModifierManager(private val plugin: KnockBackFFA) {
             logger.severe(TranslationManager.translate("modifiers.register.error", "error" to e.message.toString()))
             e.printStackTrace()
         }
-    }    private fun processModifierClass(className: String): String? {
+    }
+    
+    private fun processModifierClass(className: String): String? {
         try {
-            logger.info("[Modifier Registration] Processing class: $className")
+            debug("Processing class: $className")
             val clazz = Class.forName(className)
 
             if (!ModifyObject::class.java.isAssignableFrom(clazz) ||
                 java.lang.reflect.Modifier.isAbstract(clazz.modifiers)) {
-                logger.info("[Modifier Registration] Class $className is not a valid modifier class (not a ModifyObject or is abstract)")
+                debug("Class $className is not a valid modifier class (not a ModifyObject or is abstract)")
                 return null
             }
 
             val annotation = clazz.getAnnotation(KitModifier::class.java)
             if (annotation != null) {
-                logger.info("[Modifier Registration] Found KitModifier annotation with ID: ${annotation.id} on class $className")
+                debug("Found KitModifier annotation with ID: ${annotation.id} on class $className")
                 try {
                     val field = clazz.getDeclaredField("INSTANCE")
                     field.isAccessible = true
                     val modifier = field.get(null) as ModifyObject
                     
-                    logger.info("[Modifier Registration] Successfully obtained modifier instance: ${modifier.id}")
+                    debug("Successfully obtained modifier instance: ${modifier.id}")
                     registry.register(modifier)
                     return modifier.id
                 } catch (e: Exception) {
-                    logger.severe("[Modifier Registration] Failed to access INSTANCE field on $className: ${e.message}")
+                    logger.severe("Failed to access INSTANCE field on $className: ${e.message}")
                     e.printStackTrace()
                     return null
                 }
             } else {
-                logger.info("[Modifier Registration] Class $className does not have the KitModifier annotation")
+                logger.info("Class $className does not have the KitModifier annotation")
             }
         } catch (e: Exception) {
-            logger.severe("[Modifier Registration] Exception processing class $className: ${e.message}")
+            logger.severe("Exception processing class $className: ${e.message}")
             e.printStackTrace()
         }
         return null
