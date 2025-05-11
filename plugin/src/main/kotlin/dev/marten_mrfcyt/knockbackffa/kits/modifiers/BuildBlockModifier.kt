@@ -10,6 +10,7 @@ import org.bukkit.Material
 import org.bukkit.block.Block
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
+import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.inventory.EquipmentSlot
@@ -73,8 +74,9 @@ object BuildBlockModifier : ModifyObject(
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.MONITOR)
     fun onBlockPlaceEvent(event: BlockPlaceEvent) {
+        if (event.isCancelled) return
         try {
             val player = event.player
             val playerDataInstance = PlayerData.getInstance(plugin)

@@ -24,35 +24,52 @@ object OnKillModifier : ModifyObject(
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {
-        val config = File("${plugin.dataFolder}/kits.yml")
-        val kitConfig = YamlConfiguration.loadConfiguration(config)
-        val slot = (args["slot"] as? Int) ?: return
-        val kitName = (args["kit_name"] as? String) ?: return
-        val amount = kitConfig.getInt("kit.$kitName.items.$slot.amount")
-
-        val resolvedSlot = KitSlotResolver.resolveSlot(player, slot)
-
-        item.amount = amount
-        player.inventory.setItem(resolvedSlot, item)
+        try {
+            val config = File("${plugin.dataFolder}/kits.yml")
+            val kitConfig = YamlConfiguration.loadConfiguration(config)
+            val slot = (args["slot"] as? Int) ?: return
+            val kitName = (args["kit_name"] as? String) ?: return
+            val amount = kitConfig.getInt("kit.$kitName.items.$slot.amount", 1)
+            
+            val resolvedSlot = KitSlotResolver.resolveSlot(player, slot)
+            
+            plugin.logger.info("[OnKillModifier] Restoring item at slot $slot (resolved to $resolvedSlot) for player ${player.name} to amount $amount")
+            
+            item.amount = amount
+            player.inventory.setItem(resolvedSlot, item)
+            player.updateInventory()
+        } catch (e: Exception) {
+            plugin.logger.warning("[OnKillModifier] Error handling item restore: ${e.message}")
+        }
     }
 
     @EventHandler
     fun onKill(event: PlayerDeathEvent) {
-        val source = event.entity.killer ?: return
-        for (item in source.inventory.contents) {
-            if (item == null) continue
+        try {
+            val killer = event.entity.killer ?: return
+            
             val playerDataInstance = PlayerData.getInstance(plugin)
-            val slot = source.inventory.contents.indexOfFirst {
-                it?.isSimilar(item) == true
-            }
-            if (slot == -1) return
-            val playerDataModel = playerDataInstance.getPlayerDataModel(event.player.uniqueId)
+            val playerDataModel = playerDataInstance.getPlayerDataModel(killer.uniqueId)
             val kitName = playerDataModel.kit ?: return
-            val args = mapOf(
-                "slot" to slot,
-                "kit_name" to kitName
-            )
-            KnockBackFFA.instance.modifierManager.handleEvent(source, item, args, id)
+            
+            plugin.logger.info("[OnKillModifier] Player ${killer.name} killed ${event.entity.name}, checking inventory items")
+            
+            // Process main inventory slots
+            for (slot in 0 until killer.inventory.size) {
+                val item = killer.inventory.getItem(slot) ?: continue
+                
+                // Convert inventory slot to kit slot
+                val kitSlot = KitSlotResolver.resolveNewSlot(killer, slot)
+                
+                val args = mapOf(
+                    "slot" to kitSlot,
+                    "kit_name" to kitName
+                )
+                
+                KnockBackFFA.instance.modifierManager.handleEvent(killer, item, args, id)
+            }
+        } catch (e: Exception) {
+            plugin.logger.warning("[OnKillModifier] Error processing kill event: ${e.message}")
         }
     }
 }

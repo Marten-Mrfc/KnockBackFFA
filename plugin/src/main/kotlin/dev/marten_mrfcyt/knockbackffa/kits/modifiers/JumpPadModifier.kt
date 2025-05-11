@@ -4,6 +4,7 @@ import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import mlib.api.utilities.getCustomValue
 import mlib.api.utilities.message
 import org.bukkit.Material
@@ -19,6 +20,7 @@ import org.bukkit.scheduler.BukkitRunnable
 import org.bukkit.util.Vector
 import org.bukkit.inventory.ItemStack
 import org.bukkit.event.block.Action
+import org.bukkit.inventory.EquipmentSlot
 import java.io.File
 
 @KitModifier("jumpPad")
@@ -34,28 +36,58 @@ object JumpPadModifier : ModifyObject(
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {
-        val config = File("${plugin.dataFolder}/kits.yml")
-        val kitConfig = YamlConfiguration.loadConfiguration(config)
-        val block = args["block"] as? Block ?: return
-        val kitName = getCustomValue(item.itemMeta, plugin, "kit_name") as? String ?: return
-        val slot = getCustomValue(item.itemMeta, plugin, "slot") as? Int ?: return
-        block.setMetadata("jumpPad", FixedMetadataValue(plugin, true))
-        block.setMetadata("kit_name", FixedMetadataValue(plugin, kitName))
-        block.setMetadata("slot", FixedMetadataValue(plugin, slot))
-        val delay = kitConfig.get("kit.$kitName.items.$slot.modifiers.delay") ?: player.message("Invalid delay")
-        if (delay !is Int) return player.message("Invalid delay")
-        object : BukkitRunnable() {
-            override fun run() {
-                block.type = Material.AIR
-            }
-        }.runTaskLater(plugin, delay * 20L)
+        try {
+            val config = File("${plugin.dataFolder}/kits.yml")
+            val kitConfig = YamlConfiguration.loadConfiguration(config)
+            val block = args["block"] as? Block ?: return
+            val slot = (args["slot"] as? Int) ?: return
+            val kitName = (args["kit_name"] as? String) ?: return
+            
+            block.setMetadata("jumpPad", FixedMetadataValue(plugin, true))
+            block.setMetadata("kit_name", FixedMetadataValue(plugin, kitName))
+            block.setMetadata("slot", FixedMetadataValue(plugin, slot))
+            
+            val delay = kitConfig.getInt("kit.$kitName.items.$slot.modifiers.delay", 10)
+            plugin.logger.info("[JumpPadModifier] Setting jump pad delay for ${player.name} to ${delay} seconds")
+            
+            object : BukkitRunnable() {
+                override fun run() {
+                    block.type = Material.AIR
+                }
+            }.runTaskLater(plugin, delay * 20L)
+        } catch (e: Exception) {
+            plugin.logger.warning("[JumpPadModifier] Error handling jump pad: ${e.message}")
+        }
     }
 
     @EventHandler
     fun placePressurePlateEvent(event: BlockPlaceEvent) {
-        val item = event.itemInHand
-        val args = mapOf("block" to event.block)
-        KnockBackFFA.instance.modifierManager.handleEvent(event.player, item, args, id)
+        try {
+            val player = event.player
+            val playerDataInstance = PlayerData.getInstance(plugin)
+            val playerDataModel = playerDataInstance.getPlayerDataModel(player.uniqueId)
+            val kitName = playerDataModel.kit
+            
+            if (kitName == null) {
+                plugin.logger.fine("[JumpPadModifier] No active kit for player ${player.name}")
+                return
+            }
+            
+            val hand = event.hand
+            val currentSlot = if (hand == EquipmentSlot.OFF_HAND) 40 else player.inventory.heldItemSlot
+            
+            val originalKitSlot = KitSlotResolver.resolveNewSlot(player, currentSlot)
+            
+            val args = mapOf(
+                "block" to event.block,
+                "slot" to originalKitSlot,
+                "kit_name" to kitName
+            )
+            
+            KnockBackFFA.instance.modifierManager.handleEvent(player, event.itemInHand, args, id)
+        } catch (e: Exception) {
+            plugin.logger.warning("[JumpPadModifier] Error in pressure plate event: ${e.message}")
+        }
     }
 
     @EventHandler

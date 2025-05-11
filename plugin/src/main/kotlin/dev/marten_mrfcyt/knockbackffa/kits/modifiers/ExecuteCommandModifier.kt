@@ -1,9 +1,11 @@
 package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
+import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import me.clip.placeholderapi.PlaceholderAPI
 import mlib.api.utilities.getCustomValue
 import org.bukkit.Bukkit
@@ -26,28 +28,58 @@ object ExecuteCommandModifier : ModifyObject(
     plugin = KnockBackFFA.instance
 ), Listener {
     override fun handle(player: Player, item: ItemStack, args: Map<String, Any>) {
-        val config = File("${plugin.dataFolder}/kits.yml")
-        val kitConfig = YamlConfiguration.loadConfiguration(config)
-        val slot = (args["slot"] as? Int) ?: return
-        val kitName = (args["kit_name"] as? String) ?: return
-        val command = kitConfig.getString("kit.$kitName.items.$slot.modifiers.command") ?: return
-        val parsedCommand = PlaceholderAPI.setPlaceholders(player, command)
-        Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand)
+        try {
+            val config = File("${plugin.dataFolder}/kits.yml")
+            val kitConfig = YamlConfiguration.loadConfiguration(config)
+            val slot = (args["slot"] as? Int) ?: return
+            val kitName = (args["kit_name"] as? String) ?: return
+            val victim = args["victim"] as? Player
+            
+            val command = kitConfig.getString("kit.$kitName.items.$slot.modifiers.command") ?: return
+            
+            // Replace placeholders
+            val parsedCommand = if (victim != null) {
+                PlaceholderAPI.setPlaceholders(player, command)
+                    .replace("%victim%", victim.name)
+                    .replace("%victim_uuid%", victim.uniqueId.toString())
+            } else {
+                PlaceholderAPI.setPlaceholders(player, command)
+            }
+            
+            plugin.logger.info("[ExecuteCommandModifier] Executing command: $parsedCommand for player ${player.name}")
+            Bukkit.dispatchCommand(Bukkit.getConsoleSender(), parsedCommand)
+        } catch (e: Exception) {
+            plugin.logger.warning("[ExecuteCommandModifier] Error executing command: ${e.message}")
+        }
     }
 
     @EventHandler
     fun onKillExecute(event: PlayerDeathEvent) {
-        val source = event.entity.killer ?: return
-        for (item in source.inventory.contents) {
-            if (item == null) continue
-            val itemMeta = item.itemMeta ?: continue
-            val kitName = getCustomValue(itemMeta, plugin, "kit_name") as? String ?: continue
-            val slot = getCustomValue(itemMeta, plugin, "slot") as? Int ?: continue
-            val args = mapOf(
-                "slot" to slot,
-                "kit_name" to kitName
-            )
-            KnockBackFFA.instance.modifierManager.handleEvent(source, item, args, id)
+        try {
+            val killer = event.entity.killer ?: return
+            val victim = event.entity
+            
+            val playerDataInstance = PlayerData.getInstance(plugin)
+            val playerDataModel = playerDataInstance.getPlayerDataModel(killer.uniqueId)
+            val kitName = playerDataModel.kit ?: return
+            
+            // Process main inventory slots
+            for (slot in 0 until killer.inventory.size) {
+                val item = killer.inventory.getItem(slot) ?: continue
+                
+                // Convert inventory slot to kit slot
+                val kitSlot = KitSlotResolver.resolveNewSlot(killer, slot)
+                
+                val args = mapOf(
+                    "slot" to kitSlot,
+                    "kit_name" to kitName,
+                    "victim" to victim
+                )
+                
+                KnockBackFFA.instance.modifierManager.handleEvent(killer, item, args, id)
+            }
+        } catch (e: Exception) {
+            plugin.logger.warning("[ExecuteCommandModifier] Error processing kill event: ${e.message}")
         }
     }
 }
