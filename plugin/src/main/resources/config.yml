@@ -41,4 +41,3 @@ storage:
 
 config-version: 1.0.0 # MLib version - Do Not Change
 currentArena: "" # Current arena name
-currentLocation: "" # Current location of the player

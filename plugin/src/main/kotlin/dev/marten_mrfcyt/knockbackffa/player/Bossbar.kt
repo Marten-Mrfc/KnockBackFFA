@@ -12,7 +12,9 @@ import java.time.Instant
 import java.util.*
 
 class BossBarHandler(private val plugin: KnockBackFFA) {
-    private val playerBossBars = mutableMapOf<UUID, BossBar>()    fun showBossBar(player: Player) {
+    private val playerBossBars = mutableMapOf<UUID, BossBar>()
+
+    fun showBossBar(player: Player) {
         if (!plugin.config.getBoolean("bossbar.enabled", true)) {
             mlib.api.utilities.debug(plugin, "BossBar disabled in config for ${player.name}, not showing")
             return
