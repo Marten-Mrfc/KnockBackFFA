@@ -85,15 +85,13 @@ object SmokeScreenBoostType : ItemBoost(
 
         val lastUse = cooldowns[player.uniqueId] ?: 0L
         val currentTime = System.currentTimeMillis() / 1000
+        event.isCancelled = true
 
         if (currentTime - lastUse < cooldown) {
             val remaining = cooldown - (currentTime - lastUse)
             player.message(cooldownMessage.replace("<seconds>", remaining.toString()))
             return
         }
-
-        event.isCancelled = true
-
         createSmokeCloud(player)
 
         player.getNearbyEntities(smokeRadius, smokeRadius, smokeRadius).forEach { entity ->
