@@ -8,7 +8,7 @@ data class ArenaModel(
     val spawnRegion: Pair<Location, Location>? = null,
     val spawnpoint: Location,
     val killBlock: Material = Material.VOID_AIR,
-    val settings: Map<String, Any> = mapOf()
+    val settings: Map<String, Any> = ArenaSetting.createDefaultSettings()
 ) {
     fun isInSpawnRegion(location: Location): Boolean {
         if (spawnRegion == null || location.world != spawnRegion.first.world) return false
@@ -30,5 +30,20 @@ data class ArenaModel(
         return location.x >= min.x && location.x <= max.x &&
                 location.y >= min.y && location.y <= max.y &&
                 location.z >= min.z && location.z <= max.z
+    }
+    
+    /**
+     * Get a setting value with type safety
+     */
+    fun <T> getSetting(setting: ArenaSetting<T>?): T {
+        return try {
+            ArenaSetting.getValue(settings, setting)
+        } catch (e: Exception) {
+            // In case of any error, return a sensible default
+            when (setting) {
+                is ArenaSetting.Global.AllowDamage -> true as T // Allow damage by default
+                else -> false as T // Most other settings default to false
+            }
+        }
     }
 }

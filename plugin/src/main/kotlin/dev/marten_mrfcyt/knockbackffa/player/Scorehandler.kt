@@ -1,6 +1,8 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
+import dev.marten_mrfcyt.knockbackffa.arena.currentArena
 import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
@@ -87,10 +89,12 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                 it.error(TranslationManager.translate("error.data_save_admin"))
             }
         }
-    }    @EventHandler
+    }
+
+    @EventHandler
     fun respawn(event: PlayerRespawnEvent) {
         val source = event.player
-        val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
+        val currentArena = currentArena?.spawnpoint
 
         debug(plugin, "Player ${source.name} respawning")
         source.message(TranslationManager.translate("kit.loading_kit"))

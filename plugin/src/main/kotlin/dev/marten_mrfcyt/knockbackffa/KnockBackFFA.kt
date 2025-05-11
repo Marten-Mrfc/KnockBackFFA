@@ -178,7 +178,9 @@ class KnockBackFFA : KotlinPlugin() {
 
     private fun setupUpdateTracker() {
         UpdateTracker.init(this)
-    }    fun loadBoosts() {
+    }
+
+    fun loadBoosts() {
         try {
             ensureResourceFileExists("boosts.yml")
             boostManager = BoostManager(this)
@@ -215,8 +217,8 @@ class KnockBackFFA : KotlinPlugin() {
         shopCommand()
         boostsCommand()
         logger.info(TranslationManager.translate("plugin.commands_ready"))
-    }
-
+    }    
+    
     private fun registerListeners() {
         logger.info(TranslationManager.translate("plugin.registering_events"))
         registerEvents(
@@ -224,12 +226,13 @@ class KnockBackFFA : KotlinPlugin() {
             PlayerQuitListener(ScoreboardHandler(this), BossBarHandler(this)),
             ScoreHandler(this),
             PlayerHandler(this),
+            SpawnRegionHandler(this),
             KitLayoutManager(this),
         )
 
         arenaInitializer.setupArenaSystem()
 
-        logger.info(TranslationManager.translate("plugin.events_registered", "count" to 5))
+        logger.info(TranslationManager.translate("plugin.events_registered", "count" to 6))
     }
 
     private fun setupPlaceholders() {
