@@ -50,7 +50,7 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
         
         // Use the plugin's template debug method
         plugin.debug("getSelection called for ${player.name}: $selection")
-        
+
         return selection
     }
 
@@ -145,7 +145,7 @@ class SelectionManager(private val plugin: KnockBackFFA) : Listener {
             plugin.debug("Selection complete for ${player.name}: firstPos=${selection.firstPosition}, secondPos=${selection.secondPosition}")
             player.action(translate("arena.editor.complete"))
 
-            player.message("<green><bold><click:run_command:/kbffa arena selection_complete>[ Set Spawn Region ]</click></bold></green>")
+            player.message("<green><bold><click:run_command:/kbffa arena zselection_complete>[ Set Spawn Region ]</click></bold></green>")
         }
     }
 

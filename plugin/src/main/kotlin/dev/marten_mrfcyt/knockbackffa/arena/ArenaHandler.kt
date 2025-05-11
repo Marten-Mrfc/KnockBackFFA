@@ -2,6 +2,8 @@ package dev.marten_mrfcyt.knockbackffa.arena
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.arena.utils.ArenaModel
+import dev.marten_mrfcyt.knockbackffa.guis.editor.arena.ArenaSettingsGUI
+import dev.marten_mrfcyt.knockbackffa.guis.editor.arena.SpawnSettingsGUI
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translate
 import mlib.api.utilities.*
 import org.bukkit.Bukkit
@@ -27,7 +29,8 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         }
         arenaConfig = YamlConfiguration.loadConfiguration(arenaFile)
     }
-    fun addArena(arena: ArenaModel) {
+
+    fun addArena(arena: ArenaModel, callback: (() -> Unit)? = null) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
             debug("Adding arena: ${arena.name}")
 
@@ -55,8 +58,16 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             }
             arenaConfig.save(File("${plugin.dataFolder}/arena.yml"))
             debug("Arena ${arena.name} saved successfully")
+
+            if (callback != null) {
+                Bukkit.getScheduler().runTask(plugin, Runnable {
+                    callback()
+                })
+            }
         })
-    }    fun removeArena(arena: ArenaModel) {
+    }    
+    
+    fun removeArena(arena: ArenaModel) {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, Runnable {
             debug("Removing arena: ${arena.name}")
             arenaConfig.set("arenas.${arena.name}", null)
@@ -64,7 +75,9 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             plugin.saveConfig()
             debug("Arena ${arena.name} removed successfully")
         })
-    }    fun loadArenas() {
+    }    
+    
+    fun loadArenas() {
         arenaConfig.load(File("${plugin.dataFolder}/arena.yml"))
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
 
@@ -88,7 +101,9 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             }
         }
         plugin.logger.info(translate("arena.load.success", "count" to loadedCount.toString()))
-    }fun loadArenaByName(name: String): ArenaModel? {
+    }
+    
+    fun loadArenaByName(name: String): ArenaModel? {
 
         val worldName = arenaConfig.getString("arenas.$name.spawnRegion.world") ?: arenaConfig.getString("arenas.$name.spawnpoint.world")
         val world = worldName?.let { Bukkit.getWorld(it) } ?: return null
@@ -155,7 +170,9 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             killBlock = killBlock,
             settings = settings
         )
-    }    fun switchArena() {
+    }    
+    
+    fun switchArena() {
         arenaConfig.load(File("${plugin.dataFolder}/arena.yml"))
         val arenaSection = arenaConfig.getConfigurationSection("arenas")
 
@@ -193,10 +210,33 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
         return arenaSection?.getKeys(false)?.toList() ?: emptyList()
     }
 
-    fun startArenaCreation(player: Player, name: String, killBlock: Material): ArenaCreationSession {
-        val session = ArenaCreationSession(name, killBlock)
-        arenaCreationSessions[player.uniqueId] = session
-        return session
+    fun startArenaCreation(player: Player, name: String, killBlock: Material, defaultSettings: Map<String, Any>? = null): ArenaCreationSession {
+        try {
+            val session = ArenaCreationSession(name, killBlock)
+            
+            // If default settings are provided, store them
+            if (defaultSettings != null) {
+                session.settings = defaultSettings.toMutableMap()
+                debug("Arena creation session for ${player.name} initialized with ${defaultSettings.size} default settings")
+                
+                // Log the first few settings for debugging
+                val settingsList = defaultSettings.entries.take(3).joinToString { "${it.key}=${it.value}" }
+                debug("Sample settings: $settingsList${if (defaultSettings.size > 3) "..." else ""}")
+            } else {
+                debug("No default settings provided for ${player.name}'s arena creation session")
+            }
+            
+            arenaCreationSessions[player.uniqueId] = session
+            return session
+        } catch (e: Exception) {
+            debug("Error in startArenaCreation: ${e.message}")
+            e.printStackTrace()
+            
+            // Create a basic session as fallback
+            val fallbackSession = ArenaCreationSession(name, killBlock)
+            arenaCreationSessions[player.uniqueId] = fallbackSession
+            return fallbackSession
+        }
     }
 
     fun getArenaCreationSession(player: Player): ArenaCreationSession? {
@@ -214,7 +254,8 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
             name = session.name,
             spawnRegion = session.spawnRegion,
             spawnpoint = session.spawnpoint!!,
-            killBlock = session.killBlock
+            killBlock = session.killBlock,
+            settings = session.settings // Use the settings from the session
         )
 
         addArena(arena)
@@ -225,6 +266,33 @@ class ArenaHandler(private val plugin: KnockBackFFA) {
     fun cancelArenaCreation(player: Player) {
         arenaCreationSessions.remove(player.uniqueId)
     }
+
+    fun updateArenaSetting(arenaName: String, settingKey: String, value: Any, player: Player, spawn: Boolean = false) {
+        val arena = loadArenaByName(arenaName) ?: return
+
+        val updatedSettings = arena.settings.toMutableMap()
+        updatedSettings[settingKey] = value
+
+        val updatedArena = ArenaModel(
+            name = arena.name,
+            spawnRegion = arena.spawnRegion,
+            spawnpoint = arena.spawnpoint,
+            killBlock = arena.killBlock,
+            settings = updatedSettings
+        )
+
+        addArena(updatedArena) {
+            // This code runs after the arena is saved
+            if (currentArena?.name == arenaName) {
+                currentArena = updatedArena
+            }
+            if (spawn) {
+                SpawnSettingsGUI(plugin, player, arenaName)
+            } else {
+                ArenaSettingsGUI(plugin, player, arenaName)
+            }
+        }
+    }
 }
 
 data class ArenaCreationSession(
@@ -232,7 +300,8 @@ data class ArenaCreationSession(
     val killBlock: Material,
     var spawnRegion: Pair<Location, Location>? = null,
     var spawnpoint: Location? = null,
-    var step: ArenaCreationStep = ArenaCreationStep.SELECT_REGION
+    var step: ArenaCreationStep = ArenaCreationStep.SELECT_REGION,
+    var settings: MutableMap<String, Any> = mutableMapOf() // Added settings property
 ) {
     fun isComplete(): Boolean {
         return spawnRegion != null && spawnpoint != null

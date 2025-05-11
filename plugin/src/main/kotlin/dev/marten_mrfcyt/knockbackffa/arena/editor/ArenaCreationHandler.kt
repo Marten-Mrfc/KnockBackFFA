@@ -1,8 +1,10 @@
 package dev.marten_mrfcyt.knockbackffa.arena.editor
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.arena.utils.ArenaSetting
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.utilities.action
+import mlib.api.utilities.debug
 import mlib.api.utilities.sendMini
 import net.kyori.adventure.text.minimessage.MiniMessage
 import org.bukkit.Material
@@ -15,9 +17,23 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
     init {
         plugin.server.pluginManager.registerEvents(this, plugin)
     }    fun startArenaCreation(player: Player, name: String, killBlock: Material) {
-        mlib.api.utilities.debug(plugin, "Starting arena creation for ${player.name}: arena=${name}, killBlock=${killBlock.name}")
+        debug(plugin, "Starting arena creation for ${player.name}: arena=${name}, killBlock=${killBlock.name}")
 
-        plugin.arenaHandler.startArenaCreation(player, name, killBlock)
+        // Initialize with default settings
+        val defaultSettings = try {
+            debug(plugin, "Attempting to create default settings...")
+            ArenaSetting.createDefaultSettings().also { 
+                debug(plugin, "Successfully created ${it.size} default settings") 
+            }
+        } catch (e: Exception) {
+            debug(plugin, "Error creating default settings: ${e.message}")
+            e.printStackTrace() // Print stack trace for better debugging
+            mutableMapOf<String, Any>() // Empty map as fallback
+        }
+        
+        debug(plugin, "Initializing arena with default settings: $defaultSettings")
+        
+        plugin.arenaHandler.startArenaCreation(player, name, killBlock, defaultSettings)
 
         plugin.selectionManager.startSelection(player, SelectionMode.SPAWN_REGION)
 
@@ -30,7 +46,7 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
         )
 
         sendSelectionCompletionButton(player)
-        mlib.api.utilities.debug(plugin, "Arena creation session initialized for ${player.name}")
+        debug(plugin, "Arena creation session initialized for ${player.name}")
     }
 
     private fun sendSelectionCompletionButton(player: Player) {
@@ -50,7 +66,7 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
             "<dark_gray>━━━━━━━━━━ <gold>Arena Creation</gold> ━━━━━━━━━━</dark_gray>\n" +
                     "<gray>Spawn region set successfully!</gray>\n" +
                     "<gray>Now go to where players should spawn and click:</gray>\n" +
-                    "<green><bold><click:run_command:/kbffa arena spawnpoint_complete>[ Set Spawnpoint ]</click></bold></green>\n" +
+                    "<green><bold><click:run_command:/kbffa arena zspawnpoint_complete>[ Set Spawnpoint ]</click></bold></green>\n" +
                     "<dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>"
         )
 
@@ -65,8 +81,8 @@ class ArenaCreationHandler(private val plugin: KnockBackFFA) : Listener {
             "<dark_gray>━━━━━━━━━━ <gold>Arena Creation</gold> ━━━━━━━━━━</dark_gray>\n" +
                     "<gray>Spawnpoint set successfully!</gray>\n" +
                     "<gray>Arena <gold>$arenaName</gold> is ready to be created:</gray>\n" +
-                    "<green><bold><click:run_command:/kbffa arena confirm>[ Create Arena ]</click></bold></green> " +
-                    "<red><bold><click:run_command:/kbffa arena cancel>[ Cancel ]</click></bold></red>\n" +
+                    "<green><bold><click:run_command:/kbffa arena zconfirm>[ Create Arena ]</click></bold></green> " +
+                    "<red><bold><click:run_command:/kbffa arena zcancel>[ Cancel ]</click></bold></red>\n" +
                     "<dark_gray>━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━</dark_gray>"
         )
 
