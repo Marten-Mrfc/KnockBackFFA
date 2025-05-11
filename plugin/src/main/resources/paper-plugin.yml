@@ -1,5 +1,5 @@
 name: KnockBackFFA
-version: '0.7.0-alpha'
+version: '0.7.1'
 main: dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 api-version: '1.21.4'
 authors: [Marten_Mrfcyt]
