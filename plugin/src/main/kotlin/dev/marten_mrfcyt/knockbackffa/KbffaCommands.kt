@@ -15,18 +15,13 @@ import dev.marten_mrfcyt.knockbackffa.guis.shop.boosts.ActiveBoostsGUI
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager
 import mlib.api.commands.builders.LiteralDSLBuilder
 import mlib.api.commands.builders.command
+import mlib.api.commands.builders.suggestionTypes.SuggestionPresets
 import mlib.api.utilities.*
 import org.bukkit.Material
 import org.bukkit.Registry
 import org.bukkit.entity.Player
 import org.bukkit.plugin.Plugin
 
-private val blockSuggestions: List<String> by lazy {
-    Registry.MATERIAL.stream()
-        .filter { it.isBlock }
-        .map { it.name }
-        .toList()
-}
 internal val bypassMode = mutableMapOf<Player, Boolean>()
 
 fun Plugin.kbffaCommand(arenaHandler: ArenaHandler) = command("kbffa") {
@@ -83,8 +78,10 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {    literal("by
             argument("name", string()) {
                 argument("killBlock", StringArgumentType.greedyString()) {
                     suggests { builder ->
-                        blockSuggestions.forEach { builder.suggest(it) }
-                        builder.build()
+                        SuggestionPresets.registry(Registry.MATERIAL)
+                            .filter { it.isBlock }
+                            .sorted()
+                            .suggest(this, builder)
                     }
                     executes {
                         plugin.createArena(source, getArgument("name"), Material.valueOf(getArgument("killBlock")))
@@ -98,22 +95,22 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {    literal("by
                 source.error(TranslationManager.translate("commands.arena.create.missing_name"))
             }
         }
-        literal("selection_complete") {
+        literal("zselection_complete") {
             executes {
                 KnockBackFFA.instance.arenaCreationHandler.handleSelectionComplete(source as Player)
             }
         }
-        literal("spawnpoint_complete") {
+        literal("zspawnpoint_complete") {
             executes {
                 KnockBackFFA.instance.arenaCreationHandler.handleSpawnpointComplete(source as Player)
             }
         }
-        literal("confirm") {
+        literal("zconfirm") {
             executes {
                 KnockBackFFA.instance.arenaCreationHandler.completeArenaCreation(source as Player)
             }
         }
-        literal("cancel") {
+        literal("zcancel") {
             executes {
                 KnockBackFFA.instance.arenaCreationHandler.cancelArenaCreation(source as Player)
             }
@@ -153,12 +150,20 @@ private fun LiteralDSLBuilder.setup(arenaHandler: ArenaHandler) {    literal("by
                     builder.build()
                 }
                 executes {
-
-                    source.message(TranslationManager.translate("commands.arena.settings.coming_soon"))
+                    if (source is Player) {
+                        val arenaName = getArgument<String>("name")
+                        dev.marten_mrfcyt.knockbackffa.guis.editor.arena.ArenaSettingsGUI(KnockBackFFA.instance, source as Player, arenaName)
+                    } else {
+                        source.error(TranslationManager.translate("error.player_only"))
+                    }
                 }
             }
             executes {
-                source.error(TranslationManager.translate("commands.arena.settings.missing_name"))
+                if (source is Player) {
+                    dev.marten_mrfcyt.knockbackffa.guis.editor.arena.ArenaSettingsSelector(KnockBackFFA.instance, source as Player)
+                } else {
+                    source.error(TranslationManager.translate("error.player_only"))
+                }
             }
         }
         executes {
