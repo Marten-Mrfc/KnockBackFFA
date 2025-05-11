@@ -1,13 +1,22 @@
 package dev.marten_mrfcyt.knockbackffa.arena.utils
 
 import dev.marten_mrfcyt.knockbackffa.arena.currentArena
+import dev.marten_mrfcyt.knockbackffa.bypassMode
+import mlib.api.utilities.debug
+import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
 import org.bukkit.event.Listener
 import org.bukkit.event.player.PlayerMoveEvent
 
 class DeathBlock() : Listener {
-
+    private fun isBypassing(player: Player): Boolean {
+        val bypassing = bypassMode.getOrDefault(player, false)
+        if (bypassing) {
+            debug("Player ${player.name} is bypassing restrictions")
+        }
+        return bypassing
+    }
     @EventHandler(priority = EventPriority.HIGHEST)
     fun onDeathBlock(event: PlayerMoveEvent) {
         val currentArena = currentArena ?: return
@@ -20,7 +29,7 @@ class DeathBlock() : Listener {
             return
         }
 
-        if (currentArena.isInSpawnRegion(event.to)) {
+        if (currentArena.isInSpawnRegion(event.to) || isBypassing(event.player)) {
             return
         }
 
