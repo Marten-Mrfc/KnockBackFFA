@@ -167,10 +167,11 @@ kit:
     success: "Reloaded <count> kits"
   selector:
     title: "<gray>Please select a kit</gray>"
-    item_name: "<!italic><n>"
+    item_name: "<!italic><name>"
     item_description: "<description>"
   layout:
     changed: "<green>Saved new layout<gray> (<white><slot> <gray>→ <white><new_slot>)"
+    item_slot_reverted: "<yellow>An item was moved to a slot originally for a consumed item. Its position has been reverted to prevent layout issues."
 
 # ###############################
 #                              #
