@@ -56,6 +56,10 @@ class ArenaSettingsGUI(private val plugin: KnockBackFFA, private val player: Pla
         // Two rows of settings, 7 per row
         settings.forEachIndexed { index, setting ->
             // Skip any null settings to prevent NullPointerException
+            if (setting == null) {
+                debug("Null setting found at index $index in Global settings")
+                return@forEachIndexed
+            }
 
             val row = index / 7
             val col = index % 7
