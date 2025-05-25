@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "dev.marten_mrfcyt"
-version = "0.7.1"
+version = "0.7.2"
 
 repositories {
     mavenCentral()
