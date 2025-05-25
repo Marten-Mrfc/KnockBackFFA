@@ -20,6 +20,7 @@ import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerEvent
 import org.bukkit.event.player.PlayerInteractEvent
 import org.bukkit.event.player.PlayerMoveEvent
+import org.bukkit.event.player.PlayerPickupArrowEvent
 import org.bukkit.inventory.EquipmentSlot
 import kotlin.compareTo
 import kotlin.to
@@ -85,7 +86,19 @@ class PlayerHandler(private val plugin: KnockBackFFA) : Listener {
             event.isCancelled = true
         }
     }
-    
+    @EventHandler(priority = EventPriority.HIGH)
+    fun handleArrowPickUp(event: PlayerPickupArrowEvent) {
+        val current = currentArena ?: return
+        val player = event.player
+        if (isInSpawnRegion(player)) return
+
+        val allowPickup = current.getSetting(ArenaSetting.Global.AllowPickUp)
+
+        if (!allowPickup && !isBypassing(player)) {
+            debug(plugin, "Prevented ${player.name} from picking up ${event.item.itemStack.type} in spawn region")
+            event.isCancelled = true
+        }
+    }
     /**
      * Handler for block breaking
      * Priority is LOW to let the SpawnRegionHandler override if needed

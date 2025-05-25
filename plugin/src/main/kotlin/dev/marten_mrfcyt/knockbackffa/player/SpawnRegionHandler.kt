@@ -15,6 +15,7 @@ import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerInteractEvent
+import org.bukkit.event.player.PlayerPickupArrowEvent
 import org.bukkit.inventory.EquipmentSlot
 
 /**
@@ -111,6 +112,21 @@ class SpawnRegionHandler(private val plugin: KnockBackFFA) : Listener {
         if (current.isInSpawnRegion(player.location)) {
             val allowPickup = current.getSetting(ArenaSetting.Spawn.AllowPickup)
             
+            if (!allowPickup && !isBypassing(player)) {
+                debug(plugin, "Prevented ${player.name} from picking up ${event.item.itemStack.type} in spawn region")
+                event.isCancelled = true
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGH)
+    fun handleArrowPickUpInSpawn(event: PlayerPickupArrowEvent) {
+        val current = currentArena ?: return
+        val player = event.player
+
+        if (current.isInSpawnRegion(player.location)) {
+            val allowPickup = current.getSetting(ArenaSetting.Spawn.AllowPickup)
+
             if (!allowPickup && !isBypassing(player)) {
                 debug(plugin, "Prevented ${player.name} from picking up ${event.item.itemStack.type} in spawn region")
                 event.isCancelled = true
