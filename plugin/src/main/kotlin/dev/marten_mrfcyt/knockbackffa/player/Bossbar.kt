@@ -50,11 +50,6 @@ class BossBarHandler(private val plugin: KnockBackFFA) {
             bossBar.progress(boundedProgress)
 
             bossBar.name(formatBossBarText(currentArena?.name ?: "None"))
-            
-            // Debug less frequently to avoid spam (only when progress is a multiple of 0.1)
-            if ((boundedProgress * 10).toInt() % 2 == 0) {
-                mlib.api.utilities.debug(plugin, "Updated BossBar for ${player.name}: progress=${String.format("%.2f", boundedProgress)}, arena=${currentArena?.name ?: "None"}")
-            }
         }
     }
 
