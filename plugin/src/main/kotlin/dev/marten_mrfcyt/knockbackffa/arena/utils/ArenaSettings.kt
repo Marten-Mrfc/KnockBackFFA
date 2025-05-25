@@ -78,6 +78,14 @@ sealed class ArenaSetting<T>(
             "Players can interact with blocks in the arena"
         )
 
+        object RegenerateOnKill : Global(
+            "regenerateOnKill",
+            false,
+            "Regenerate on kill",
+            Material.DIAMOND_SWORD,
+            "Players health is restored on kill otherwise always full"
+        )
+
         companion object {
             val values = listOf(
                 AllowDropping,
@@ -86,7 +94,8 @@ sealed class ArenaSetting<T>(
                 AllowBlockPlacing,
                 AllowDamage,
                 AllowCrafting,
-                AllowInteraction
+                AllowInteraction,
+                RegenerateOnKill
             )
         }
     }
@@ -193,6 +202,7 @@ sealed class ArenaSetting<T>(
                 defaultSettings["allowDamage"] = true
                 defaultSettings["allowCrafting"] = false
                 defaultSettings["allowInteraction"] = false
+                defaultSettings["regenerateOnKill"] = false
                 
                 defaultSettings["spawnAllowDamage"] = false
                 defaultSettings["spawnAllowBlockBreaking"] = false

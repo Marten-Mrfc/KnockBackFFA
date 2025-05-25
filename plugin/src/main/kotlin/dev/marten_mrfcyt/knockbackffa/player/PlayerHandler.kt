@@ -6,6 +6,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.currentArena
 import dev.marten_mrfcyt.knockbackffa.arena.utils.ArenaSetting
 import mlib.api.utilities.debug
 import org.bukkit.Material
+import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.EventPriority
@@ -15,6 +16,7 @@ import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPlaceEvent
 import org.bukkit.event.entity.EntityDamageEvent
 import org.bukkit.event.entity.EntityPickupItemEvent
+import org.bukkit.event.entity.PlayerDeathEvent
 import org.bukkit.event.inventory.CraftItemEvent
 import org.bukkit.event.player.PlayerDropItemEvent
 import org.bukkit.event.player.PlayerEvent
@@ -125,28 +127,28 @@ class PlayerHandler(private val plugin: KnockBackFFA) : Listener {
             event.from.blockY == event.to.blockY &&
             event.from.blockZ == event.to.blockZ
         ) return
-
         val player = event.player
-        when {
-            player.foodLevel < 20 -> {
-                player.foodLevel = 20
-                debug(plugin, "Reset ${player.name}'s hunger to 20")
-            }
-            player.saturation < 20 -> {
-                player.saturation = 20f
-                debug(plugin, "Reset ${player.name}'s saturation to 20")
-            }
-            player.exhaustion > 0 -> {
-                player.exhaustion = 0f
-                debug(plugin, "Reset ${player.name}'s exhaustion to 0")
-            }
-            player.health < 20 -> {
-                player.health = 20.0
-                debug(plugin, "Reset ${player.name}'s health to 20")
-            }
+        val current = currentArena ?: return
+        val regenerateOnKill = current.getSetting(ArenaSetting.Global.RegenerateOnKill)
+        if (!regenerateOnKill) {
+            player.health = 20.0
+            player.foodLevel = 20
+            player.saturation = 20f
+            debug(plugin, "Reset ${player.name}'s health to 20, move")
         }
     }
-
+    @EventHandler(priority = EventPriority.LOW)
+    fun onPlayerKillOtherPlayer(event: PlayerDeathEvent) {
+        val player = event.player.killer ?: return
+        val current = currentArena ?: return
+        val regenerateOnKill = current.getSetting(ArenaSetting.Global.RegenerateOnKill)
+        if (regenerateOnKill) {
+            player.health = 20.0
+            player.foodLevel = 20
+            player.saturation = 20f
+            debug(plugin, "Reset ${player.name}'s health to 20, kill")
+        }
+    }
 
     /**
      * Handler for block placing
