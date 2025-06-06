@@ -134,7 +134,6 @@ class PlayerHandler(private val plugin: KnockBackFFA) : Listener {
             player.health = 20.0
             player.foodLevel = 20
             player.saturation = 20f
-            debug(plugin, "Reset ${player.name}'s health to 20, move")
         }
     }
     @EventHandler(priority = EventPriority.LOW)
@@ -146,7 +145,6 @@ class PlayerHandler(private val plugin: KnockBackFFA) : Listener {
             player.health = 20.0
             player.foodLevel = 20
             player.saturation = 20f
-            debug(plugin, "Reset ${player.name}'s health to 20, kill")
         }
     }
 

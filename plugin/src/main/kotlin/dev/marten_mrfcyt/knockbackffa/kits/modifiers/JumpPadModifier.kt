@@ -5,6 +5,7 @@ import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
+import mlib.api.utilities.debug
 import mlib.api.utilities.getCustomValue
 import mlib.api.utilities.message
 import org.bukkit.Material
@@ -48,8 +49,8 @@ object JumpPadModifier : ModifyObject(
             block.setMetadata("slot", FixedMetadataValue(plugin, slot))
             
             val delay = kitConfig.getInt("kit.$kitName.items.$slot.modifiers.delay", 10)
-            plugin.logger.info("[JumpPadModifier] Setting jump pad delay for ${player.name} to ${delay} seconds")
-            
+            debug("[JumpPadModifier] Setting jump pad delay for ${player.name} to $delay seconds")
+
             object : BukkitRunnable() {
                 override fun run() {
                     block.type = Material.AIR
