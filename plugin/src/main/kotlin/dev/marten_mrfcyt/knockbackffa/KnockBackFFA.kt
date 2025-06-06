@@ -5,6 +5,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.editor.ArenaCreationHandler
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaHandler
 import dev.marten_mrfcyt.knockbackffa.arena.ArenaInitializer
 import dev.marten_mrfcyt.knockbackffa.arena.editor.SelectionManager
+import dev.marten_mrfcyt.knockbackffa.arena.utils.DeathBlock
 import dev.marten_mrfcyt.knockbackffa.boosts.managers.BoostManager
 import dev.marten_mrfcyt.knockbackffa.boosts.managers.PlayerBoostManager
 import dev.marten_mrfcyt.knockbackffa.kits.KitLayoutManager
@@ -77,6 +78,7 @@ class KnockBackFFA : KotlinPlugin() {
         printReadyMessage()
     }
     override fun onDisable() {
+        DeathBlock().cleanup()
         try {
             logger.info("Saving all player data before shutdown...")
             val playerData = PlayerData.getInstanceIfInitialized()
