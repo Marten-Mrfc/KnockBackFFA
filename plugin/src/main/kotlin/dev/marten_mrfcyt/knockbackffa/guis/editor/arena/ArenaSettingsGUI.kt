@@ -49,18 +49,13 @@ class ArenaSettingsGUI(private val plugin: KnockBackFFA, private val player: Pla
             slots(4)
         }
         
-        // Dynamically create global settings
-        val settings = ArenaSetting.Global.values
+        // Get all global settings safely
+        val settings = ArenaSetting.Global.getAllSettings()
+        debug("Loading ${settings.size} global settings")
         
         // Calculate slots based on the number of settings
         // Two rows of settings, 7 per row
         settings.forEachIndexed { index, setting ->
-            // Skip any null settings to prevent NullPointerException
-            if (setting == null) {
-                debug("Null setting found at index $index in Global settings")
-                return@forEachIndexed
-            }
-
             val row = index / 7
             val col = index % 7
             val slot = 10 + (row * 9) + col
@@ -94,19 +89,15 @@ class ArenaSettingsGUI(private val plugin: KnockBackFFA, private val player: Pla
     private fun setupToggleSetting(material: Material, key: String, title: String, description: String, slot: Int) {
         val arena = this.arena ?: return
 
-        // Find the setting but handle potential nulls safely
-        val setting = ArenaSetting.Global.values.find { it?.key == key }
+        // Find the setting by key using the improved method
+        val setting = ArenaSetting.Global.findByKey(key)
         
-        val currentValue = try {
-            if (setting == null) {
-                debug("Setting with key $key not found in Global settings")
-                false
-            } else {
-                ArenaSetting.getValue(arena.settings, setting)
-            }
-        } catch (e: Exception) {
-            debug("Error getting setting value for $key: ${e.message}")
-            false  // Default to false on error
+        val currentValue = if (setting != null) {
+            arena.getSetting(setting)
+        } else {
+            // Fallback to map lookup for backwards compatibility
+            debug("Setting with key $key not found in Global settings, using fallback")
+            arena.settings[key] as? Boolean ?: false
         }
         
         val statusText = if (currentValue) translate("arena.settings.enabled") else translate("arena.settings.disabled")

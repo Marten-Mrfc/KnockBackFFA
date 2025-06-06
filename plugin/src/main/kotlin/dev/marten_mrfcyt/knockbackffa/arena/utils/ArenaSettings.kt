@@ -87,7 +87,7 @@ sealed class ArenaSetting<T>(
         )
 
         companion object {
-            val values = listOf(
+            val values: List<Global> = listOf(
                 AllowDropping,
                 AllowPickUp,
                 AllowBlockBreaking,
@@ -97,6 +97,16 @@ sealed class ArenaSetting<T>(
                 AllowInteraction,
                 RegenerateOnKill
             )
+            
+            /**
+             * Get all global settings as a non-nullable list
+             */
+            fun getAllSettings(): List<Global> = values
+            
+            /**
+             * Find a setting by its key
+             */
+            fun findByKey(key: String): Global? = values.find { it.key == key }
         }
     }
     
@@ -159,7 +169,7 @@ sealed class ArenaSetting<T>(
         )
 
         companion object {
-            val values = listOf(
+            val values: List<Spawn> = listOf(
                 AllowDamage,
                 AllowBlockBreaking,
                 AllowDropping,
@@ -167,6 +177,16 @@ sealed class ArenaSetting<T>(
                 AllowPickup,
                 AllowInteraction
             )
+            
+            /**
+             * Get all spawn settings as a non-nullable list
+             */
+            fun getAllSettings(): List<Spawn> = values
+            
+            /**
+             * Find a setting by its key
+             */
+            fun findByKey(key: String): Spawn? = values.find { it.key == key }
         }
     }
     
@@ -179,41 +199,45 @@ sealed class ArenaSetting<T>(
             val defaultSettings = mutableMapOf<String, Any>()
             
             try {
-                // Safety check for Global values
-                for (setting in Global.values) {
+                // Add all global settings with their default values
+                Global.getAllSettings().forEach { setting ->
                     defaultSettings[setting.key] = setting.defaultValue
                 }
                 
-                // Safety check for Spawn values
-                for (setting in Spawn.values) {
+                // Add all spawn settings with their default values
+                Spawn.getAllSettings().forEach { setting ->
                     defaultSettings[setting.key] = setting.defaultValue
                 }
             } catch (e: Exception) {
                 println("WARNING: Error creating arena default settings: ${e.message}")
                 e.printStackTrace()
-            }
-            
-            // Add some hardcoded defaults as a fallback
-            if (defaultSettings.isEmpty()) {
-                defaultSettings["allowDropping"] = false
-                defaultSettings["allowPickUp"] = false
-                defaultSettings["allowBlockBreaking"] = false
-                defaultSettings["allowBlockPlacing"] = true
-                defaultSettings["allowDamage"] = true
-                defaultSettings["allowCrafting"] = false
-                defaultSettings["allowInteraction"] = false
-                defaultSettings["regenerateOnKill"] = false
                 
-                defaultSettings["spawnAllowDamage"] = false
-                defaultSettings["spawnAllowBlockBreaking"] = false
-                defaultSettings["spawnAllowDropping"] = false
-                defaultSettings["spawnAllowBuilding"] = false
-                defaultSettings["spawnAllowPickup"] = false
-                defaultSettings["spawnAllowInteraction"] = false
+                // Add hardcoded defaults as a fallback
+                defaultSettings.putAll(getHardcodedDefaults())
             }
             
             return defaultSettings
         }
+        
+        /**
+         * Hardcoded fallback defaults in case of errors
+         */
+        private fun getHardcodedDefaults(): Map<String, Any> = mapOf(
+            "allowDropping" to false,
+            "allowPickUp" to false,
+            "allowBlockBreaking" to false,
+            "allowBlockPlacing" to true,
+            "allowDamage" to true,
+            "allowCrafting" to false,
+            "allowInteraction" to false,
+            "regenerateOnKill" to false,
+            "spawnAllowDamage" to false,
+            "spawnAllowBlockBreaking" to false,
+            "spawnAllowDropping" to false,
+            "spawnAllowBuilding" to false,
+            "spawnAllowPickup" to false,
+            "spawnAllowInteraction" to false
+        )
         
         /**
          * Get a setting from the arena settings map with type safety

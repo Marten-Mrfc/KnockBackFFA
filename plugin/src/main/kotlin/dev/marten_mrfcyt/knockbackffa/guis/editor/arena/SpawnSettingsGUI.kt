@@ -7,6 +7,7 @@ import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.transla
 import mlib.api.gui.GuiSize
 import mlib.api.gui.types.StandardGui
 import mlib.api.utilities.asMini
+import mlib.api.utilities.debug
 import mlib.api.utilities.sendMini
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -45,18 +46,13 @@ class SpawnSettingsGUI(private val plugin: KnockBackFFA, private val player: Pla
     }
     
     private fun setupToggleSettings() {
-        // Dynamically create settings from enum values
-        val settings = ArenaSetting.Spawn.values
+        // Get all spawn settings safely
+        val settings = ArenaSetting.Spawn.getAllSettings()
+        debug(plugin, "Loading ${settings.size} spawn settings")
         
         // Calculate slots based on the number of settings
         // Starting at slot 10 (top row + 1)
         settings.forEachIndexed { index, setting ->
-            // Skip any null settings to prevent NullPointerException
-            if (setting == null) {
-                debug("Null setting found at index $index in Spawn settings")
-                return@forEachIndexed
-            }
-            
             val slot = 10 + index
             setupToggleSetting(
                 setting.icon,
@@ -71,19 +67,15 @@ class SpawnSettingsGUI(private val plugin: KnockBackFFA, private val player: Pla
     private fun setupToggleSetting(material: Material, key: String, title: String, description: String, slot: Int) {
         val arena = this.arena ?: return
 
-        // Find the setting but handle potential nulls safely
-        val setting = ArenaSetting.Spawn.values.find { it?.key == key }
+        // Find the setting by key using the improved method
+        val setting = ArenaSetting.Spawn.findByKey(key)
         
-        val currentValue = try {
-            if (setting == null) {
-                debug("Setting with key $key not found in Spawn settings")
-                false
-            } else {
-                ArenaSetting.getValue(arena.settings, setting)
-            }
-        } catch (e: Exception) {
-            debug("Error getting setting value for $key: ${e.message}")
-            false  // Default to false on error
+        val currentValue = if (setting != null) {
+            arena.getSetting(setting)
+        } else {
+            // Fallback to map lookup for backwards compatibility
+            debug(plugin, "Setting with key $key not found in Spawn settings, using fallback")
+            arena.settings[key] as? Boolean ?: false
         }
 
         val enabledColor = if (currentValue) "<green>" else "<red>"
@@ -111,9 +103,5 @@ class SpawnSettingsGUI(private val plugin: KnockBackFFA, private val player: Pla
         val currentValue = arena.settings[key] as? Boolean ?: false
         plugin.arenaHandler.updateArenaSetting(arenaName, key, !currentValue, player, true)
         this.arena = plugin.arenaHandler.loadArenaByName(arenaName) // Reload arena after updating
-    }
-    
-    private fun debug(message: String) {
-        mlib.api.utilities.debug(plugin, "[SpawnSettingsGUI] $message")
     }
 }

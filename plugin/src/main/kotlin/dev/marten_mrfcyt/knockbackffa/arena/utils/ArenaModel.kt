@@ -31,19 +31,41 @@ data class ArenaModel(
                 location.y >= min.y && location.y <= max.y &&
                 location.z >= min.z && location.z <= max.z
     }
-    
-    /**
+      /**
      * Get a setting value with type safety
      */
     fun <T> getSetting(setting: ArenaSetting<T>?): T {
-        return try {
-            ArenaSetting.getValue(settings, setting)
-        } catch (e: Exception) {
-            // In case of any error, return a sensible default
-            when (setting) {
-                is ArenaSetting.Global.AllowDamage -> true as T // Allow damage by default
-                else -> false as T // Most other settings default to false
-            }
+        if (setting == null) {
+            // Return a sensible default for null settings
+            @Suppress("UNCHECKED_CAST")
+            return false as T
         }
+        
+        return try {
+            val value = settings[setting.key]
+            if (value != null) {
+                @Suppress("UNCHECKED_CAST")
+                value as T
+            } else {
+                setting.defaultValue
+            }
+        } catch (e: Exception) {
+            // In case of any error, return the setting's default value
+            setting.defaultValue
+        }
+    }
+    
+    /**
+     * Check if a global setting is enabled
+     */
+    fun isGlobalSettingEnabled(setting: ArenaSetting.Global): Boolean {
+        return getSetting(setting)
+    }
+    
+    /**
+     * Check if a spawn setting is enabled
+     */
+    fun isSpawnSettingEnabled(setting: ArenaSetting.Spawn): Boolean {
+        return getSetting(setting)
     }
 }
