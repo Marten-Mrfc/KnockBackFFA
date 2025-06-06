@@ -2,7 +2,6 @@ package dev.marten_mrfcyt.knockbackffa.kits.modifiers
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
-import dev.marten_mrfcyt.knockbackffa.kits.managers.KitManager
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
 import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
@@ -83,7 +82,7 @@ object DelayModifier : ModifyObject(
             )
 
             // Get the kit manager and the player's current kit
-            val kitManager = KitManager(plugin)
+            val kitManager = KnockBackFFA.kitManager
             val kit = kitManager.getKit(kitName)
             // Always restore arrows on the next tick
             object : BukkitRunnable() {

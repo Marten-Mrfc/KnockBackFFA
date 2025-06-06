@@ -4,7 +4,6 @@ import dev.marten_mrfcyt.knockbackffa.kits.models.ModifyObject
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
 import dev.marten_mrfcyt.knockbackffa.kits.KitSlotResolver
 import dev.marten_mrfcyt.knockbackffa.kits.models.KitModifier
-import dev.marten_mrfcyt.knockbackffa.kits.managers.KitManager
 import dev.marten_mrfcyt.knockbackffa.utils.PlayerData
 import org.bukkit.Material
 import org.bukkit.block.Block
@@ -99,17 +98,21 @@ object BuildBlockModifier : ModifyObject(
                 "slot" to originalKitSlot,
                 "kit_name" to kitName
             )
-
-            KnockBackFFA.instance.modifierManager.handleEvent(player, event.itemInHand, args, id)
-
-            val kit = KitManager(plugin).getKit(kitName)
+            val kit = KnockBackFFA.kitManager.getKit(kitName)
             val amount = kit.items[originalKitSlot]?.amount
-
+            
+            // Check if the item has the buildblock modifier enabled
+            val hasModifier = kit.items[originalKitSlot]?.modifiers?.filter { it.value == true }?.keys?.contains(id) ?: false
+            if (!hasModifier) {
+                return
+            }
+            
+            println("${kit.items[originalKitSlot]?.modifiers?.filter { it.value == true }?.keys}" + "${kit.items[originalKitSlot]?.modifiers?.filter { it.value == true }?.values}")
             if (amount == null) {
                 plugin.logger.warning("[BuildBlockModifier] Could not find original kit item amount for slot $originalKitSlot in kit $kitName")
                 return
             }
-
+            KnockBackFFA.instance.modifierManager.handleEvent(player, event.itemInHand, args, id)
             // Reset the item amount to the original kit amount based on which hand was used
             val item = if (hand == EquipmentSlot.OFF_HAND) {
                 player.inventory.itemInOffHand

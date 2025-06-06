@@ -1,6 +1,7 @@
 package dev.marten_mrfcyt.knockbackffa.player
 
 import dev.marten_mrfcyt.knockbackffa.KnockBackFFA
+import dev.marten_mrfcyt.knockbackffa.arena.currentArena
 import dev.marten_mrfcyt.knockbackffa.kits.loadKit
 import dev.marten_mrfcyt.knockbackffa.utils.TranslationManager.Companion.translateListRandom
 import mlib.api.utilities.asMini
@@ -21,11 +22,12 @@ class PlayerJoinListener(
         scoreboardHandler.startUpdatingScoreboard(source)
         bossBarHandler.showBossBar(source)
 
-        val currentArena = KnockBackFFA.instance.config.get("currentLocation") as? Location
+        val currentArena = currentArena
         if (currentArena != null) {
-            debug("Teleporting ${source.name} to current arena at ${currentArena.x}, ${currentArena.y}, ${currentArena.z}")
+            val spawnLocation = currentArena.spawnpoint
+            debug("Teleporting ${source.name} to current arena at ${spawnLocation.x}, ${spawnLocation.y}, ${spawnLocation.z}")
             loadKit(KnockBackFFA.instance, source, true)
-            source.teleport(currentArena)
+            source.teleport(spawnLocation)
         } else {
             debug("No current arena location found for ${source.name}")
         }
