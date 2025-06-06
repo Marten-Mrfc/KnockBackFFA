@@ -61,8 +61,7 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
         }
 
         plugin.server.scheduler.runTaskLater(plugin, Runnable {
-            saveEntireLayout(event.player)
-        }, 1L)
+            saveEntireLayout(event.player)        }, 1L)
     }
 
     private fun saveEntireLayout(player: Player) {
@@ -72,6 +71,9 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
 
             val activeKitName = playerData.kit ?: "default"
             val kit = KnockBackFFA.kitManager.getKit(activeKitName)
+            
+            // Get existing layout to distinguish between consumed items and truly missing items
+            val existingLayout = playerData.kitLayouts[activeKitName] ?: emptyMap()
 
             val inventory = player.inventory
             val finalLayout = mutableMapOf<Int, Int>() // originalKitSlot -> currentInventorySlot
@@ -100,7 +102,6 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
                         }
                     }
                 }
-
                 if (foundActualSlot != -1) {
                     foundKitItemsInfo.add(Triple(origSlotInKit, kitItemDefinition, foundActualSlot))
                 } else {
@@ -111,7 +112,15 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
             // Determine which original kit slots correspond to items that are now missing
             val allOriginalSlots = kit.items.keys
             val foundOriginalSlots = foundKitItemsInfo.map { it.first }.toSet()
-            val missingOriginalSlots = allOriginalSlots - foundOriginalSlots
+            val notFoundSlots = allOriginalSlots - foundOriginalSlots            // Only consider items as "missing" if they were never moved from their default position
+            // Items that were moved (exist in layout) but are now consumed should not be considered missing
+            val missingOriginalSlots = notFoundSlots.filter { originalSlot ->
+                val wasItemMoved = existingLayout.containsKey(originalSlot) && existingLayout[originalSlot] != originalSlot
+                !wasItemMoved // Item is truly missing only if it was never moved from its default position
+            }.toSet()
+            
+            mlib.api.utilities.debug(plugin, "[KitLayoutManager] Player ${player.name}: ExistingLayout: $existingLayout")
+            mlib.api.utilities.debug(plugin, "[KitLayoutManager] Player ${player.name}: Found items: $foundOriginalSlots, Not found: $notFoundSlots, Truly missing: $missingOriginalSlots")
 
             // Pass 2: Populate finalLayout, correcting positions if they conflict with default slots of missing items
             for ((origSlotOfFoundItem, _, actualSlotOfFoundItem) in foundKitItemsInfo) {
@@ -156,7 +165,21 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
                     finalLayout[origSlotOfFoundItem] = actualSlotOfFoundItem
                 }
             }
+            
+            // Preserve layout entries for consumed items that were previously moved
+            // This prevents the system from thinking they were never moved
+            for ((originalSlot, currentSlot) in existingLayout) {
+                if (!foundOriginalSlots.contains(originalSlot) && !finalLayout.containsKey(originalSlot)) {
+                    // This item was moved before but is now missing (consumed)
+                    // Preserve the layout entry to remember it was moved
+                    finalLayout[originalSlot] = currentSlot
+                    mlib.api.utilities.debug(plugin, "[KitLayoutManager] Preserved layout for consumed item: $originalSlot -> $currentSlot")
+                }
+            }
+            
             updateLayoutInPlayerData(player.uniqueId, activeKitName, finalLayout)
+            
+            mlib.api.utilities.debug(plugin, "[KitLayoutManager] Player ${player.name}: Final layout saved: $finalLayout")
 
         } catch (e: Exception) {
             plugin.logger.log(Level.SEVERE, "[KitLayoutManager] Error saving entire kit layout", e)
@@ -171,9 +194,7 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
             plugin.logger.log(Level.WARNING, "[KitLayoutManager] Error comparing items", e)
             false
         }
-    }
-
-    private fun updateLayoutInPlayerData(playerId: UUID, kitName: String, layout: Map<Int, Int>) {
+    }    private fun updateLayoutInPlayerData(playerId: UUID, kitName: String, layout: Map<Int, Int>) {
         try {
             val playerDataInstance = PlayerData.getInstance(plugin)
             val playerData = playerDataInstance.getPlayerDataModel(playerId)
@@ -192,11 +213,16 @@ class KitLayoutManager(private val plugin: KnockBackFFA) : Listener {
                     }
                 }
             }
+
             if(layout == existingLayout) {
                 mlib.api.utilities.debug(plugin, "[KitLayoutManager] No changes to layout for kit '$kitName' for player ${player?.name ?: playerId}. Not updating.")
                 return
             }
+            
+            mlib.api.utilities.debug(plugin, "[KitLayoutManager] Updating layout for kit '$kitName' for player ${player?.name ?: playerId}. Old: $existingLayout, New: $layout")
+            
             if (layout.isEmpty()) {
+                mlib.api.utilities.debug(plugin, "[KitLayoutManager] New layout is empty, removing kit layout for '$kitName'")
                 updatedLayouts.remove(kitName)
             } else {
                 updatedLayouts[kitName] = layout
