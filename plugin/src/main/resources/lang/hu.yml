@@ -367,3 +367,22 @@ modifiers:
     prompt: "Adj meg egy értéket: <name>"
   events:
     registered: "👂 <listeners> módosító figyelő és <static> statikus módosító regisztrálva"
+combat:
+  kill:
+    traditional: "<green>+<coins> coins <gray>(Kill)"
+  enhanced:
+    kill:
+      reward: "<green>+<coins> coins <gray>(<contribution>% contribution) <dark_gray>- <context>"
+    major-assist:
+      reward: "<gold>Major Assist: <green>+<coins> coins <gray>(<contribution>%)"
+    assist:
+      reward: "<yellow>Assist: <green>+<coins> coins <gray>(<contribution>%)"
+    minor-assist:
+      reward: "<gray>Minor Assist: <green>+<coins> coins <gray>(<contribution>%)"
+    environmental-assist:
+      reward: "<aqua>Environmental Assist: <green>+<coins> coins <gray>(<contribution>%)"
+    participation:
+      reward: "<dark_gray>Participation: <green>+<coins> coins <gray>(<contribution>%)"
+    bonuses: "<gray>Bonuses: <bonuses>"
+    achievement: "<gold>Achievement Unlocked: <yellow><achievement><gold>!"
+    experience: "<aqua>+<experience> XP"
