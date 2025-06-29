@@ -59,8 +59,16 @@ class PlaceHolderAPI(private val knockBackFFA: KnockBackFFA) : PlaceholderExpans
             }
 
             "kd-ratio" -> {
-                playerDataModel.kdRatio.toString()
+                val raw = playerDataModel.kdRatio
+                val rounded = (raw * 100).toInt() / 100.0
+                val formatted = if (rounded == 0.0) {
+                    "0"
+                } else {
+                    rounded.toString().trimEnd('0').trimEnd('.')
+                }
+                formatted
             }
+
 
             "map" -> {
                 plugin.config.getString("currentArena", "No current arena")

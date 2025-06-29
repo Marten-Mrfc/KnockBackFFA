@@ -17,6 +17,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 
 class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
+    
     @EventHandler
     fun onPlayerKill(event: PlayerDeathEvent) {
         event.drops.clear()
@@ -25,6 +26,7 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
 
         debug(plugin, "Player ${source.name} died" + if (killer != null) " killed by ${killer.name}" else " (not by a player)")
 
+        // Handle death messages
         if (killer != null) {
             val message = translateListRandom("player.killed_by_message",
                 "player_name" to source.name,
@@ -41,54 +43,12 @@ class ScoreHandler(private val plugin: KnockBackFFA) : Listener {
                 event.deathMessage(message.asMini())
             } else {
                 event.deathMessage(null)
-            }
-        }
+            }        }
 
         source.inventory.clear()
-
-        try {
-            val playerDataInstance = PlayerData.getInstance(plugin)
-
-            val sourceDataModel = playerDataInstance.getPlayerDataModel(source.uniqueId)
-            sourceDataModel.apply {
-                deaths += 1
-                killstreak = 0
-
-                val df = DecimalFormat("#.##")
-                df.roundingMode = RoundingMode.CEILING
-                val kdRatio = if (deaths != 0) kills.toDouble() / deaths else kills.toDouble()
-                val kdRatioRounded = df.format(kdRatio).replace(',', '.').toDouble()
-                this.kdRatio = kdRatioRounded
-            }
-            playerDataInstance.savePlayerDataModel(source.uniqueId, sourceDataModel)
-
-            killer?.let { killerPlayer ->
-                val killerDataModel = playerDataInstance.getPlayerDataModel(killerPlayer.uniqueId)
-                killerDataModel.apply {
-                    kills += 1
-                    killstreak += 1
-                    coins += 1
-
-                    if (killstreak > maxKillstreak) {
-                        maxKillstreak = killstreak
-                    }
-
-                    val df = DecimalFormat("#.##")
-                    df.roundingMode = RoundingMode.CEILING
-                    val killerKdRatio = if (deaths != 0) kills.toDouble() / deaths else kills.toDouble()
-                    val killerKdRatioRounded = df.format(killerKdRatio).replace(',', '.').toDouble()
-                    this.kdRatio = killerKdRatioRounded
-                }
-                playerDataInstance.savePlayerDataModel(killerPlayer.uniqueId, killerDataModel)
-            }
-        } catch (e: Exception) {
-            plugin.logger.severe(TranslationManager.translate("error.data_save",
-                "error" to e.message.toString()))
-            e.printStackTrace()
-            plugin.server.onlinePlayers.forEach {
-                it.error(TranslationManager.translate("error.data_save_admin"))
-            }
-        }
+        
+        // The combat system handles kill/death processing through its event listeners
+        // This ScoreHandler only handles death messages and respawning
     }
 
     @EventHandler

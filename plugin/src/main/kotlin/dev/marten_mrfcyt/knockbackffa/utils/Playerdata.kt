@@ -51,11 +51,10 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                 }
 
                 val statements = mapOf(
-                    "select" to "SELECT * FROM player_data WHERE player_id = ?",
-                    "replace" to """
-                        REPLACE INTO player_data (player_id, kit, deaths, kills, killstreak, max_killstreak,
-                        coins, kd_ratio, owned_kits, boosts, kit_layouts, boost_timings) 
-                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    "select" to "SELECT * FROM player_data WHERE player_id = ?",                    "replace" to """
+                        REPLACE INTO player_data (player_id, kit, deaths, kills, assists, killstreak, max_killstreak,
+                        coins, kd_ratio, damage_dealt, owned_kits, boosts, kit_layouts, boost_timings) 
+                        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     """.trimIndent(),
                     "sum_kills" to "SELECT SUM(kills) FROM player_data"
                 )
@@ -107,18 +106,18 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                 throw IllegalStateException("Failed to check or migrate database", e)
             }
         } ?: plugin.logger.severe("Cannot check database structure: connection is null")
-    }
-
-    private fun getExpectedColumns(): Map<String, String> {
+    }    private fun getExpectedColumns(): Map<String, String> {
         return mapOf(
             "player_id" to "VARCHAR(36) NOT NULL PRIMARY KEY",
             "kit" to "VARCHAR(255)",
             "deaths" to "INT DEFAULT 0",
             "kills" to "INT DEFAULT 0",
+            "assists" to "INT DEFAULT 0",
             "killstreak" to "INT DEFAULT 0",
             "max_killstreak" to "INT DEFAULT 0",
             "coins" to "INT DEFAULT 0",
             "kd_ratio" to "DOUBLE DEFAULT 0",
+            "damage_dealt" to "DOUBLE DEFAULT 0",
             "owned_kits" to "TEXT",
             "boosts" to "TEXT",
             "kit_layouts" to "TEXT",
@@ -128,17 +127,18 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
     private fun createPlayerDataTable() {
         try {
             debug( "Creating player_data table if it doesn't exist")
-            mysqlHandler.getConnection()?.createStatement()?.use { statement ->
-                statement.executeUpdate("""
+            mysqlHandler.getConnection()?.createStatement()?.use { statement ->                statement.executeUpdate("""
                     CREATE TABLE IF NOT EXISTS player_data (
                         player_id VARCHAR(36) NOT NULL,
                         kit VARCHAR(255),
                         deaths INT DEFAULT 0,
                         kills INT DEFAULT 0,
+                        assists INT DEFAULT 0,
                         killstreak INT DEFAULT 0,
                         max_killstreak INT DEFAULT 0,
                         coins INT DEFAULT 0,
                         kd_ratio DOUBLE DEFAULT 0,
+                        damage_dealt DOUBLE DEFAULT 0,
                         owned_kits TEXT,
                         boosts TEXT,
                         kit_layouts TEXT,
@@ -216,9 +216,7 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
         } catch (e: Exception) {
             throw IllegalStateException("Error saving player data to file", e)
         }
-    }
-
-    fun savePlayerDataToMySQL(playerId: UUID, model: PlayerDataModel) {
+    }    fun savePlayerDataToMySQL(playerId: UUID, model: PlayerDataModel) {
         mysqlHandler.getConnection()?.let { _ ->
             try {
                 preparedStatements["replace"]?.apply {
@@ -226,14 +224,16 @@ class PlayerData private constructor(private val plugin: KnockBackFFA) {
                     setString(2, model.kit)
                     setInt(3, model.deaths)
                     setInt(4, model.kills)
-                    setInt(5, model.killstreak)
-                    setInt(6, model.maxKillstreak)
-                    setInt(7, model.coins)
-                    setDouble(8, model.kdRatio)
-                    setString(9, model.ownedKits.joinToString(","))
-                    setString(10, model.boosts.joinToString(","))
-                    setString(11, serializeKitLayouts(model.kitLayouts))
-                    setString(12, PlayerDataSerializer.serializeBoostTimings(model.boostTimings))
+                    setInt(5, model.assists)
+                    setInt(6, model.killstreak)
+                    setInt(7, model.maxKillstreak)
+                    setInt(8, model.coins)
+                    setDouble(9, model.kdRatio)
+                    setDouble(10, model.damageDealt)
+                    setString(11, model.ownedKits.joinToString(","))
+                    setString(12, model.boosts.joinToString(","))
+                    setString(13, serializeKitLayouts(model.kitLayouts))
+                    setString(14, PlayerDataSerializer.serializeBoostTimings(model.boostTimings))
                     executeUpdate()
                 }
             } catch (e: Exception) {

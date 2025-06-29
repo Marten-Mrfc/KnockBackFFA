@@ -8,6 +8,7 @@ import dev.marten_mrfcyt.knockbackffa.arena.editor.SelectionManager
 import dev.marten_mrfcyt.knockbackffa.arena.utils.DeathBlock
 import dev.marten_mrfcyt.knockbackffa.boosts.managers.BoostManager
 import dev.marten_mrfcyt.knockbackffa.boosts.managers.PlayerBoostManager
+import dev.marten_mrfcyt.knockbackffa.combat.CombatManager
 import dev.marten_mrfcyt.knockbackffa.kits.KitLayoutManager
 import dev.marten_mrfcyt.knockbackffa.kits.managers.KitManager
 import dev.marten_mrfcyt.knockbackffa.kits.managers.ModifierManager
@@ -78,7 +79,6 @@ class KnockBackFFA : KotlinPlugin() {
         printReadyMessage()
     }
     override fun onDisable() {
-        DeathBlock().cleanup()
         try {
             logger.info("Saving all player data before shutdown...")
             val playerData = PlayerData.getInstanceIfInitialized()
@@ -220,8 +220,7 @@ class KnockBackFFA : KotlinPlugin() {
         boostsCommand()
         logger.info(TranslationManager.translate("plugin.commands_ready"))
     }    
-    
-    private fun registerListeners() {
+      private fun registerListeners() {
         logger.info(TranslationManager.translate("plugin.registering_events"))
         registerEvents(
             PlayerJoinListener(ScoreboardHandler(this), BossBarHandler(this)),
@@ -230,11 +229,12 @@ class KnockBackFFA : KotlinPlugin() {
             PlayerHandler(this),
             SpawnRegionHandler(this),
             KitLayoutManager(this),
+            CombatManager(this),
         )
 
         arenaInitializer.setupArenaSystem()
 
-        logger.info(TranslationManager.translate("plugin.events_registered", "count" to 6))
+        logger.info(TranslationManager.translate("plugin.events_registered", "count" to 7))
     }
 
     private fun setupPlaceholders() {

@@ -7,34 +7,35 @@ import org.bukkit.configuration.file.YamlConfiguration
 import java.sql.ResultSet
 import java.util.UUID
 
-object PlayerDataSerializer {
-    fun fromResultSet(rs: ResultSet, playerId: UUID): PlayerDataModel {
+object PlayerDataSerializer {    fun fromResultSet(rs: ResultSet, playerId: UUID): PlayerDataModel {
         return PlayerDataModel(
             playerId = playerId,
             kit = rs.getString("kit"),
             deaths = rs.getInt("deaths"),
             kills = rs.getInt("kills"),
+            assists = rs.getInt("assists"),
             killstreak = rs.getInt("killstreak"),
             maxKillstreak = rs.getInt("max_killstreak"),
             coins = rs.getInt("coins"),
             kdRatio = rs.getDouble("kd_ratio"),
+            damageDealt = rs.getDouble("damage_dealt"),
             ownedKits = rs.getString("owned_kits")?.splitToList() ?: emptyList(),
             boosts = rs.getString("boosts")?.splitToList() ?: emptyList(),
             kitLayouts = rs.getString("kit_layouts")?.parseKitLayoutsString() ?: emptyMap(),
             boostTimings = rs.getString("boost_timings")?.parseBoostTimingsString() ?: emptyMap()
         )
-    }
-
-    fun fromYaml(config: YamlConfiguration, playerId: UUID): PlayerDataModel {
+    }fun fromYaml(config: YamlConfiguration, playerId: UUID): PlayerDataModel {
         val model = PlayerDataModel(playerId = playerId)
 
         model.kit = config.getString("kit")
         model.deaths = config.getInt("deaths")
         model.kills = config.getInt("kills")
+        model.assists = config.getInt("assists", 0)
         model.killstreak = config.getInt("killstreak")
         model.maxKillstreak = config.getInt("max-killstreak")
         model.coins = config.getInt("coins")
         model.kdRatio = config.getDouble("kd-ratio")
+        model.damageDealt = config.getDouble("damage-dealt", 0.0)
         model.ownedKits = config.getStringList("owned_kits")
         model.boosts = config.getStringList("boosts")
 
@@ -49,18 +50,18 @@ object PlayerDataSerializer {
         }
 
         return model
-    }
-
-    fun toYaml(model: PlayerDataModel): YamlConfiguration {
+    }    fun toYaml(model: PlayerDataModel): YamlConfiguration {
         val config = YamlConfiguration()
 
         config.set("kit", model.kit)
         config.set("deaths", model.deaths)
         config.set("kills", model.kills)
+        config.set("assists", model.assists)
         config.set("killstreak", model.killstreak)
         config.set("max-killstreak", model.maxKillstreak)
         config.set("coins", model.coins)
         config.set("kd-ratio", model.kdRatio)
+        config.set("damage-dealt", model.damageDealt)
         config.set("owned_kits", model.ownedKits)
         config.set("boosts", model.boosts)
 

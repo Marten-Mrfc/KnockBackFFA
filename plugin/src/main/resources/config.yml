@@ -41,3 +41,36 @@ storage:
 
 config-version: 1.0.0 # MLib version - Do Not Change
 currentArena: "" # Current arena name
+
+# ###############################
+#                              #
+#        Combat System         #
+#                              #
+# ###############################
+
+combat:
+  # Time in seconds after death to track recent kills for revenge detection
+  revenge-timeout: 30
+
+  # Time in seconds before combat sessions expire (no more damage tracking)
+  session-timeout: 10
+
+  # Minimum damage percentage required to get an assist (5% = 0.05 coins minimum)
+  min-assist-percentage: 5.0
+# ###############################
+#                              #
+#         Kill Rewards         #
+#                              #
+# ###############################
+
+# Kill types and their coin rewards (configured in code):
+# - NORMAL: 1 coin
+# - AERIAL: 5 coins (when killer is airborne)
+# - UNDERDOG: 2 coins (when victim has higher K/D than killer)
+# - REVENGE: 2 coins (when killer was recently killed by victim)
+#
+# Assists are calculated as percentage of total damage:
+# - 10% damage = 0.1 coins
+# - 50% damage = 0.5 coins
+# - 90% damage = 0.9 coins
+# - 100% damage = kill reward (not assist)
